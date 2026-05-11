@@ -590,7 +590,7 @@ function startQ(){
       <span style="font-size:1.8rem">🫀</span>
       <div>
         <div style="font-size:13px;font-weight:900;color:white;letter-spacing:.05em">TÉCNICAS DE REANIMACIÓN CARDIOPULMONAR BÁSICA</div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.65);margin-top:2px">GP Empresas · Prevención de Riesgos · 11 preguntas · 1 punto c/u</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.65);margin-top:2px">GP Empresas · Prevención de Riesgos · 13 preguntas · Alternativas, V/F y Orden</div>
       </div>
       <span style="font-size:1.8rem">💪</span>
     </div>`;
@@ -598,7 +598,18 @@ function startQ(){
     navBar.insertAdjacentElement('afterend', banner);
   }
   document.getElementById('qpl').textContent='0 de '+curQ.questions.length+' respondidas';
-  document.getElementById('qbody').innerHTML=curQ.questions.map((q,i)=>`<div class="qcard"><div class="qnum">Pregunta ${i+1} de ${curQ.questions.length}</div><div class="qtext">${q.text}</div>${q.options.map((o,j)=>`<div class="opt" id="op-${i}-${j}" onclick="selO(${i},${j},${curQ.questions.length})"><div class="ol">${LT[j]}</div><span>${o}</span></div>`).join('')}</div>`).join('');
+  document.getElementById('qbody').innerHTML=curQ.questions.map((q,i)=>{
+    const isVF = q.type==='vf';
+    const isOrder = q.type==='order';
+    const tag = isVF ? '<span style="display:inline-block;background:#1B2A4A;color:white;font-size:10px;font-weight:900;padding:2px 8px;border-radius:99px;margin-bottom:8px;letter-spacing:.05em">V / F</span>' 
+                     : isOrder ? '<span style="display:inline-block;background:#F5811E;color:white;font-size:10px;font-weight:900;padding:2px 8px;border-radius:99px;margin-bottom:8px;letter-spacing:.05em">ORDENAR</span>'
+                     : '<span style="display:inline-block;background:#4A5568;color:white;font-size:10px;font-weight:900;padding:2px 8px;border-radius:99px;margin-bottom:8px;letter-spacing:.05em">ALTERNATIVAS</span>';
+    const opts = q.options.map((o,j)=>{
+      const icon = isVF ? (j===0?'✅ ':'❌ ') : isOrder ? `${j+1}. ` : '';
+      return `<div class="opt" id="op-${i}-${j}" onclick="selO(${i},${j},${curQ.questions.length})"><div class="ol">${isVF||isOrder?j+1:LT[j]}</div><span>${icon}${o}</span></div>`;
+    }).join('');
+    return `<div class="qcard">${tag}<div class="qnum">Pregunta ${i+1} de ${curQ.questions.length}</div><div class="qtext">${q.text}</div>${opts}</div>`;
+  }).join('');
   sp('pqz');
 }
 function selO(qi,oi,tot){
@@ -808,9 +819,48 @@ initDB();
 
 async function insertRCPQuiz(){
   const rcpId = 'rcp-basica-2026';
-  // Check if already exists
-  const {data} = await sb.from('quizzes').select('id').eq('id', rcpId);
-  if(data && data.length > 0) return; // already exists
+  // Siempre actualizar con upsert para reflejar cambios
+
+  const rcpQuiz = {
+    id: rcpId,
+    name: 'RCP Básica - Reanimación Cardiopulmonar',
+    icon: '🫀',
+    questions: [
+      {type:'alt',text:'Ante un trabajador inconsciente, ¿cuáles son los signos fundamentales de un Paro Cardiorrespiratorio (PCR)?',options:['Presión arterial alta y fiebre','Pérdida de consciencia, ausencia de pulso y ausencia de respiración normal','Sudoración excesiva y dolor abdominal','Tos persistente y palidez facial','Dilatación de pupilas y escalofríos'],answer:1},
+      {type:'alt',text:'¿A qué se refiere la regla 30:2 en una reanimación cardiopulmonar?',options:['30 minutos de masaje por 2 minutos de descanso','30 compresiones torácicas seguidas de 2 ventilaciones','30 segundos de evaluación por 2 minutos de compresiones','30 compresiones por 2 personas distintas','30 ventilaciones por cada 2 compresiones'],answer:1},
+      {type:'alt',text:'Al realizar un llamado de emergencia en Chile, ¿a qué número debe llamar y qué información es esencial?',options:['133 (Carabineros); nombre de la empresa','131 (SAMU); dirección exacta, tipo de emergencia y estado de la víctima','132 (Bomberos); nombre completo y RUT','131 (SAMU); solo el nombre de quien llama','800 (ACHS); número de empleados presentes'],answer:1},
+      {type:'alt',text:'¿Qué es la cadena de supervivencia y cuándo se aplica?',options:['Un manual que se lee al llegar al hospital','Una serie de pasos críticos y secuenciales que se aplican de inmediato ante sospecha de PCR','Una estrategia administrativa de registro de accidentes','Un protocolo de evacuación masiva en incendios','Un conjunto de acciones exclusivas del equipo médico'],answer:1},
+      {type:'alt',text:'¿Cuáles son los signos que distinguen una obstrucción de vía aérea GRAVE de una leve?',options:['Leve: puede hablar y toser; Grave: no puede hablar ni toser y se lleva las manos al cuello','Leve: inconsciencia; Grave: fiebre alta','Leve: dificultad para tragar; Grave: dolor de cabeza','Leve: cianosis; Grave: piel roja','Leve: parálisis; Grave: convulsiones'],answer:0},
+      {type:'alt',text:'¿Qué funciones debe cumplir el líder ante un PCR en el trabajo?',options:['Abandonar el lugar para buscar ayuda','Coordinar el equipo, delegar tareas (llamar al 131, buscar DEA, despejar el área) e iniciar RCP','Redactar un informe administrativo','Limpiar el área mientras otros atienden','Entrevistar testigos para determinar responsabilidades'],answer:1},
+      {type:'vf',text:'✅❌ VERDADERO o FALSO: Las compresiones torácicas deben realizarse en el centro del pecho (sobre el esternón) con los brazos extendidos y a una profundidad de al menos 5 cm.',options:['Verdadero','Falso'],answer:0},
+      {type:'vf',text:'✅❌ VERDADERO o FALSO: Ante una obstrucción leve de la vía aérea, lo correcto es realizar la maniobra de Heimlich de inmediato sin esperar a que la persona intente toser por sí misma.',options:['Verdadero','Falso'],answer:1},
+      {type:'vf',text:'✅❌ VERDADERO o FALSO: El DEA (Desfibrilador Externo Automático) puede utilizarse sin capacitación previa, ya que el dispositivo entrega instrucciones de voz paso a paso.',options:['Verdadero','Falso'],answer:0},
+      {type:'vf',text:'✅❌ VERDADERO o FALSO: Si una víctima respira con normalidad, se debe igualmente iniciar compresiones torácicas para prevenir un posible paro.',options:['Verdadero','Falso'],answer:1},
+      {type:'order',text:'🔢 ORDEN CORRECTO: ¿Cuál es la secuencia correcta de actuación ante una víctima con sospecha de PCR? Selecciona la alternativa que muestra el orden adecuado.',options:['1) Verificar seguridad → 2) Comprobar consciencia → 3) Llamar al 131 → 4) Iniciar RCP → 5) Usar DEA','1) Iniciar RCP → 2) Llamar al 131 → 3) Verificar seguridad → 4) Usar DEA → 5) Comprobar consciencia','1) Llamar al 131 → 2) Usar DEA → 3) Verificar seguridad → 4) Comprobar consciencia → 5) Iniciar RCP','1) Comprobar consciencia → 2) Iniciar RCP → 3) Verificar seguridad → 4) Llamar al 131 → 5) Usar DEA'],answer:0},
+      {type:'order',text:'🔢 ORDEN CORRECTO: ¿Cuál es el orden correcto para aplicar la maniobra de Heimlich en un adulto consciente con obstrucción grave?',options:['1) Ponerse detrás de la víctima → 2) Rodear la cintura con los brazos → 3) Colocar el puño sobre el ombligo → 4) Aplicar compresiones hacia adentro y arriba','1) Golpear la espalda → 2) Rodear la cintura → 3) Llamar al 131 → 4) Colocar el puño bajo el esternón','1) Acostar a la víctima → 2) Presionar el abdomen → 3) Abrir la boca → 4) Extraer el objeto con los dedos','1) Colocar el puño en el pecho → 2) Rodear con los brazos → 3) Empujar hacia atrás → 4) Repetir hasta que salga'],answer:0}
+    ]
+  };
+
+  try{
+    await sb.from('quizzes').insert([{id:nq.id,name:nq.name,icon:nq.icon,questions:nq.questions}]);
+    DB.quizzes.push(nq);
+    ok.classList.remove('hidden');
+    setTimeout(()=>{ok.classList.add('hidden');st('tqc');},1800);
+  }catch(e){ee.textContent='Error al guardar.';ee.classList.remove('hidden');}
+}
+function chPw(){
+  const np=document.getElementById('npw').value,cp=document.getElementById('cpw').value,m=document.getElementById('pwm');
+  m.classList.remove('hidden');
+  if(np.length<6){m.className='alert ae';m.textContent='Mínimo 6 caracteres.';return;}
+  if(np!==cp){m.className='alert ae';m.textContent='No coinciden.';return;}
+  DB.pw=np;sv('pw',np);m.className='alert as';m.textContent='¡Actualizada!';
+}
+document.getElementById('sd').value=new Date().toISOString().split('T')[0];
+initDB();
+
+async function insertRCPQuiz(){
+  const rcpId = 'rcp-basica-2026';
+  // Siempre actualizar con upsert para reflejar cambios
 
   const rcpQuiz = {
     id: rcpId,
@@ -832,15 +882,15 @@ async function insertRCPQuiz(){
   };
 
   try{
-    await sb.from('quizzes').insert([{
+    await sb.from('quizzes').upsert([{
       id: rcpQuiz.id,
       name: rcpQuiz.name,
       icon: rcpQuiz.icon,
       questions: rcpQuiz.questions
     }]);
-    console.log('RCP quiz inserted!');
+    console.log('RCP quiz actualizado!');
     await loadQuizzes();
-  }catch(e){console.error('Error inserting RCP quiz:',e);}
+  }catch(e){console.error('Error actualizando RCP quiz:',e);}
 }
 
 
