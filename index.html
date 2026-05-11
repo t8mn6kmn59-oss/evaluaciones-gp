@@ -174,6 +174,27 @@ textarea{resize:vertical;min-height:64px;}
 .filter-bar{display:flex;gap:8px;margin-bottom:1.25rem;flex-wrap:wrap;align-items:center;}
 .filter-bar select{font-size:13px;padding:8px 12px;border-radius:var(--rs);border:1.5px solid var(--border);background:white;font-family:inherit;font-weight:600;flex:1;min-width:180px;}
 
+
+/* MATERIAL DE ESTUDIO */
+.modulo-card{background:white;border:1.5px solid var(--border);border-radius:var(--r);margin-bottom:1.25rem;overflow:hidden;box-shadow:var(--shadow);}
+.modulo-hdr{padding:1.1rem 1.5rem;display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none;}
+.modulo-hdr:hover{background:var(--gray);}
+.modulo-icon{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;}
+.modulo-title{flex:1;}
+.modulo-title h3{font-size:14px;font-weight:900;color:var(--navy);margin-bottom:2px;}
+.modulo-title p{font-size:11px;color:var(--textLight);}
+.modulo-chevron{font-size:18px;color:var(--textLight);transition:transform .2s;}
+.modulo-chevron.open{transform:rotate(180deg);}
+.modulo-body{display:none;padding:0 1.5rem 1.5rem;border-top:1px solid var(--border);}
+.modulo-body.open{display:block;}
+.modulo-body h4{font-size:13px;font-weight:800;color:var(--navy);margin:1rem 0 .5rem;}
+.modulo-body p{font-size:13px;color:var(--textMid);line-height:1.7;margin-bottom:.75rem;}
+.modulo-body ul{padding-left:1.2rem;margin-bottom:.75rem;}
+.modulo-body ul li{font-size:13px;color:var(--textMid);line-height:1.7;margin-bottom:3px;}
+.modulo-body .tip{background:var(--orangeL);border-left:3px solid var(--orange);border-radius:0 var(--rs) var(--rs) 0;padding:10px 14px;font-size:13px;color:var(--navy);margin-top:.75rem;}
+.modulo-body .tip strong{color:var(--orange2);}
+.badge-mod{display:inline-block;font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;margin-left:8px;vertical-align:middle;}
+
 .hidden{display:none!important;}
 @media(max-width:640px){.metrics-row{grid-template-columns:repeat(2,1fr)}.charts-row{grid-template-columns:1fr}.og{grid-template-columns:1fr}.hero-inner{flex-direction:column;gap:1.5rem}}
 </style>
@@ -195,11 +216,14 @@ textarea{resize:vertical;min-height:64px;}
         <h1>Evaluaciones<br><span>Online</span></h1>
         <p>Plataforma de evaluaciones y seguimiento de cursos de prevención de riesgos laborales</p>
         <div class="role-row">
-          <div class="role-card" onclick="sp('psi')">
+          <div class="role-card" style="min-width:160px">
             <div class="role-icon">📝</div>
             <h3>Soy alumno</h3>
             <p>Rendir una evaluación</p>
-            <span class="rc-badge">Ingresa aquí</span>
+            <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;">
+              <button class="btn btn-orange btn-sm" style="width:100%;justify-content:center;font-size:11px" onclick="sp('pmat')">📖 Ver material primero</button>
+              <button class="btn btn-outline btn-sm" style="width:100%;justify-content:center;font-size:11px;color:white;border-color:rgba(255,255,255,0.3);background:rgba(255,255,255,0.08)" onclick="sp('psi')">✏️ Ir directo a la prueba</button>
+            </div>
           </div>
           <div class="role-card" onclick="sp('plo')">
             <div class="role-icon">👨‍🏫</div>
@@ -223,6 +247,183 @@ textarea{resize:vertical;min-height:64px;}
       <span>✅ Compatible con celular, tablet y PC</span>
       <span style="color:rgba(255,255,255,0.2)">|</span>
       <span>🔒 Resultados en tiempo real</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- MATERIAL DE ESTUDIO -->
+<div class="page" id="pmat">
+  <div class="wrap" style="max-width:680px">
+    <div class="back" onclick="gh()">← Volver al inicio</div>
+    <div style="background:linear-gradient(135deg,#C0392B 0%,#922B21 100%);border-radius:var(--r);padding:1.75rem 1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+      <div style="font-size:2.5rem">🫀</div>
+      <div>
+        <div style="font-size:20px;font-weight:900;color:white">Material de Estudio</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.65);margin-top:3px">RCP Básica · GP Empresas · 5 Módulos</div>
+      </div>
+    </div>
+
+    <div style="background:white;border:1.5px solid var(--border);border-radius:var(--r);padding:1.25rem;margin-bottom:1.25rem;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px;">
+      <div style="font-size:1.5rem">💡</div>
+      <div style="font-size:13px;color:var(--textMid);line-height:1.6;">Revisa los contenidos de cada módulo antes de rendir la evaluación. Puedes expandir cada sección tocando el título.</div>
+    </div>
+
+    <!-- MÓDULO I -->
+    <div class="modulo-card">
+      <div class="modulo-hdr" onclick="toggleMod('m1')">
+        <div class="modulo-icon" style="background:#FEF0E3;">🫀</div>
+        <div class="modulo-title">
+          <h3>Módulo I · Conceptos Generales de RCP</h3>
+          <p>¿Qué es el PCR? · Signos · Causas y factores de riesgo</p>
+        </div>
+        <div class="modulo-chevron" id="ch-m1">▾</div>
+      </div>
+      <div class="modulo-body" id="m1">
+        <h4>¿Qué es el Paro Cardiorrespiratorio (PCR)?</h4>
+        <p>Es la interrupción inesperada y repentina del latido cardíaco y la respiración, dejando a la persona inconsciente. Puede ocurrir en cualquier momento y lugar, incluso sin presencia de personal de salud.</p>
+        <h4>Signos del PCR</h4>
+        <ul>
+          <li>🔴 Pérdida de consciencia (no responde a ningún estímulo)</li>
+          <li>🔴 Jadeo (respiración agónica) o ausencia de respiración</li>
+          <li>🔴 Ausencia de pulso</li>
+        </ul>
+        <h4>¿Cómo se detectan?</h4>
+        <ul>
+          <li><strong>Consciencia:</strong> hablarle a la persona provocando un estímulo</li>
+          <li><strong>Respiración:</strong> observar si el pecho sube y baja</li>
+          <li><strong>Pulso:</strong> palpar arteria carótida (cuello) o radial (muñeca) con dos dedos</li>
+        </ul>
+        <h4>Causas más comunes</h4>
+        <ul>
+          <li>Accidente cerebrovascular (ACV)</li>
+          <li>Infarto agudo al miocardio (IAM)</li>
+          <li>Obstrucción de la vía aérea por cuerpo extraño</li>
+          <li>Trauma severo · Asfixia por inmersión</li>
+        </ul>
+        <div class="tip">⚠️ <strong>Factores de riesgo modificables:</strong> presión arterial alta, colesterol elevado, obesidad, sedentarismo, tabaquismo y alto consumo de sal.</div>
+      </div>
+    </div>
+
+    <!-- MÓDULO II -->
+    <div class="modulo-card">
+      <div class="modulo-hdr" onclick="toggleMod('m2')">
+        <div class="modulo-icon" style="background:#E8F5E8;">🔗</div>
+        <div class="modulo-title">
+          <h3>Módulo II · Cadena de Supervivencia</h3>
+          <p>Etapas · Llamado de emergencia · Secuencia de actuación</p>
+        </div>
+        <div class="modulo-chevron" id="ch-m2">▾</div>
+      </div>
+      <div class="modulo-body" id="m2">
+        <h4>¿Qué es la Cadena de Supervivencia?</h4>
+        <p>Es una serie de pasos críticos y secuenciales que se aplican de inmediato ante una víctima con sospecha de PCR. Cualquier interrupción del orden puede disminuir la sobrevida.</p>
+        <h4>Etapas de la cadena</h4>
+        <ul>
+          <li>1️⃣ <strong>Reconocimiento temprano</strong> — Verificar seguridad de la escena y detectar el PCR</li>
+          <li>2️⃣ <strong>Llamada de emergencia</strong> — Llamar al 131 (SAMU) con: dirección, tipo de emergencia y estado de la víctima</li>
+          <li>3️⃣ <strong>RCP por testigos</strong> — Iniciar masaje cardíaco de inmediato</li>
+          <li>4️⃣ <strong>Desfibrilación temprana</strong> — Usar el DEA si está disponible</li>
+          <li>5️⃣ <strong>Soporte vital avanzado</strong> — Atención por personal especializado y traslado</li>
+        </ul>
+        <div class="tip">📞 <strong>Número de emergencia en Chile: 131 (SAMU)</strong><br>Al llamar indica: ubicación exacta, qué sucede y estado de la víctima.</div>
+      </div>
+    </div>
+
+    <!-- MÓDULO III -->
+    <div class="modulo-card">
+      <div class="modulo-hdr" onclick="toggleMod('m3')">
+        <div class="modulo-icon" style="background:#EDE7F6;">💪</div>
+        <div class="modulo-title">
+          <h3>Módulo III · Técnicas de RCP Básica</h3>
+          <p>Regla 30:2 · Compresiones torácicas · Ventilación</p>
+        </div>
+        <div class="modulo-chevron" id="ch-m3">▾</div>
+      </div>
+      <div class="modulo-body" id="m3">
+        <h4>¿Qué es la RCP Básica?</h4>
+        <p>Conjunto de maniobras para restaurar la circulación y oxigenación de una persona en PCR, a través del masaje cardíaco y la ventilación.</p>
+        <h4>Regla 30:2</h4>
+        <p><strong>30 compresiones torácicas</strong> seguidas de <strong>2 ventilaciones</strong>, generando aproximadamente 100 compresiones por minuto.</p>
+        <h4>¿Cómo hacer las compresiones?</h4>
+        <ul>
+          <li>Arrodillarse al costado derecho de la víctima</li>
+          <li>Talón de la mano sobre el esternón (centro del pecho)</li>
+          <li>Brazos rectos, espalda recta, usar el peso del cuerpo</li>
+          <li>Hundir al menos <strong>5 cm</strong> y permitir expansión completa del tórax</li>
+          <li>Nunca interrumpir salvo fatiga del reanimador, víctima despierta o llegada de equipo especializado</li>
+        </ul>
+        <h4>Secuencia completa</h4>
+        <ul>
+          <li>✅ Verificar seguridad de la escena</li>
+          <li>✅ Comprobar consciencia, respiración y pulso (máx. 10 seg)</li>
+          <li>✅ Llamar al 131</li>
+          <li>✅ Ubicarse al costado derecho de la víctima</li>
+          <li>✅ Iniciar RCP básica (30:2)</li>
+        </ul>
+        <div class="tip">🎵 <strong>¿Sabías que?</strong> La canción "Stayin' Alive" de los Bee Gees tiene el ritmo perfecto para realizar las compresiones. ¡Recuérdala!</div>
+      </div>
+    </div>
+
+    <!-- MÓDULO IV -->
+    <div class="modulo-card">
+      <div class="modulo-hdr" onclick="toggleMod('m4')">
+        <div class="modulo-icon" style="background:#FDECEA;">🤲</div>
+        <div class="modulo-title">
+          <h3>Módulo IV · Maniobra de Heimlich</h3>
+          <p>Obstrucción de vía aérea · Grados · Técnica de desobstrucción</p>
+        </div>
+        <div class="modulo-chevron" id="ch-m4">▾</div>
+      </div>
+      <div class="modulo-body" id="m4">
+        <h4>¿Qué es el atragantamiento?</h4>
+        <p>Ocurre cuando un objeto sólido o líquido entra a la vía respiratoria en vez del sistema digestivo, obstruyendo el paso del aire y pudiendo derivar en un PCR si no se actúa rápido.</p>
+        <h4>Signo universal</h4>
+        <p>La persona se lleva las manos al cuello en estado de desesperación.</p>
+        <h4>Grados de obstrucción</h4>
+        <ul>
+          <li>🟡 <strong>Leve:</strong> aún entra aire, puede hablar y toser con fuerza → Animar a seguir tosiendo, vigilar</li>
+          <li>🔴 <strong>Grave:</strong> no puede hablar ni toser, cianosis → Aplicar Maniobra de Heimlich de inmediato</li>
+        </ul>
+        <h4>Maniobra de Heimlich (obstrucción grave)</h4>
+        <ul>
+          <li>1️⃣ Ponerse detrás de la víctima</li>
+          <li>2️⃣ Rodear la cintura con los brazos</li>
+          <li>3️⃣ Colocar el puño sobre el ombligo (no en costillas)</li>
+          <li>4️⃣ Aplicar compresiones fuertes hacia adentro y arriba</li>
+          <li>5️⃣ Repetir hasta que salga el objeto o la víctima caiga inconsciente</li>
+        </ul>
+        <div class="tip">⚠️ Si la víctima cae inconsciente y aún tiene pulso: iniciar compresión abdominal en el suelo. Si no tiene pulso: iniciar RCP básica inmediatamente.</div>
+      </div>
+    </div>
+
+    <!-- MÓDULO V -->
+    <div class="modulo-card">
+      <div class="modulo-hdr" onclick="toggleMod('m5')">
+        <div class="modulo-icon" style="background:#FFF8E1;">👥</div>
+        <div class="modulo-title">
+          <h3>Módulo V · Gestión Organizacional ante PCR</h3>
+          <p>Roles · Protocolo · Clave azul · Estrés postraumático</p>
+        </div>
+        <div class="modulo-chevron" id="ch-m5">▾</div>
+      </div>
+      <div class="modulo-body" id="m5">
+        <h4>Protocolo de roles</h4>
+        <ul>
+          <li>👤 <strong>Líder:</strong> evalúa a la víctima, mantiene la calma del grupo, activa la cadena de supervivencia</li>
+          <li>👤 <strong>Sublíder:</strong> activa la "Clave Azul", llama al 131, despeja entradas y salidas para el equipo especializado</li>
+        </ul>
+        <h4>Clave Azul</h4>
+        <p>Código de aviso para activar el equipo de respuesta ante un PCR. Se anuncia por altoparlante indicando: <em>"Clave azul, [lugar], [sexo], [edad aproximada], [estado de la persona]"</em></p>
+        <h4>Conducta personal</h4>
+        <p>Es importante que cada persona evalúe sus propias capacidades emocionales antes de actuar: si siento bloqueo, nerviosismo o angustia, debo comunicarlo al líder para no interferir en el procedimiento.</p>
+        <div class="tip">🧠 <strong>Estrés postraumático:</strong> vivenciar un PCR puede generar impacto emocional. Es normal sentir mareos, insomnio, irritabilidad o ansiedad después. Busca apoyo si lo necesitas.</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:1.5rem;">
+      <button class="btn btn-orange" style="flex:1;justify-content:center" onclick="sp('psi')">✏️ Ir a la evaluación</button>
+      <button class="btn btn-outline" style="flex:1;justify-content:center" onclick="gh()">← Volver al inicio</button>
     </div>
   </div>
 </div>
@@ -562,6 +763,13 @@ async function loadResults(){
 }
 
 function sp(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
+function toggleMod(id){
+  const body=document.getElementById(id);
+  const ch=document.getElementById('ch-'+id);
+  const open=body.classList.contains('open');
+  body.classList.toggle('open',!open);
+  ch.classList.toggle('open',!open);
+}
 function gh(){selQid=null;curQ=null;curS=null;for(const k in ans)delete ans[k];sp('ph');}
 
 function gtsq(){
