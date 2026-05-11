@@ -252,6 +252,46 @@ textarea{resize:vertical;min-height:64px;}
 </div>
 
 
+
+<!-- ENTRADA QR: PANTALLA INTERMEDIA -->
+<div class="page" id="pqr">
+  <div class="wrap" style="max-width:520px">
+    <div style="text-align:center;padding:1.5rem 0 1rem;">
+      <div style="font-size:3rem;margin-bottom:.5rem" id="qr-icon">🫀</div>
+      <div style="font-size:22px;font-weight:900;color:var(--navy);margin-bottom:4px" id="qr-name">RCP Básica</div>
+      <div style="font-size:13px;color:var(--textLight)">GP Empresas · Selecciona cómo quieres continuar</div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:1rem;margin-top:.5rem;">
+      <div class="card" style="cursor:pointer;border-color:var(--orange);transition:all .2s" onclick="sp('pmat')" onmouseover="this.style.background='var(--orangeL)'" onmouseout="this.style.background='white'">
+        <div style="display:flex;align-items:center;gap:1rem;">
+          <div style="width:52px;height:52px;border-radius:var(--r);background:var(--orangeL);display:flex;align-items:center;justify-content:center;font-size:1.8rem;flex-shrink:0;">📖</div>
+          <div>
+            <div style="font-size:15px;font-weight:900;color:var(--navy);margin-bottom:3px">Ver material de estudio</div>
+            <div style="font-size:12px;color:var(--textLight);line-height:1.5">Repasa los 5 módulos del curso antes de rendir la evaluación</div>
+          </div>
+          <div style="font-size:20px;color:var(--orange);margin-left:auto">→</div>
+        </div>
+      </div>
+
+      <div class="card" style="cursor:pointer;transition:all .2s" onclick="sp('psi')" onmouseover="this.style.background='var(--gray)'" onmouseout="this.style.background='white'">
+        <div style="display:flex;align-items:center;gap:1rem;">
+          <div style="width:52px;height:52px;border-radius:var(--r);background:var(--gray2);display:flex;align-items:center;justify-content:center;font-size:1.8rem;flex-shrink:0;">✏️</div>
+          <div>
+            <div style="font-size:15px;font-weight:900;color:var(--navy);margin-bottom:3px">Ir directo a la prueba</div>
+            <div style="font-size:12px;color:var(--textLight);line-height:1.5">Ya conozco el contenido, quiero rendir la evaluación ahora</div>
+          </div>
+          <div style="font-size:20px;color:var(--textLight);margin-left:auto">→</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:1.5rem;">
+      <div style="font-size:11px;color:var(--textLight)">🔒 GP Empresas · Plataforma de Evaluaciones</div>
+    </div>
+  </div>
+</div>
+
 <!-- MATERIAL DE ESTUDIO -->
 <div class="page" id="pmat">
   <div class="wrap" style="max-width:680px">
@@ -422,7 +462,7 @@ textarea{resize:vertical;min-height:64px;}
     </div>
 
     <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:1.5rem;">
-      <button class="btn btn-orange" style="flex:1;justify-content:center" onclick="sp('psi')">✏️ Ir a la evaluación</button>
+      <button class="btn btn-orange" style="flex:1;justify-content:center" onclick="sp('psi')">✏️ Ir a la evaluación →</button>
       <button class="btn btn-outline" style="flex:1;justify-content:center" onclick="gh()">← Volver al inicio</button>
     </div>
   </div>
@@ -731,7 +771,7 @@ async function initDB(){
   await insertRCPQuiz();
   const params=new URLSearchParams(window.location.search);
   const qp=params.get('quiz');
-  if(qp&&DB.quizzes.find(q=>q.id===qp)){selQid=qp;sp('psi');}
+  if(qp&&DB.quizzes.find(q=>q.id===qp)){selQid=qp;showQuizEntry(qp);}
 }
 
 async function loadQuizzes(){
@@ -763,6 +803,14 @@ async function loadResults(){
 }
 
 function sp(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
+function showQuizEntry(qid){
+  const q=DB.quizzes.find(x=>x.id===qid);
+  if(q){
+    document.getElementById('qr-name').textContent=q.name;
+    document.getElementById('qr-icon').textContent=q.icon||'📋';
+  }
+  sp('pqr');
+}
 function toggleMod(id){
   const body=document.getElementById(id);
   const ch=document.getElementById('ch-'+id);
