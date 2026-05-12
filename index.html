@@ -487,12 +487,12 @@ textarea{resize:vertical;min-height:64px;}
         <div><div style="font-size:17px;font-weight:900;color:var(--navy)">Ingresa tus datos</div><div style="font-size:12px;color:var(--textLight)">Paso 1 de 4 · GP Empresas</div></div>
       </div>
       <div class="fg">
-        <label>Nombre completo <span style="color:var(--red);font-size:10px;font-weight:700">* Obligatorio</span></label>
-        <input type="text" id="sn" placeholder="Ej: Juan Pérez González">
+        <label>RUT / Cédula de identidad <span style="color:var(--red);font-size:10px;font-weight:700">* Obligatorio</span></label>
+        <input type="text" id="srut" placeholder="Ej: 12.345.678-9" oninput="autoNombre(this.value)">
       </div>
       <div class="fg">
-        <label>RUT / Cédula de identidad <span style="color:var(--red);font-size:10px;font-weight:700">* Obligatorio</span></label>
-        <input type="text" id="srut" placeholder="Ej: 12.345.678-9">
+        <label>Nombre completo <span style="color:var(--textLight);font-size:10px;font-weight:600">Se autocompleta con tu RUT</span></label>
+        <input type="text" id="sn" placeholder="Se autocompleta al ingresar RUT" readonly style="background:#f5f7fa;color:#555">
       </div>
       <div class="fg">
         <label>Fecha <span style="color:var(--red);font-size:10px;font-weight:700">* Obligatorio</span></label>
@@ -820,10 +820,31 @@ function toggleMod(id){
 }
 function gh(){selQid=null;curQ=null;curS=null;for(const k in ans)delete ans[k];sp('ph');}
 
+const PARTICIPANTES=[
+  {rut:'14431904-4',nombre:'Leonardo Ulloa'},
+  {rut:'7018108-8',nombre:'Oscar Millas'},
+  {rut:'16115025-8',nombre:'Yenny Espinoza'},
+  {rut:'8047327-3',nombre:'María Carmona'},
+  {rut:'22749017-9',nombre:'Dylan Arteaga'}
+];
+function normRut(r){return r.replace(/\./g,'').replace(/\s/g,'').toUpperCase();}
+function findParticipante(rut){const nr=normRut(rut);return PARTICIPANTES.find(p=>normRut(p.rut)===nr);}
+function autoNombre(rut){
+  const p=findParticipante(rut);
+  const inp=document.getElementById('sn');
+  if(p){inp.value=p.nombre;inp.style.color='var(--navy)';}
+  else{inp.value='';inp.style.color='#555';}
+}
+
 function gtsq(){
   const n=document.getElementById('sn').value.trim(),d=document.getElementById('sd').value,rut=document.getElementById('srut').value.trim(),email=document.getElementById('semail').value.trim();
-  if(!n||!d||!rut){document.getElementById('ie').classList.remove('hidden');return;}
-  document.getElementById('ie').classList.add('hidden');curS={name:n,date:d,rut:rut,email:email};
+  if(!rut){document.getElementById('ie').textContent='Por favor ingresa tu RUT.';document.getElementById('ie').classList.remove('hidden');return;}
+  const part=findParticipante(rut);
+  if(!part){document.getElementById('ie').textContent='RUT no autorizado. Verifica que esté bien escrito o consulta al instructor.';document.getElementById('ie').classList.remove('hidden');return;}
+  if(!d){document.getElementById('ie').textContent='Por favor selecciona la fecha.';document.getElementById('ie').classList.remove('hidden');return;}
+  document.getElementById('ie').classList.add('hidden');
+  const nombre=n||part.nombre;
+  curS={name:nombre,date:d,rut:rut,email:email};
   if(selQid){startQ();return;}
   document.getElementById('qsgrid').innerHTML=DB.quizzes.map(q=>`<div class="qsc" id="qc-${q.id}" onclick="selQ('${q.id}')"><div class="qi">${q.icon||'📋'}</div><h3>${q.name}</h3><p>${q.questions.length} preguntas</p></div>`).join('');
   sp('psq');
