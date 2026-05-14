@@ -1041,18 +1041,20 @@ function renderReport(){
   list.innerHTML=f.map((r,idx)=>{
     const p=r.score>=60;
     const initials=r.student.split(' ').slice(0,2).map(n=>n[0]||'').join('').toUpperCase();
-    return`<div class="student-row" onclick="showStudentDetail('${r.id}')" style="cursor:pointer;" title="Ver detalle">
-      <div class="student-avatar ${p?'pass':'fail'}">${initials}</div>
-      <div class="student-info">
+    return`<div class="student-row" style="cursor:pointer;">
+      <div class="student-avatar ${p?'pass':'fail'}" onclick="showStudentDetail('${r.id}')">${initials}</div>
+      <div class="student-info" onclick="showStudentDetail('${r.id}')">
         <div class="name">${r.student}</div>
         <div class="meta">${r.rut?r.rut+' · ':''}${r.email?'📧 '+r.email+' · ':''}${r.quizName} · ${r.date} · ${r.correct}/${r.total} correctas</div>
       </div>
-      <div style="text-align:right;display:flex;align-items:center;gap:10px;">
-        <div>
+      <div style="text-align:right;display:flex;align-items:center;gap:8px;">
+        <div onclick="showStudentDetail('${r.id}')">
           <div class="student-score">${r.score}%</div>
           <span class="badge ${p?'badge-green':'badge-red'}">${p?'Aprobado':'Reprobado'}</span>
         </div>
-        <div style="font-size:18px;color:var(--textLight)">›</div>
+        <button class="btn btn-sm" style="background:white;color:#C0392B;border:1.5px solid #f5c6c2;font-size:11px;padding:4px 10px;" onclick="event.stopPropagation();delResult('${r.id}')">🗑</button>
+        <button class="btn btn-sm" style="background:white;color:var(--navy);border:1.5px solid var(--border);font-size:11px;padding:4px 10px;" onclick="event.stopPropagation();printResult('${r.id}')">🖨</button>
+        <div style="font-size:18px;color:var(--textLight)" onclick="showStudentDetail('${r.id}')">›</div>
       </div>
     </div>`;
   }).join('');
@@ -1244,6 +1246,78 @@ async function insertRCPQuiz(){
   }catch(e){console.error('Error actualizando RCP quiz:',e);}
 }
 
+
+async function delResult(rid){
+  if(!confirm('¿Eliminar este resultado? Esta acción no se puede deshacer.'))return;
+  try{
+    await sb.from('results').delete().eq('id',rid);
+    DB.results=DB.results.filter(r=>r.id!==rid);
+    renderReport();
+  }catch(e){alert('Error al eliminar.');}
+}
+
+function printResult(rid){
+  const r=DB.results.find(x=>x.id===rid);
+  if(!r)return;
+  const quiz=DB.quizzes.find(q=>q.id===r.quizId);
+  if(!quiz)return;
+  const pass=r.score>=60;
+  const LT2=['A','B','C','D','E'];
+  const win=window.open('','_blank','width=800,height=600');
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <title>Resultado · ${r.student}</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:11px;color:#1B2A4A;background:white;padding:12px;}
+    .header{background:#1B2A4A;color:white;padding:10px 14px;border-radius:6px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+    .header h1{font-size:13px;font-weight:900;}
+    .header p{font-size:10px;opacity:.6;margin-top:2px;}
+    .score-row{display:flex;gap:8px;margin-bottom:10px;}
+    .score-box{flex:1;border:1.5px solid #D8E0EE;border-radius:6px;padding:8px;text-align:center;}
+    .score-box .val{font-size:18px;font-weight:900;}
+    .score-box .lbl{font-size:9px;color:#8A96AA;margin-top:2px;text-transform:uppercase;}
+    .pass{color:#2D7D2D;}.fail{color:#C0392B;}
+    .status-badge{display:inline-block;padding:4px 12px;border-radius:99px;font-size:11px;font-weight:800;}
+    .status-badge.pass{background:#E8F5E8;color:#2D7D2D;}
+    .status-badge.fail{background:#FDECEA;color:#C0392B;}
+    .q{border:1px solid #eee;border-radius:5px;margin-bottom:6px;overflow:hidden;}
+    .qh{padding:5px 8px;font-size:10px;font-weight:700;display:flex;align-items:center;gap:6px;}
+    .qh.ok{background:#f0fff0;color:#2D7D2D;}
+    .qh.bad{background:#fff0f0;color:#C0392B;}
+    .opts{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:5px 8px;background:white;}
+    .opt{border:1px solid #eee;border-radius:4px;padding:3px 7px;font-size:10px;}
+    .opt.correct{border-color:#2D7D2D;background:#e8f5e8;color:#2D7D2D;font-weight:700;}
+    .opt.wrong{border-color:#C0392B;background:#fdecea;color:#C0392B;font-weight:700;}
+    .footer{margin-top:10px;text-align:center;font-size:9px;color:#8A96AA;border-top:1px solid #eee;padding-top:8px;}
+    @media print{body{padding:6px;}button{display:none!important;}}
+  </style></head><body>
+  <div class="header">
+    <div><h1>GP Empresas · ${quiz.name}</h1><p>${r.student}${r.rut?' · RUT: '+r.rut:''} · ${r.date}</p></div>
+    <span class="status-badge ${pass?'pass':'fail'}">${pass?'✓ APROBADO':'✗ REPROBADO'}</span>
+  </div>
+  <div class="score-row">
+    <div class="score-box"><div class="val ${pass?'pass':'fail'}">${r.score}%</div><div class="lbl">Puntaje</div></div>
+    <div class="score-box"><div class="val">${r.correct}/${r.total}</div><div class="lbl">Correctas</div></div>
+    <div class="score-box"><div class="val">${r.total-r.correct}</div><div class="lbl">Incorrectas</div></div>
+  </div>
+  ${quiz.questions.map((q,i)=>{
+    const ua=r.answers[i];const ok=ua===q.answer;
+    return`<div class="q">
+      <div class="qh ${ok?'ok':'bad'}">${ok?'✅':'❌'} P${i+1}: ${q.text}</div>
+      <div class="opts">${q.options.map((o,j)=>{
+        let cls='opt';
+        if(j===q.answer)cls+=' correct';
+        else if(j===ua&&!ok)cls+=' wrong';
+        return`<div class="${cls}"><strong>${LT2[j]}.</strong> ${o}${j===q.answer?' ✓':''}${j===ua&&!ok?' ✗':''}`;
+      }).join('')}</div>
+    </div>`;
+  }).join('')}
+  <div class="footer">GP Empresas · Plataforma de Evaluaciones · Generado ${new Date().toLocaleDateString('es-CL')}</div>
+  <br><button onclick="window.print()" style="padding:6px 16px;background:#1B2A4A;color:white;border:none;border-radius:4px;cursor:pointer;font-size:11px;">🖨 Imprimir</button>
+  </body></html>`);
+  win.document.close();
+  setTimeout(()=>win.print(),500);
+}
 
 function showStudentDetail(rid){
   const r=DB.results.find(x=>x.id===rid);
