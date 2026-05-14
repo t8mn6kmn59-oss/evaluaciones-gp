@@ -828,7 +828,7 @@ async function loadResults(){
   try{
     const {data,error}=await sb.from('results').select('*').order('created_at',{ascending:false});
     if(error)throw error;
-    DB.results=(data||[]).map(r=>({id:r.id,quizId:r.quiz_id,quizName:r.quiz_name,student:r.student,rut:r.rut||'',email:r.email||'',date:r.date,score:r.score,correct:r.correct,total:r.total,answers:r.answers}));
+    DB.results=(data||[]).map(r=>({id:r.id,quizId:r.quiz_id,quizName:r.quiz_name,student:r.student,rut:r.rut||'',email:r.email||'',date:r.date,score:r.score,correct:r.correct,total:r.total,answers:r.answers,enc1:r.enc1||null,enc2:r.enc2||null,enc3:r.enc3||null}));
   }catch(e){console.error(e);}
 }
 
@@ -1368,6 +1368,24 @@ function showStudentDetail(rid){
     </div>`;
   }).join('');
 
+  // Encuesta
+  const ENC_LABELS=['Entendió el objetivo de la capacitación','Se siente más preparado tras la capacitación','El relator transmitió los contenidos en forma clara'];
+  const encVals=[r.enc1,r.enc2,r.enc3];
+  const encColors={I:'#C0392B',S:'#E67E22',B:'#2980B9',MB:'#2D7D2D'};
+  const encBg={I:'#fdecea',S:'#fef5e7',B:'#ebf5fb',MB:'#e8f5e8'};
+  const encSection = encVals.some(v=>v) ? `
+    <div style="margin-top:1.25rem;">
+      <h3 style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:.75rem;">📝 Encuesta de satisfacción</h3>
+      ${ENC_LABELS.map((lbl,i)=>{
+        const v=encVals[i];
+        return`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border:1px solid var(--border);border-radius:var(--rs);margin-bottom:6px;background:white;">
+          <span style="font-size:12px;color:var(--navy);flex:1">${lbl}</span>
+          ${v?`<span style="background:${encBg[v]};color:${encColors[v]};font-weight:900;font-size:12px;padding:3px 12px;border-radius:99px;">${v}</span>`:'<span style="font-size:11px;color:var(--textLight)">Sin respuesta</span>'}
+        </div>`;
+      }).join('')}
+    </div>` : `<div style="margin-top:1rem;font-size:12px;color:var(--textLight);padding:10px;background:var(--gray);border-radius:var(--rs);">📝 Este alumno aún no respondió la encuesta.</div>`;
+
+  document.getElementById('dm-questions').innerHTML += encSection;
   document.getElementById('dm').classList.remove('hidden');
 }
 
