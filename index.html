@@ -873,7 +873,10 @@ const PARTICIPANTES=[
   {rut:'15699994-6',nombre:'Paulo Alexis Monje Vallejos'},
   {rut:'17340322-4',nombre:'Jazmin Estivaliz Jimenez Bravo'},
   {rut:'19460903-5',nombre:'Felipe Eduardo Monje Vallejos'},
-  {rut:'9709098-k',nombre:'Jorge Luis Arias Campos'}
+  {rut:'9709098-k',nombre:'Jorge Luis Arias Campos'},
+  // Instructores
+  {rut:'14431904-4',nombre:'Leonardo Ulloa'},
+  {rut:'16115025-8',nombre:'Yenny Espinoza'}
 ];
 function normRut(r){return r.replace(/\./g,'').replace(/\s/g,'').toUpperCase();}
 function findParticipante(rut){const nr=normRut(rut);return PARTICIPANTES.find(p=>normRut(p.rut)===nr);}
