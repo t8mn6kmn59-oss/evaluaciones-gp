@@ -1240,10 +1240,11 @@ async function insertRCPQuiz(){
 async function delResult(rid){
   if(!confirm('¿Eliminar este resultado? Esta acción no se puede deshacer.'))return;
   try{
-    await sb.from('results').delete().eq('id',rid);
-    DB.results=DB.results.filter(r=>r.id!==rid);
+    const {error}=await sb.from('results').delete().eq('id',String(rid));
+    if(error){console.error('Error Supabase:',error);alert('Error al eliminar: '+error.message);return;}
+    DB.results=DB.results.filter(r=>String(r.id)!==String(rid));
     renderReport();
-  }catch(e){alert('Error al eliminar.');}
+  }catch(e){console.error(e);alert('Error al eliminar.');}
 }
 
 function printResult(rid){
