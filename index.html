@@ -799,6 +799,7 @@ async function initDB(){
   DB.siteUrl=lv('siteUrl','https://t8mn6kmn59-oss.github.io/evaluaciones-gp');
   await loadQuizzes();
   await insertRCPQuiz();
+  await insertLiderazgoQuiz();
   const params=new URLSearchParams(window.location.search);
   const qp=params.get('quiz');
   if(qp&&DB.quizzes.find(q=>q.id===qp)){selQid=qp;showQuizEntry(qp);}
@@ -1235,6 +1236,37 @@ async function insertRCPQuiz(){
     console.log('RCP quiz actualizado!');
     await loadQuizzes();
   }catch(e){console.error('Error actualizando RCP quiz:',e);}
+}
+
+async function insertLiderazgoQuiz(){
+  const lidId = 'liderazgo-efectivo-2026';
+  const lidQuiz = {
+    id: lidId,
+    name: 'Técnicas de Liderazgo Efectivo',
+    icon: '🎯',
+    questions: [
+      {text:'¿Cuál de los siguientes corresponde a un liderazgo democrático?',options:['El líder toma todas las decisiones sin consultar','El líder comparte decisiones e involucra al equipo','El líder evita intervenir'],answer:1},
+      {text:'¿Qué significa la letra G del modelo GROW?',options:['Identificar objetivos','Generar conflictos','Guiar al equipo sin metas'],answer:0},
+      {text:'Una característica de un equipo de trabajo es:',options:['Responsabilidad solo individual','Liderazgo compartido','No tiene objetivos comunes'],answer:1},
+      {text:'¿Cuál es una etapa de formación del equipo?',options:['Normalización','Eliminación','Delegación'],answer:0},
+      {text:'La motivación intrínseca es:',options:['Motivación por satisfacción personal','Motivación por premio externo','Motivación por castigo'],answer:0},
+      {text:'Un componente del proceso de comunicación es:',options:['Emisor','Inventario','Presupuesto'],answer:0},
+      {text:'¿Qué actividades corresponden a ANTES de la reunión?',options:['Inicio, conducción y cierre','Evaluación y seguimiento','Preparación y selección tipo','Contribuye al despliegue de la estrategia'],answer:2},
+      {text:'¿Qué actividades corresponden a DURANTE la reunión?',options:['Inicio, conducción y cierre','Evaluación y seguimiento','Preparación y selección tipo','Contribuye al despliegue de la estrategia'],answer:0},
+      {text:'¿Qué actividades corresponden a DESPUÉS de la reunión?',options:['Inicio, conducción y cierre','Evaluación y seguimiento','Preparación y selección tipo','Contribuye al despliegue de la estrategia'],answer:1},
+      {text:'¿A qué corresponde el concepto de "Organización" en el contexto de reuniones?',options:['Inicio, conducción y cierre','Evaluación y seguimiento','Preparación y selección tipo','Contribuye al despliegue de la estrategia'],answer:3}
+    ]
+  };
+  try{
+    await sb.from('quizzes').upsert([{
+      id: lidQuiz.id,
+      name: lidQuiz.name,
+      icon: lidQuiz.icon,
+      questions: lidQuiz.questions
+    }]);
+    console.log('Liderazgo quiz actualizado!');
+    await loadQuizzes();
+  }catch(e){console.error('Error actualizando Liderazgo quiz:',e);}
 }
 
 
