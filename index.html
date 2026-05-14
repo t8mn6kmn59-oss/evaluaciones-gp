@@ -935,9 +935,27 @@ function startQ(){
   document.getElementById('qbody').innerHTML=curQ.questions.map((q,i)=>{
     const isVF = q.type==='vf';
     const isOrder = q.type==='order';
+    const isMatch = q.type==='match';
     const tag = isVF ? '<span style="display:inline-block;background:#1B2A4A;color:white;font-size:10px;font-weight:900;padding:2px 8px;border-radius:99px;margin-bottom:8px;letter-spacing:.05em">V / F</span>' 
                      : isOrder ? '<span style="display:inline-block;background:#F5811E;color:white;font-size:10px;font-weight:900;padding:2px 8px;border-radius:99px;margin-bottom:8px;letter-spacing:.05em">ORDENAR</span>'
+                     : isMatch ? '<span style="display:inline-block;background:#6B46C1;color:white;font-size:10px;font-weight:900;padding:2px 8px;border-radius:99px;margin-bottom:8px;letter-spacing:.05em">RELACIONAR</span>'
                      : '<span style="display:inline-block;background:#4A5568;color:white;font-size:10px;font-weight:900;padding:2px 8px;border-radius:99px;margin-bottom:8px;letter-spacing:.05em">ALTERNATIVAS</span>';
+    if(isMatch){
+      const pairs = q.options; // array of {left, right} objects, answer = index of correct right for each left
+      const rights = q.rights; // shuffled right-side options
+      const opts = pairs.map((p,j)=>{
+        const selectOpts = rights.map((r,k)=>`<option value="${k}">${r}</option>`).join('');
+        return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;">
+          <div style="flex:1;min-width:140px;background:var(--gray2);border-radius:var(--rs);padding:10px 14px;font-size:13px;font-weight:700;color:var(--navy)">${j+1}. ${p}</div>
+          <div style="font-size:18px;color:var(--textLight)">→</div>
+          <select id="match-${i}-${j}" style="flex:1;min-width:160px;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--rs);font-size:13px;background:white;color:var(--text);font-family:inherit;" onchange="selMatch(${i},${curQ.questions.length})">
+            <option value="">-- Selecciona --</option>
+            ${selectOpts}
+          </select>
+        </div>`;
+      }).join('');
+      return `<div class="qcard">${tag}<div class="qnum">Pregunta ${i+1} de ${curQ.questions.length}</div><div class="qtext">${q.text}</div>${opts}</div>`;
+    }
     const opts = q.options.map((o,j)=>{
       const icon = isVF ? (j===0?'✅ ':'❌ ') : isOrder ? `${j+1}. ` : '';
       return `<div class="opt" id="op-${i}-${j}" onclick="selO(${i},${j},${curQ.questions.length})"><div class="ol">${isVF||isOrder?j+1:LT[j]}</div><span>${icon}${o}</span></div>`;
@@ -953,11 +971,31 @@ function selO(qi,oi,tot){
   document.getElementById('qpf').style.width=Math.round(c/tot*100)+'%';
   document.getElementById('qpl').textContent=c+' de '+tot+' respondidas';
 }
+function selMatch(qi,tot){
+  // For match questions, store array of selected right-side indices
+  const q=curQ.questions[qi];
+  const vals=q.options.map((_,j)=>{
+    const el=document.getElementById(`match-${qi}-${j}`);
+    return el?parseInt(el.value):-1;
+  });
+  const allSelected=vals.every(v=>!isNaN(v)&&v>=0);
+  if(allSelected){ans[qi]=vals;}
+  else{delete ans[qi];}
+  const c=Object.keys(ans).length;
+  document.getElementById('qpf').style.width=Math.round(c/tot*100)+'%';
+  document.getElementById('qpl').textContent=c+' de '+tot+' respondidas';
+}
 async function submitQ(){
   const tot=curQ.questions.length;
   if(Object.keys(ans).length<tot){document.getElementById('qse2').classList.remove('hidden');return;}
   document.getElementById('qse2').classList.add('hidden');
-  const ua=curQ.questions.map((_,i)=>ans[i]);
+  const ua=curQ.questions.map((q,i)=>{
+    if(q.type==='match'){
+      // For match, store as JSON string of selections
+      return JSON.stringify(ans[i]);
+    }
+    return ans[i];
+  });
   const corr=ua.filter((a,i)=>a===curQ.questions[i].answer).length;
   const score=Math.round(corr/tot*100);
   const rec={id:Date.now()+'',quiz_id:curQ.id,quiz_name:curQ.name,student:curS.name,rut:curS.rut||'',email:curS.email||'',date:curS.date,score,correct:corr,total:tot,answers:ua};
