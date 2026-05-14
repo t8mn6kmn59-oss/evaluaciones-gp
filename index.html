@@ -1268,28 +1268,29 @@ function printResult(rid){
   <title>Resultado · ${r.student}</title>
   <style>
     *{box-sizing:border-box;margin:0;padding:0;}
-    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:11px;color:#1B2A4A;background:white;padding:12px;}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:10.5px;color:#1B2A4A;background:white;padding:14px 16px;max-width:700px;}
     .header{background:#1B2A4A;color:white;padding:10px 14px;border-radius:6px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-    .header h1{font-size:13px;font-weight:900;}
-    .header p{font-size:10px;opacity:.6;margin-top:2px;}
+    .header h1{font-size:12px;font-weight:900;margin-bottom:2px;}
+    .header p{font-size:9.5px;opacity:.6;}
     .score-row{display:flex;gap:8px;margin-bottom:10px;}
-    .score-box{flex:1;border:1.5px solid #D8E0EE;border-radius:6px;padding:8px;text-align:center;}
-    .score-box .val{font-size:18px;font-weight:900;}
-    .score-box .lbl{font-size:9px;color:#8A96AA;margin-top:2px;text-transform:uppercase;}
+    .score-box{flex:1;border:1.5px solid #D8E0EE;border-radius:6px;padding:7px;text-align:center;}
+    .score-box .val{font-size:17px;font-weight:900;}
+    .score-box .lbl{font-size:8.5px;color:#8A96AA;margin-top:2px;text-transform:uppercase;letter-spacing:.04em;}
     .pass{color:#2D7D2D;}.fail{color:#C0392B;}
-    .status-badge{display:inline-block;padding:4px 12px;border-radius:99px;font-size:11px;font-weight:800;}
+    .status-badge{display:inline-block;padding:4px 10px;border-radius:99px;font-size:10px;font-weight:800;white-space:nowrap;}
     .status-badge.pass{background:#E8F5E8;color:#2D7D2D;}
     .status-badge.fail{background:#FDECEA;color:#C0392B;}
-    .q{border:1px solid #eee;border-radius:5px;margin-bottom:6px;overflow:hidden;}
-    .qh{padding:5px 8px;font-size:10px;font-weight:700;display:flex;align-items:center;gap:6px;}
+    .q{border:1px solid #e0e0e0;border-radius:5px;margin-bottom:7px;overflow:hidden;page-break-inside:avoid;}
+    .qh{padding:6px 10px;font-size:9.5px;font-weight:700;line-height:1.4;}
     .qh.ok{background:#f0fff0;color:#2D7D2D;}
     .qh.bad{background:#fff0f0;color:#C0392B;}
-    .opts{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:5px 8px;background:white;}
-    .opt{border:1px solid #eee;border-radius:4px;padding:3px 7px;font-size:10px;}
+    .opts{padding:5px 10px 7px;background:white;display:flex;flex-direction:column;gap:3px;}
+    .opt{border:1px solid #eee;border-radius:4px;padding:3px 8px;font-size:9.5px;line-height:1.4;display:flex;align-items:flex-start;gap:5px;}
     .opt.correct{border-color:#2D7D2D;background:#e8f5e8;color:#2D7D2D;font-weight:700;}
     .opt.wrong{border-color:#C0392B;background:#fdecea;color:#C0392B;font-weight:700;}
-    .footer{margin-top:10px;text-align:center;font-size:9px;color:#8A96AA;border-top:1px solid #eee;padding-top:8px;}
-    @media print{body{padding:6px;}button{display:none!important;}}
+    .opt-letter{font-weight:800;min-width:14px;}
+    .footer{margin-top:10px;text-align:center;font-size:8.5px;color:#8A96AA;border-top:1px solid #eee;padding-top:8px;}
+    @media print{body{padding:8px;}button{display:none!important;}.q{page-break-inside:avoid;}}
   </style></head><body>
   <div class="header">
     <div><h1>GP Empresas · ${quiz.name}</h1><p>${r.student}${r.rut?' · RUT: '+r.rut:''} · ${r.date}</p></div>
@@ -1308,12 +1309,13 @@ function printResult(rid){
         let cls='opt';
         if(j===q.answer)cls+=' correct';
         else if(j===ua&&!ok)cls+=' wrong';
-        return`<div class="${cls}"><strong>${LT2[j]}.</strong> ${o}${j===q.answer?' ✓':''}${j===ua&&!ok?' ✗':''}`;
+        const marker=j===q.answer?' ✓':(j===ua&&!ok?' ✗':'');
+        return`<div class="${cls}"><span class="opt-letter">${LT2[j]}.</span><span>${o}${marker}</span></div>`;
       }).join('')}</div>
     </div>`;
   }).join('')}
   <div class="footer">GP Empresas · Plataforma de Evaluaciones · Generado ${new Date().toLocaleDateString('es-CL')}</div>
-  <br><button onclick="window.print()" style="padding:6px 16px;background:#1B2A4A;color:white;border:none;border-radius:4px;cursor:pointer;font-size:11px;">🖨 Imprimir</button>
+  <br><button onclick="window.print()" style="padding:6px 16px;background:#1B2A4A;color:white;border:none;border-radius:4px;cursor:pointer;font-size:11px;margin-top:8px;">🖨 Imprimir</button>
   </body></html>`);
   win.document.close();
   setTimeout(()=>win.print(),500);
