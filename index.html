@@ -74,7 +74,8 @@ textarea{resize:vertical;min-height:64px;}
 .sline{height:2px;background:var(--border);flex:1;position:relative;top:-11px;}
 .sline.done{background:var(--orange);}
 .quiz-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:1rem;margin-bottom:1.25rem;}
-.qsc{background:white;border:1.5px solid var(--border);border-radius:var(--r);padding:1.25rem;cursor:pointer;transition:all .2s;box-shadow:var(--shadow);}
+.qsc{background:white;border:1.5px solid var(--border);border-radius:var(--r);padding:1.25rem;cursor:pointer;transition:all .2s;box-shadow:var(--shadow);display:flex;flex-direction:column;}
+.qsc .qsc-body{flex:1;}
 .qsc:hover{border-color:var(--orange);transform:translateY(-2px);}
 .qsc.active{border-color:var(--orange);background:var(--orangeL);}
 .qsc .qi{font-size:1.8rem;margin-bottom:8px;}
@@ -902,7 +903,7 @@ function gtsq(){
   const nombre=n||part.nombre;
   curS={name:nombre,date:d,rut:rut,email:email};
   if(selQid){startQ();return;}
-  document.getElementById('qsgrid').innerHTML=DB.quizzes.map(q=>`<div class="qsc" id="qc-${q.id}" onclick="selQ('${q.id}')"><div class="qi">${q.icon||'📋'}</div><h3>${q.name}</h3><p>${q.questions.length} preguntas</p><button class="btn btn-orange btn-sm" style="margin-top:10px;width:100%;justify-content:center" onclick="event.stopPropagation();selQ('${q.id}');startQ()">Comenzar →</button></div>`).join('');
+  document.getElementById('qsgrid').innerHTML=DB.quizzes.map(q=>`<div class="qsc" id="qc-${q.id}" onclick="selQ('${q.id}')"><div class="qsc-body"><div class="qi">${q.icon||'📋'}</div><h3>${q.name}</h3><p>${q.questions.length} preguntas</p></div><button class="btn btn-orange btn-sm" style="margin-top:10px;width:100%;justify-content:center" onclick="event.stopPropagation();selQ('${q.id}');startQ()">Comenzar →</button></div>`).join('');
   sp('psq');
 }
 function selQ(id){selQid=id;document.querySelectorAll('.qsc').forEach(c=>c.classList.remove('active'));const el=document.getElementById('qc-'+id);if(el)el.classList.add('active');document.getElementById('qse').classList.add('hidden');}
