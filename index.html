@@ -562,7 +562,33 @@ textarea{resize:vertical;min-height:64px;}
     </div>
     <h3 style="font-size:15px;font-weight:900;color:var(--navy);margin-bottom:1rem;">Revisión de respuestas</h3>
     <div id="rrv"></div>
-    <div style="margin-top:1.5rem"><button class="btn btn-orange" onclick="gh()">Finalizar</button></div>
+    <div style="margin-top:1.5rem"><button class="btn btn-orange" onclick="showEnc()">Continuar → Encuesta 📝</button></div>
+  </div>
+</div>
+
+<!-- ENCUESTA SATISFACCIÓN -->
+<div class="page" id="penc">
+  <div class="wrap" style="max-width:620px">
+    <div style="background:linear-gradient(135deg,#1B2A4A 0%,#2d4270 100%);border-radius:var(--r);padding:2rem 1.5rem;text-align:center;margin-bottom:1.5rem;">
+      <div style="font-size:2.5rem;margin-bottom:8px">📝</div>
+      <div style="font-size:18px;font-weight:900;color:white">Encuesta de Satisfacción</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.55);margin-top:4px">GP Empresas · Evaluación del Curso</div>
+    </div>
+    <div class="card">
+      <p style="font-size:13px;color:var(--textLight);margin-bottom:1.5rem;line-height:1.6">Marque su opinión sobre los aspectos que se detallan. Su respuesta es importante para mejorar futuras capacitaciones.</p>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-bottom:6px;padding-right:4px">
+        <span style="font-size:10px;font-weight:800;color:var(--textLight);width:36px;text-align:center">I</span>
+        <span style="font-size:10px;font-weight:800;color:var(--textLight);width:36px;text-align:center">S</span>
+        <span style="font-size:10px;font-weight:800;color:var(--textLight);width:36px;text-align:center">B</span>
+        <span style="font-size:10px;font-weight:800;color:var(--textLight);width:36px;text-align:center">MB</span>
+      </div>
+      <div id="enc-items"></div>
+      <div id="enc-err" class="alert ae hidden" style="margin-top:1rem">Por favor responde todas las preguntas.</div>
+      <button class="btn btn-orange btn-block" style="margin-top:1.5rem" onclick="submitEnc()">Enviar encuesta y finalizar</button>
+    </div>
+    <div style="margin-top:1rem;text-align:center;font-size:11px;color:var(--textLight)">
+      I = Insuficiente (1-3) &nbsp;|&nbsp; S = Suficiente (4) &nbsp;|&nbsp; B = Bueno (5-6) &nbsp;|&nbsp; MB = Muy Bueno (7)
+    </div>
   </div>
 </div>
 
@@ -821,11 +847,33 @@ function toggleMod(id){
 function gh(){selQid=null;curQ=null;curS=null;for(const k in ans)delete ans[k];sp('ph');}
 
 const PARTICIPANTES=[
-  {rut:'14431904-4',nombre:'Leonardo Ulloa'},
-  {rut:'7018108-8',nombre:'Oscar Millas'},
-  {rut:'16115025-8',nombre:'Yenny Espinoza'},
-  {rut:'8047327-3',nombre:'María Carmona'},
-  {rut:'22749017-9',nombre:'Dylan Arteaga'}
+  // Prueba 15-05-2026
+  {rut:'10031095-3',nombre:'Patricia Elizabeth Villanueva Villagran'},
+  {rut:'11167299-7',nombre:'Jose Alejandro Castro Pereira'},
+  {rut:'12243369-2',nombre:'Patricio Rodrigo Urrutia Márquez'},
+  {rut:'12403495-7',nombre:'Cristian Ojeda Guerrero'},
+  {rut:'13205717-6',nombre:'Pedro Ernesto Albornoz Pareja'},
+  {rut:'14414188-1',nombre:'Claudia Ximena Montoya Albornoz'},
+  {rut:'15337043-5',nombre:'Rodrigo Andres Iturrieta Lara'},
+  {rut:'16390482-9',nombre:'Octavio Alberto Urrutia Silva'},
+  {rut:'20288069-k',nombre:'Maria José Geraldine Paulsen Bustamante'},
+  {rut:'20776249-0',nombre:'Rene Patricio Retamales Pinto'},
+  {rut:'20800354-2',nombre:'Benjamín Tomás Carmona Mendoza'},
+  {rut:'20961016-7',nombre:'Jaime Soza Epull'},
+  {rut:'21043227-2',nombre:'Sebastián Salazar Silva'},
+  {rut:'21161354-8',nombre:'Diego Antonio Abarca Moya'},
+  {rut:'23589876-4',nombre:'Humberto Sebastian Muzz Lartiga'},
+  {rut:'25563918-8',nombre:'Carlos Eduardo Da Costa Omaña'},
+  {rut:'8605016-1',nombre:'Griset Paola Gonzalez Sepulveda'},
+  // Prueba 18-05-2026
+  {rut:'10461993-2',nombre:'Mario Antonio Montesinos Vergara'},
+  {rut:'12028613-7',nombre:'Daniel Bernardino Villarroel Palacios'},
+  {rut:'12820834-8',nombre:'Sergio Clever Leyton Rodriguez'},
+  {rut:'13460883-8',nombre:'Verónica Cecilia González Cancino'},
+  {rut:'15699994-6',nombre:'Paulo Alexis Monje Vallejos'},
+  {rut:'17340322-4',nombre:'Jazmin Estivaliz Jimenez Bravo'},
+  {rut:'19460903-5',nombre:'Felipe Eduardo Monje Vallejos'},
+  {rut:'9709098-k',nombre:'Jorge Luis Arias Campos'}
 ];
 function normRut(r){return r.replace(/\./g,'').replace(/\s/g,'').toUpperCase();}
 function findParticipante(rut){const nr=normRut(rut);return PARTICIPANTES.find(p=>normRut(p.rut)===nr);}
@@ -914,11 +962,13 @@ function showRes(rec){
   const rs=document.getElementById('rsc');rs.textContent=rec.score+'%';rs.className='rscore '+(pass?'pass':'fail');
   document.getElementById('rst').textContent=pass?'¡Aprobado!':'Reprobado';
   document.getElementById('rdt').textContent=rec.correct+' de '+rec.total+' preguntas correctas';
+  window._lastRec={...rec};
   document.getElementById('rrv').innerHTML=curQ.questions.map((q,i)=>{
     const ua=rec.answers[i];const ok=ua===q.answer;
     return`<div class="qcard" style="border-color:${ok?'#2D7D2D':'#C0392B'};background:${ok?'#f8fff8':'#fff8f8'}"><div class="qnum" style="color:${ok?'var(--green)':'var(--red)'}">Pregunta ${i+1} · ${ok?'Correcta ✓':'Incorrecta ✗'}</div><div class="qtext">${q.text}</div>${q.options.map((o,j)=>{let c='opt';if(j===q.answer)c+=' correct';else if(j===ua&&!ok)c+=' wrong';return`<div class="${c}" style="pointer-events:none"><div class="ol">${LT[j]}</div><span>${o}</span></div>`;}).join('')}</div>`;
   }).join('');sp('prx');
 }
+
 function doLogin(){
   const pw=document.getElementById('lpw').value;
   if(pw===DB.pw){document.getElementById('le').classList.add('hidden');document.getElementById('lpw').value='';rIns();sp('pins');}
@@ -1091,47 +1141,65 @@ function chPw(){
   if(np!==cp){m.className='alert ae';m.textContent='No coinciden.';return;}
   DB.pw=np;sv('pw',np);m.className='alert as';m.textContent='¡Actualizada!';
 }
-document.getElementById('sd').value=new Date().toISOString().split('T')[0];
-initDB();
+const ENC_PREGUNTAS=[
+  '1.- Entendió el objetivo de la capacitación entregada.',
+  '2.- Después de realizada la capacitación, se siente más preparado en los temas tratados.',
+  '3.- El relator transmitió los contenidos en forma clara.'
+];
+const ENC_OPTS=['I','S','B','MB'];
+let encLastRec=null;
 
-async function insertRCPQuiz(){
-  const rcpId = 'rcp-basica-2026';
-  // Siempre actualizar con upsert para reflejar cambios
+function showEnc(rec){
+  encLastRec=rec;
+  document.getElementById('enc-preguntas').innerHTML=ENC_PREGUNTAS.map((q,i)=>`
+    <div style="margin-bottom:1.25rem;padding:1rem;border:1.5px solid var(--border);border-radius:var(--rs);background:white;">
+      <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:.75rem">${q}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        ${ENC_OPTS.map(o=>`<button id="enc-${i}-${o}" onclick="selEnc(${i},'${o}')" style="flex:1;min-width:48px;padding:8px 4px;border:2px solid var(--border);border-radius:8px;background:white;font-size:13px;font-weight:800;color:var(--textMid);cursor:pointer;transition:all .15s">${o}</button>`).join('')}
+      </div>
+    </div>`).join('');
+  sp('penc');
+}
 
-  const rcpQuiz = {
-    id: rcpId,
-    name: 'RCP Básica - Reanimación Cardiopulmonar',
-    icon: '🫀',
-    questions: [
-      {type:'alt',text:'Ante un trabajador inconsciente, ¿cuáles son los signos fundamentales de un Paro Cardiorrespiratorio (PCR)?',options:['Presión arterial alta y fiebre','Pérdida de consciencia, ausencia de pulso y ausencia de respiración normal','Sudoración excesiva y dolor abdominal','Tos persistente y palidez facial','Dilatación de pupilas y escalofríos'],answer:1},
-      {type:'alt',text:'¿A qué se refiere la regla 30:2 en una reanimación cardiopulmonar?',options:['30 minutos de masaje por 2 minutos de descanso','30 compresiones torácicas seguidas de 2 ventilaciones','30 segundos de evaluación por 2 minutos de compresiones','30 compresiones por 2 personas distintas','30 ventilaciones por cada 2 compresiones'],answer:1},
-      {type:'alt',text:'Al realizar un llamado de emergencia en Chile, ¿a qué número debe llamar y qué información es esencial?',options:['133 (Carabineros); nombre de la empresa','131 (SAMU); dirección exacta, tipo de emergencia y estado de la víctima','132 (Bomberos); nombre completo y RUT','131 (SAMU); solo el nombre de quien llama','800 (ACHS); número de empleados presentes'],answer:1},
-      {type:'alt',text:'¿Qué es la cadena de supervivencia y cuándo se aplica?',options:['Un manual que se lee al llegar al hospital','Una serie de pasos críticos y secuenciales que se aplican de inmediato ante sospecha de PCR','Una estrategia administrativa de registro de accidentes','Un protocolo de evacuación masiva en incendios','Un conjunto de acciones exclusivas del equipo médico'],answer:1},
-      {type:'alt',text:'¿Cuáles son los signos que distinguen una obstrucción de vía aérea GRAVE de una leve?',options:['Leve: puede hablar y toser; Grave: no puede hablar ni toser y se lleva las manos al cuello','Leve: inconsciencia; Grave: fiebre alta','Leve: dificultad para tragar; Grave: dolor de cabeza','Leve: cianosis; Grave: piel roja','Leve: parálisis; Grave: convulsiones'],answer:0},
-      {type:'alt',text:'¿Qué funciones debe cumplir el líder ante un PCR en el trabajo?',options:['Abandonar el lugar para buscar ayuda','Coordinar el equipo, delegar tareas (llamar al 131, buscar DEA, despejar el área) e iniciar RCP','Redactar un informe administrativo','Limpiar el área mientras otros atienden','Entrevistar testigos para determinar responsabilidades'],answer:1},
-      {type:'vf',text:'✅❌ VERDADERO o FALSO: Las compresiones torácicas deben realizarse en el centro del pecho (sobre el esternón) con los brazos extendidos y a una profundidad de al menos 5 cm.',options:['Verdadero','Falso'],answer:0},
-      {type:'vf',text:'✅❌ VERDADERO o FALSO: Ante una obstrucción leve de la vía aérea, lo correcto es realizar la maniobra de Heimlich de inmediato sin esperar a que la persona intente toser por sí misma.',options:['Verdadero','Falso'],answer:1},
-      {type:'vf',text:'✅❌ VERDADERO o FALSO: El DEA (Desfibrilador Externo Automático) puede utilizarse sin capacitación previa, ya que el dispositivo entrega instrucciones de voz paso a paso.',options:['Verdadero','Falso'],answer:0},
-      {type:'vf',text:'✅❌ VERDADERO o FALSO: Si una víctima respira con normalidad, se debe igualmente iniciar compresiones torácicas para prevenir un posible paro.',options:['Verdadero','Falso'],answer:1},
-      {type:'order',text:'🔢 ORDEN CORRECTO: ¿Cuál es la secuencia correcta de actuación ante una víctima con sospecha de PCR? Selecciona la alternativa que muestra el orden adecuado.',options:['1) Verificar seguridad → 2) Comprobar consciencia → 3) Llamar al 131 → 4) Iniciar RCP → 5) Usar DEA','1) Iniciar RCP → 2) Llamar al 131 → 3) Verificar seguridad → 4) Usar DEA → 5) Comprobar consciencia','1) Llamar al 131 → 2) Usar DEA → 3) Verificar seguridad → 4) Comprobar consciencia → 5) Iniciar RCP','1) Comprobar consciencia → 2) Iniciar RCP → 3) Verificar seguridad → 4) Llamar al 131 → 5) Usar DEA'],answer:0},
-      {type:'order',text:'🔢 ORDEN CORRECTO: ¿Cuál es el orden correcto para aplicar la maniobra de Heimlich en un adulto consciente con obstrucción grave?',options:['1) Ponerse detrás de la víctima → 2) Rodear la cintura con los brazos → 3) Colocar el puño sobre el ombligo → 4) Aplicar compresiones hacia adentro y arriba','1) Golpear la espalda → 2) Rodear la cintura → 3) Llamar al 131 → 4) Colocar el puño bajo el esternón','1) Acostar a la víctima → 2) Presionar el abdomen → 3) Abrir la boca → 4) Extraer el objeto con los dedos','1) Colocar el puño en el pecho → 2) Rodear con los brazos → 3) Empujar hacia atrás → 4) Repetir hasta que salga'],answer:0}
-    ]
-  };
+function selEnc(idx, val){
+  ENC_OPTS.forEach(o=>{
+    const btn=document.getElementById(`enc-${idx}-${o}`);
+    if(btn){btn.style.background='white';btn.style.borderColor='var(--border)';btn.style.color='var(--textMid)';}
+  });
+  const sel=document.getElementById(`enc-${idx}-${val}`);
+  if(sel){sel.style.background='var(--orange)';sel.style.borderColor='var(--orange)';sel.style.color='white';}
+}
 
+async function submitEnc(){
+  const vals=ENC_OPTS;
+  const resp=ENC_PREGUNTAS.map((_,i)=>{
+    return ENC_OPTS.find(o=>{
+      const btn=document.getElementById(`enc-${i}-${o}`);
+      return btn&&btn.style.background.includes('245');//naranja
+    })||null;
+  });
+  // Verificar que todas estén respondidas
+  const seleccionadas=ENC_PREGUNTAS.map((_,i)=>{
+    return ENC_OPTS.find(o=>{
+      const btn=document.getElementById(`enc-${i}-${o}`);
+      return btn&&btn.style.borderColor==='var(--orange)';
+    })||null;
+  });
+  if(seleccionadas.some(v=>!v)){document.getElementById('enc-err').classList.remove('hidden');return;}
+  document.getElementById('enc-err').classList.add('hidden');
   try{
-    await sb.from('quizzes').insert([{id:nq.id,name:nq.name,icon:nq.icon,questions:nq.questions}]);
-    DB.quizzes.push(nq);
-    ok.classList.remove('hidden');
-    setTimeout(()=>{ok.classList.add('hidden');st('tqc');},1800);
-  }catch(e){ee.textContent='Error al guardar.';ee.classList.remove('hidden');}
+    await sb.from('results').update({enc1:seleccionadas[0],enc2:seleccionadas[1],enc3:seleccionadas[2]}).eq('id',encLastRec.id);
+  }catch(e){console.error(e);}
+  // Mensaje de cierre
+  document.getElementById('enc-preguntas').innerHTML=`
+    <div style="text-align:center;padding:2rem 1rem;">
+      <div style="font-size:3rem;margin-bottom:1rem">🎉</div>
+      <div style="font-size:18px;font-weight:900;color:var(--navy);margin-bottom:.5rem">¡Gracias por tu opinión!</div>
+      <div style="font-size:14px;color:var(--textLight)">Ya puedes cerrar esta página.</div>
+    </div>`;
+  document.querySelector('#penc .btn-orange').style.display='none';
 }
-function chPw(){
-  const np=document.getElementById('npw').value,cp=document.getElementById('cpw').value,m=document.getElementById('pwm');
-  m.classList.remove('hidden');
-  if(np.length<6){m.className='alert ae';m.textContent='Mínimo 6 caracteres.';return;}
-  if(np!==cp){m.className='alert ae';m.textContent='No coinciden.';return;}
-  DB.pw=np;sv('pw',np);m.className='alert as';m.textContent='¡Actualizada!';
-}
+
 document.getElementById('sd').value=new Date().toISOString().split('T')[0];
 initDB();
 
