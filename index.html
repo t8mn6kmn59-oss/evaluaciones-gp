@@ -562,7 +562,13 @@ textarea{resize:vertical;min-height:64px;}
     </div>
     <h3 style="font-size:15px;font-weight:900;color:var(--navy);margin-bottom:1rem;">Revisión de respuestas</h3>
     <div id="rrv"></div>
-    <div style="margin-top:1.5rem"><button class="btn btn-orange" onclick="showEnc()">Continuar → Encuesta 📝</button></div>
+    <div style="margin-top:1.5rem;background:linear-gradient(135deg,var(--navy) 0%,#2d4270 100%);border-radius:var(--r);padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+      <div>
+        <div style="font-size:14px;font-weight:900;color:white;margin-bottom:3px">📝 ¡Antes de terminar!</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.6)">Responde una breve encuesta de satisfacción. Solo toma 1 minuto.</div>
+      </div>
+      <button class="btn btn-orange" onclick="showEnc(window._lastRec)">Ir a la encuesta →</button>
+    </div>
   </div>
 </div>
 
@@ -576,13 +582,7 @@ textarea{resize:vertical;min-height:64px;}
     </div>
     <div class="card">
       <p style="font-size:13px;color:var(--textLight);margin-bottom:1.5rem;line-height:1.6">Marque su opinión sobre los aspectos que se detallan. Su respuesta es importante para mejorar futuras capacitaciones.</p>
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-bottom:6px;padding-right:4px">
-        <span style="font-size:10px;font-weight:800;color:var(--textLight);width:36px;text-align:center">I</span>
-        <span style="font-size:10px;font-weight:800;color:var(--textLight);width:36px;text-align:center">S</span>
-        <span style="font-size:10px;font-weight:800;color:var(--textLight);width:36px;text-align:center">B</span>
-        <span style="font-size:10px;font-weight:800;color:var(--textLight);width:36px;text-align:center">MB</span>
-      </div>
-      <div id="enc-items"></div>
+      <div id="enc-preguntas"></div>
       <div id="enc-err" class="alert ae hidden" style="margin-top:1rem">Por favor responde todas las preguntas.</div>
       <button class="btn btn-orange btn-block" style="margin-top:1.5rem" onclick="submitEnc()">Enviar encuesta y finalizar</button>
     </div>
