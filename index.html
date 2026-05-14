@@ -524,7 +524,6 @@ textarea{resize:vertical;min-height:64px;}
     <div style="margin-bottom:1.25rem"><div style="font-size:18px;font-weight:900;color:var(--navy)">Selecciona tu evaluación</div><div style="font-size:13px;color:var(--textLight);margin-top:3px">Elige el curso que debes rendir</div></div>
     <div class="quiz-grid" id="qsgrid"><div class="empty">⏳ Cargando...</div></div>
     <div id="qse" class="alert ae hidden">Selecciona una evaluación para continuar.</div>
-    <button class="btn btn-orange" onclick="startQ()">Comenzar evaluación →</button>
   </div>
 </div>
 
@@ -903,7 +902,7 @@ function gtsq(){
   const nombre=n||part.nombre;
   curS={name:nombre,date:d,rut:rut,email:email};
   if(selQid){startQ();return;}
-  document.getElementById('qsgrid').innerHTML=DB.quizzes.map(q=>`<div class="qsc" id="qc-${q.id}" onclick="selQ('${q.id}')"><div class="qi">${q.icon||'📋'}</div><h3>${q.name}</h3><p>${q.questions.length} preguntas</p></div>`).join('');
+  document.getElementById('qsgrid').innerHTML=DB.quizzes.map(q=>`<div class="qsc" id="qc-${q.id}" onclick="selQ('${q.id}')"><div class="qi">${q.icon||'📋'}</div><h3>${q.name}</h3><p>${q.questions.length} preguntas</p><button class="btn btn-orange btn-sm" style="margin-top:10px;width:100%;justify-content:center" onclick="event.stopPropagation();selQ('${q.id}');startQ()">Comenzar →</button></div>`).join('');
   sp('psq');
 }
 function selQ(id){selQid=id;document.querySelectorAll('.qsc').forEach(c=>c.classList.remove('active'));const el=document.getElementById('qc-'+id);if(el)el.classList.add('active');document.getElementById('qse').classList.add('hidden');}
