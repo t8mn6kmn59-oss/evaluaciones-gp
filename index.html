@@ -566,35 +566,18 @@ textarea{resize:vertical;min-height:64px;}
     </div>
     <h3 style="font-size:15px;font-weight:900;color:var(--navy);margin-bottom:1rem;">Revisión de respuestas</h3>
     <div id="rrv"></div>
-    <div style="margin-top:1.5rem;background:linear-gradient(135deg,var(--navy) 0%,#2d4270 100%);border-radius:var(--r);padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
-      <div>
-        <div style="font-size:14px;font-weight:900;color:white;margin-bottom:3px">📝 ¡Antes de terminar!</div>
-        <div style="font-size:12px;color:rgba(255,255,255,0.6)">Responde una breve encuesta de satisfacción. Solo toma 1 minuto.</div>
-      </div>
-      <button class="btn btn-orange" onclick="showEnc(window._lastRec)">Ir a la encuesta →</button>
+    <div style="margin-top:1.5rem;background:linear-gradient(135deg,var(--navy) 0%,#2d4270 100%);border-radius:var(--r);padding:1.5rem;">
+      <div style="font-size:14px;font-weight:900;color:white;margin-bottom:3px">📝 Encuesta de Satisfacción</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:1.25rem">Responde las 3 preguntas para finalizar. Solo toma 1 minuto.</div>
+      <div id="enc-preguntas"></div>
+      <div id="enc-err" class="alert ae hidden" style="margin-top:1rem">Por favor responde todas las preguntas.</div>
+      <button id="enc-submit-btn" class="btn btn-orange btn-block" style="margin-top:1.25rem;opacity:0.45;pointer-events:none" onclick="submitEnc()">Enviar y finalizar ✓</button>
+      <div style="margin-top:.75rem;text-align:center;font-size:11px;color:rgba(255,255,255,0.4)">I = Insuficiente (1-3) &nbsp;|&nbsp; S = Suficiente (4) &nbsp;|&nbsp; B = Bueno (5-6) &nbsp;|&nbsp; MB = Muy Bueno (7)</div>
     </div>
   </div>
 </div>
 
-<!-- ENCUESTA SATISFACCIÓN -->
-<div class="page" id="penc">
-  <div class="wrap" style="max-width:620px">
-    <div style="background:linear-gradient(135deg,#1B2A4A 0%,#2d4270 100%);border-radius:var(--r);padding:2rem 1.5rem;text-align:center;margin-bottom:1.5rem;">
-      <div style="font-size:2.5rem;margin-bottom:8px">📝</div>
-      <div style="font-size:18px;font-weight:900;color:white">Encuesta de Satisfacción</div>
-      <div style="font-size:12px;color:rgba(255,255,255,0.55);margin-top:4px">GP Empresas · Evaluación del Curso</div>
-    </div>
-    <div class="card">
-      <p style="font-size:13px;color:var(--textLight);margin-bottom:1.5rem;line-height:1.6">Marque su opinión sobre los aspectos que se detallan. Su respuesta es importante para mejorar futuras capacitaciones.</p>
-      <div id="enc-preguntas"></div>
-      <div id="enc-err" class="alert ae hidden" style="margin-top:1rem">Por favor responde todas las preguntas.</div>
-      <button class="btn btn-orange btn-block" style="margin-top:1.5rem" onclick="submitEnc()">Enviar encuesta y finalizar</button>
-    </div>
-    <div style="margin-top:1rem;text-align:center;font-size:11px;color:var(--textLight)">
-      I = Insuficiente (1-3) &nbsp;|&nbsp; S = Suficiente (4) &nbsp;|&nbsp; B = Bueno (5-6) &nbsp;|&nbsp; MB = Muy Bueno (7)
-    </div>
-  </div>
-</div>
+
 
 <!-- LOGIN -->
 <div class="page" id="plo">
@@ -975,7 +958,7 @@ function showRes(rec){
   document.getElementById('rrv').innerHTML=curQ.questions.map((q,i)=>{
     const ua=rec.answers[i];const ok=ua===q.answer;
     return`<div class="qcard" style="border-color:${ok?'#2D7D2D':'#C0392B'};background:${ok?'#f8fff8':'#fff8f8'}"><div class="qnum" style="color:${ok?'var(--green)':'var(--red)'}">Pregunta ${i+1} · ${ok?'Correcta ✓':'Incorrecta ✗'}</div><div class="qtext">${q.text}</div>${q.options.map((o,j)=>{let c='opt';if(j===q.answer)c+=' correct';else if(j===ua&&!ok)c+=' wrong';return`<div class="${c}" style="pointer-events:none"><div class="ol">${LT[j]}</div><span>${o}</span></div>`;}).join('')}</div>`;
-  }).join('');sp('prx');
+  }).join('');sp('prx');showEnc(window._lastRec);
 }
 
 function doLogin(){
@@ -1165,23 +1148,29 @@ function showEnc(rec){
   encLastRec=rec;
   encResp[0]=null;encResp[1]=null;encResp[2]=null;
   document.getElementById('enc-preguntas').innerHTML=ENC_PREGUNTAS.map((q,i)=>`
-    <div style="margin-bottom:1.25rem;padding:1rem;border:1.5px solid var(--border);border-radius:var(--rs);background:white;">
-      <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:.75rem">${q}</div>
+    <div style="margin-bottom:1rem;padding:1rem;border:1.5px solid rgba(255,255,255,0.15);border-radius:var(--rs);background:rgba(255,255,255,0.07);">
+      <div style="font-size:13px;font-weight:700;color:white;margin-bottom:.75rem">${q}</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        ${ENC_OPTS.map(o=>`<button id="enc-${i}-${o}" onclick="selEnc(${i},'${o}')" style="flex:1;min-width:48px;padding:8px 4px;border:2px solid var(--border);border-radius:8px;background:white;font-size:13px;font-weight:800;color:var(--textMid);cursor:pointer;transition:all .15s">${o}</button>`).join('')}
+        ${ENC_OPTS.map(o=>`<button id="enc-${i}-${o}" onclick="selEnc(${i},'${o}')" style="flex:1;min-width:48px;padding:8px 4px;border:2px solid rgba(255,255,255,0.25);border-radius:8px;background:transparent;font-size:13px;font-weight:800;color:rgba(255,255,255,0.7);cursor:pointer;transition:all .15s">${o}</button>`).join('')}
       </div>
     </div>`).join('');
-  sp('penc');
+}
+
+function checkEncComplete(){
+  const all=encResp[0]&&encResp[1]&&encResp[2];
+  const btn=document.getElementById('enc-submit-btn');
+  if(btn){btn.style.opacity=all?'1':'0.45';btn.style.pointerEvents=all?'auto':'none';}
 }
 
 function selEnc(idx, val){
   encResp[idx]=val;
   ENC_OPTS.forEach(o=>{
     const btn=document.getElementById(`enc-${idx}-${o}`);
-    if(btn){btn.style.background='white';btn.style.borderColor='var(--border)';btn.style.color='var(--textMid)';}
+    if(btn){btn.style.background='transparent';btn.style.borderColor='rgba(255,255,255,0.25)';btn.style.color='rgba(255,255,255,0.7)';}
   });
   const sel=document.getElementById(`enc-${idx}-${val}`);
   if(sel){sel.style.background='var(--orange)';sel.style.borderColor='var(--orange)';sel.style.color='white';}
+  checkEncComplete();
 }
 
 async function submitEnc(){
@@ -1193,12 +1182,13 @@ async function submitEnc(){
     console.log('Encuesta guardada:',seleccionadas,res);
   }catch(e){console.error('Error guardando encuesta:',e);}
   document.getElementById('enc-preguntas').innerHTML=`
-    <div style="text-align:center;padding:2rem 1rem;">
+    <div style="text-align:center;padding:1.5rem 1rem;">
       <div style="font-size:3rem;margin-bottom:1rem">🎉</div>
-      <div style="font-size:18px;font-weight:900;color:var(--navy);margin-bottom:.5rem">¡Gracias por tu opinión!</div>
-      <div style="font-size:14px;color:var(--textLight)">Ya puedes cerrar esta página.</div>
+      <div style="font-size:18px;font-weight:900;color:white;margin-bottom:.5rem">¡Gracias por tu opinión!</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.6)">Ya puedes cerrar esta página.</div>
     </div>`;
-  document.querySelector('#penc .btn-orange').style.display='none';
+  document.getElementById('enc-submit-btn').style.display='none';
+  document.getElementById('enc-err').style.display='none';
 }
 
 document.getElementById('sd').value=new Date().toISOString().split('T')[0];
