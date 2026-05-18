@@ -1074,28 +1074,20 @@ function renderQR(){
   grid.innerHTML=DB.quizzes.map(q=>`<div class="qr-card">
     <div style="font-size:1.8rem;margin-bottom:6px">${q.icon||'📋'}</div>
     <h3>${q.name}</h3><p>${q.questions.length} preguntas</p>
-    <div class="qr-wrap"><canvas id="qrc-${q.id}" width="400" height="400" style="width:160px;height:160px"></canvas></div>
+    <div class="qr-wrap"><canvas id="qrc-${q.id}" width="160" height="160"></canvas></div>
     <div class="qr-url">${qUrl(q.id)}</div>
     <div class="qr-actions">
       <button class="btn btn-navy btn-sm" onclick="openModal('${q.id}')">🖨 Imprimir</button>
       <button class="btn btn-outline btn-sm" onclick="dlQR('${q.id}','${q.name.replace(/'/g,'')}')">⬇ PNG</button>
       <button class="btn btn-ghost btn-sm" onclick="cpUrl('${q.id}')">🔗 URL</button>
     </div></div>`).join('');
-  setTimeout(()=>DB.quizzes.forEach(q=>genQR('qrc-'+q.id,qUrl(q.id),400)),150);
-}
-const GP_LOGO_B64='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';
-function drawLogoOnQR(ctx,sz){
-  const lsz=Math.round(sz*0.22);const pad=Math.round(sz*0.025);
-  const x=Math.round((sz-lsz)/2);const y=Math.round((sz-lsz)/2);
-  ctx.fillStyle='white';ctx.beginPath();ctx.arc(x+lsz/2,y+lsz/2,lsz/2+pad,0,Math.PI*2);ctx.fill();
-  const logo=new Image();logo.onload=()=>ctx.drawImage(logo,x,y,lsz,lsz);
-  logo.src='data:image/jpeg;base64,'+GP_LOGO_B64;
+  setTimeout(()=>DB.quizzes.forEach(q=>genQR('qrc-'+q.id,qUrl(q.id),160)),150);
 }
 function genQR(cid,url,sz){
   const c=document.getElementById(cid);if(!c)return;
   const t=document.createElement('div');t.style.display='none';document.body.appendChild(t);
-  try{new QRCode(t,{text:url,width:sz,height:sz,colorDark:'#1B2A4A',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
-  setTimeout(()=>{const img=t.querySelector('img');if(img){const i=new Image();i.onload=()=>{const ctx=c.getContext('2d');ctx.drawImage(i,0,0,sz,sz);drawLogoOnQR(ctx,sz);};i.src=img.src;}document.body.removeChild(t);},350);}
+  try{new QRCode(t,{text:url,width:sz,height:sz,colorDark:'#1B2A4A',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+  setTimeout(()=>{const img=t.querySelector('img');if(img){const i=new Image();i.onload=()=>c.getContext('2d').drawImage(i,0,0,sz,sz);i.src=img.src;}document.body.removeChild(t);},350);}
   catch(e){document.body.removeChild(t);}
 }
 function openModal(id){
@@ -1104,8 +1096,8 @@ function openModal(id){
   document.getElementById('pm-u').textContent=qUrl(id);
   const c=document.getElementById('pm-c');c.width=200;c.height=200;
   const t=document.createElement('div');t.style.display='none';document.body.appendChild(t);
-  new QRCode(t,{text:qUrl(id),width:200,height:200,colorDark:'#1B2A4A',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
-  setTimeout(()=>{const img=t.querySelector('img');if(img){const i=new Image();i.onload=()=>{const ctx=c.getContext('2d');ctx.drawImage(i,0,0,200,200);drawLogoOnQR(ctx,200);};i.src=img.src;}document.body.removeChild(t);},350);
+  new QRCode(t,{text:qUrl(id),width:200,height:200,colorDark:'#1B2A4A',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+  setTimeout(()=>{const img=t.querySelector('img');if(img){const i=new Image();i.onload=()=>c.getContext('2d').drawImage(i,0,0,200,200);i.src=img.src;}document.body.removeChild(t);},350);
   document.getElementById('pm').classList.remove('hidden');
 }
 function dlQR(id,name){const c=document.getElementById('qrc-'+id);if(!c){alert('QR no listo.');return;}const a=document.createElement('a');a.href=c.toDataURL('image/png');a.download='QR-GP-'+name+'.png';a.click();}
