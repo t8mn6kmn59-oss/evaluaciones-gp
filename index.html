@@ -326,6 +326,13 @@ textarea{resize:vertical;min-height:64px;}
         <div style="font-size:12px;color:rgba(255,255,255,0.65);margin-top:3px">Técnicas de Liderazgo Efectivo · GP Empresas · 4 Módulos</div>
       </div>
     </div>
+    <div id="mat-header-ergo" style="display:none;background:linear-gradient(135deg,#1a5c2a 0%,#2e7d32 100%);border-radius:var(--r);padding:1.75rem 1.5rem;margin-bottom:1.5rem;align-items:center;gap:1rem;flex-wrap:wrap;">
+      <div style="font-size:2.5rem">🦴</div>
+      <div>
+        <div style="font-size:20px;font-weight:900;color:white">Material de Estudio</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.65);margin-top:3px">Protocolos de Prevención de Riesgo Ergonómico · GP Empresas · 5 Módulos</div>
+      </div>
+    </div>
 
     <div style="background:white;border:1.5px solid var(--border);border-radius:var(--r);padding:1.25rem;margin-bottom:1.25rem;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px;">
       <div style="font-size:1.5rem">💡</div>
@@ -599,6 +606,195 @@ textarea{resize:vertical;min-height:64px;}
         </div>
       </div>
     </div><!-- fin mat-lid -->
+
+    <!-- CONTENIDO ERGONOMÍA -->
+    <div id="mat-ergo" style="display:none">
+
+      <!-- MÓDULO 1 -->
+      <div class="modulo-card">
+        <div class="modulo-hdr" onclick="toggleMod('e1')">
+          <div class="modulo-icon" style="background:#E8F5E8;">🔬</div>
+          <div class="modulo-title">
+            <h3>Módulo 1 · Introducción a la Ergonomía Laboral</h3>
+            <p>Concepto · Disciplinas · Historia · Objetivos y beneficios</p>
+          </div>
+          <div class="modulo-chevron" id="ch-e1">▾</div>
+        </div>
+        <div class="modulo-body" id="e1">
+          <h4>¿Qué es la Ergonomía?</h4>
+          <p>Viene del griego <strong>Ergo</strong> (trabajo) y <strong>Nomos</strong> (leyes). Es la disciplina científica que se ocupa de la comprensión de las interacciones entre los seres humanos y los componentes de un sistema, con el fin de optimizar el bienestar de las personas y el rendimiento del sistema.</p>
+          <h4>Disciplinas que la componen</h4>
+          <ul>
+            <li>🧠 <strong>Psicología:</strong> capacidades cognitivas, toma de decisiones, estrés mental.</li>
+            <li>📏 <strong>Antropometría:</strong> dimensiones del cuerpo humano (alturas de trabajo, espacios).</li>
+            <li>💓 <strong>Fisiología:</strong> consumo metabólico, cardiovascular y sensorial.</li>
+            <li>⚙️ <strong>Biomecánica:</strong> cuerpo humano desde el punto de vista mecánico; causas de lesiones por carga física, movimientos repetitivos y posturas estáticas.</li>
+          </ul>
+          <h4>Historia resumida</h4>
+          <ul>
+            <li>🏭 <strong>Revolución Industrial:</strong> primeras consideraciones de diseño ergonómico en máquinas.</li>
+            <li>✈️ <strong>Segunda Guerra Mundial:</strong> inicio real del estudio formal de ergonomía (diseño de aviones y equipos militares).</li>
+            <li>💻 <strong>Desde 1960:</strong> se extiende a computadoras, software e internet.</li>
+          </ul>
+          <h4>Beneficios de la Ergonomía</h4>
+          <ul>
+            <li>✅ Reducción de accidentes y enfermedades</li>
+            <li>✅ Incremento de productividad y calidad</li>
+            <li>✅ Disminución del estrés y mejora de la salud</li>
+            <li>✅ Mayor motivación y compromiso del trabajador</li>
+          </ul>
+          <div class="tip">💡 <strong>Principio clave:</strong> la ergonomía adapta el trabajo al trabajador, no el trabajador al trabajo.</div>
+        </div>
+      </div>
+
+      <!-- MÓDULO 2 -->
+      <div class="modulo-card">
+        <div class="modulo-hdr" onclick="toggleMod('e2')">
+          <div class="modulo-icon" style="background:#FEF0E3;">⚠️</div>
+          <div class="modulo-title">
+            <h3>Módulo 2 · Factores de Riesgo Ergonómico</h3>
+            <p>TME · Movimientos repetitivos · Manejo Manual de Carga</p>
+          </div>
+          <div class="modulo-chevron" id="ch-e2">▾</div>
+        </div>
+        <div class="modulo-body" id="e2">
+          <h4>¿Qué son los Factores de Riesgo?</h4>
+          <p>Son condiciones del trabajo que determinan las exigencias físicas y mentales que la tarea impone al trabajador, incrementando la probabilidad de que se produzca un daño musculoesquelético (TME).</p>
+          <h4>4 Grandes Grupos de Riesgo</h4>
+          <ul>
+            <li>👤 <strong>Individuales:</strong> capacidad funcional, hábitos, antecedentes de salud.</li>
+            <li>🏋️ <strong>Condiciones de trabajo:</strong> fuerza, posturas y repetición.</li>
+            <li>📋 <strong>Organizacionales:</strong> jornadas, horarios, pausas, ritmo y carga de trabajo.</li>
+            <li>🌡️ <strong>Ambientales:</strong> temperatura, vibración.</li>
+          </ul>
+          <h4>Factores de riesgo en movimientos repetitivos</h4>
+          <ul>
+            <li>🔁 <strong>Repetitividad:</strong> tarea repetitiva cuando los ciclos duran menos de 30 segundos o el mismo gesto ocupa el 50% o más del ciclo.</li>
+            <li>🙆 <strong>Postura forzada:</strong> posturas fuera de rangos funcionales o mantenidas por tiempo prolongado.</li>
+            <li>💪 <strong>Fuerza:</strong> esfuerzo físico muscular que puede superar la capacidad individual y generar fatiga.</li>
+            <li>❄️ <strong>Factores ambientales:</strong> frío (≤10°C) y vibración de herramientas.</li>
+          </ul>
+          <h4>Lesiones más comunes por TME</h4>
+          <ul>
+            <li>🦴 <strong>Muñeca:</strong> Síndrome del Túnel Carpiano, Tenosinovitis de Quervain.</li>
+            <li>💪 <strong>Codo:</strong> Epicondilitis ("codo de tenista"), Epitrocleítis.</li>
+            <li>🦾 <strong>Hombro:</strong> Tendinitis del manguito rotador.</li>
+            <li>🖐️ <strong>Mano/dedos:</strong> Dedo gatillo (tenosinovitis estenosante).</li>
+            <li>🔙 <strong>Espalda (MMC):</strong> Lumbalgia, Hernia discal, Ciática, Síndrome cervical.</li>
+          </ul>
+          <div class="tip">⚠️ <strong>Los TME generan 2 tipos de lesiones:</strong> agudas (dolor inmediato por esfuerzo intenso) y crónicas (por esfuerzos constantes y progresivos).</div>
+        </div>
+      </div>
+
+      <!-- MÓDULO 3 -->
+      <div class="modulo-card">
+        <div class="modulo-hdr" onclick="toggleMod('e3')">
+          <div class="modulo-icon" style="background:#EDE7F6;">📋</div>
+          <div class="modulo-title">
+            <h3>Módulo 3 · Conceptos Técnicos de Evaluación de Riesgos</h3>
+            <p>Protocolos · Marco legal · TMERT-EESS · MMC</p>
+          </div>
+          <div class="modulo-chevron" id="ch-e3">▾</div>
+        </div>
+        <div class="modulo-body" id="e3">
+          <h4>Protocolos vigentes según normativa legal</h4>
+          <ul>
+            <li>🦴 <strong>TMERT-EESS:</strong> Trastornos Musculoesqueléticos de Extremidades Superiores relacionados con el Trabajo.</li>
+            <li>📦 <strong>MMC:</strong> Manejo Manual de Carga (Ley N°20.001 y Ley N°20.949).</li>
+            <li>🔊 <strong>PREXOR:</strong> Pérdida Auditiva por Exposición a Ruido.</li>
+            <li>☀️ <strong>Radiaciones UV · Sílice · Plaguicidas · Asbesto · Dermatitis · Fiebre Q</strong> entre otros.</li>
+          </ul>
+          <h4>Marco Legal MMC (Ley 20.001 y 20.949)</h4>
+          <ul>
+            <li>♂️ <strong>Hombres adultos:</strong> máximo <strong>25 kg</strong></li>
+            <li>♀️ <strong>Mujeres y menores de 18 años:</strong> máximo <strong>20 kg</strong></li>
+            <li>🤰 <strong>Mujeres embarazadas:</strong> <strong>prohibido</strong> el manejo manual de carga</li>
+          </ul>
+          <h4>Norma Técnica TMERT-EESS</h4>
+          <p>Elaborada por el MINSAL para identificar y evaluar factores de riesgo musculoesquelético en extremidades superiores. Se aplica a <strong>todo tipo de empresa</strong>, independientemente del rubro, tamaño o número de trabajadores.</p>
+          <h4>Responsabilidades del Empleador (DS 594)</h4>
+          <ul>
+            <li>📝 Evaluar con la Lista de Chequeo Inicial del MINSAL (Art. 110 a.1)</li>
+            <li>🔧 Implementar medidas de control en tareas rojas (Art. 110 a.2)</li>
+            <li>📢 Capacitar a los trabajadores sobre los riesgos y medidas preventivas (Art. 110 a.3)</li>
+          </ul>
+          <div class="tip">📌 <strong>Semáforo de riesgo:</strong> 🟢 Verde = bajo riesgo (mantener) · 🟡 Amarillo = riesgo medio (corregir) · 🔴 Rojo = alto riesgo (intervención obligatoria).</div>
+        </div>
+      </div>
+
+      <!-- MÓDULO 4 -->
+      <div class="modulo-card">
+        <div class="modulo-hdr" onclick="toggleMod('e4')">
+          <div class="modulo-icon" style="background:#E0F7FA;">🔍</div>
+          <div class="modulo-title">
+            <h3>Módulo 4 · Etapas de Implementación de Protocolos</h3>
+            <p>Identificación de peligro · Evaluación · Documentación · Control</p>
+          </div>
+          <div class="modulo-chevron" id="ch-e4">▾</div>
+        </div>
+        <div class="modulo-body" id="e4">
+          <h4>Las 4 Etapas del Protocolo TMERT-EESS</h4>
+          <ul>
+            <li>0️⃣ <strong>Etapa 0 – Identificación del Peligro:</strong> construir una matriz de peligro. Identificar tareas con uso de extremidades superiores (repetitividad, postura, fuerza). Si al menos uno de los 3 factores está presente → existe peligro → pasar a Etapa 1.</li>
+            <li>1️⃣ <strong>Etapa 1 – Evaluación del Riesgo:</strong> aplicar la Lista de Chequeo Inicial del MINSAL. Se categoriza cada factor con color de semáforo. Si al menos uno de los pasos 1, 2 o 3 es ROJO → la tarea es crítica (rojo global).</li>
+            <li>2️⃣ <strong>Etapa 2 – Documentación:</strong> ingresar datos a la plataforma TMERT-EESS de la Mutualidad. Genera el 1° Informe Técnico con tareas rojas identificadas.</li>
+            <li>3️⃣ <strong>Etapa 3 – Medidas de Control:</strong> implementar controles en plazo máximo de 3 meses. Reevaluar con lista de chequeo. Si sigue rojo → ingresar trabajadores al programa de vigilancia de salud.</li>
+          </ul>
+          <h4>Protocolo MMC – Pasos</h4>
+          <ul>
+            <li>📊 <strong>Paso 1:</strong> Información general del puesto (Tabla 1).</li>
+            <li>❓ <strong>Paso 2:</strong> Identificación Inicial (Tabla 2) con preguntas clave.</li>
+            <li>🔎 <strong>Paso 3:</strong> Identificación Avanzada – Condición Aceptable y Condición Crítica.</li>
+            <li>📋 <strong>Paso 4:</strong> Resumen y seguimiento (Tabla 9).</li>
+          </ul>
+          <div class="tip">⏱️ <strong>Plazos MMC:</strong> Identificación inicial 30 días (90 días empresa grande) · Implementación de medidas 60–180 días · Evaluación plan correctivo 60 días · Asesoría especialista 60 días.</div>
+        </div>
+      </div>
+
+      <!-- MÓDULO 5 -->
+      <div class="modulo-card">
+        <div class="modulo-hdr" onclick="toggleMod('e5')">
+          <div class="modulo-icon" style="background:#FFF8E1;">🛡️</div>
+          <div class="modulo-title">
+            <h3>Módulo 5 · Protocolos Preventivos y Medidas de Control</h3>
+            <p>Higiene postural · Pausas · EPP · Gimnasia de pausa</p>
+          </div>
+          <div class="modulo-chevron" id="ch-e5">▾</div>
+        </div>
+        <div class="modulo-body" id="e5">
+          <h4>Medidas de Control</h4>
+          <ul>
+            <li>🔩 <strong>Ingenieriles:</strong> modificar el ambiente físico incorporando herramientas o equipos (grúas, mesas ajustables, correas transportadoras, automatización).</li>
+            <li>📅 <strong>Administrativas:</strong> pausas, rotación de puestos, reducción del tiempo de exposición.</li>
+          </ul>
+          <h4>Pausas de Trabajo (TMERT-EESS)</h4>
+          <ul>
+            <li>⏸️ Pausa de <strong>5–8 minutos cada ½ hora</strong> ante postura moderada a severa.</li>
+            <li>🔄 <strong>Rotación de puestos:</strong> rotar desde un puesto con alta exigencia a otro que use distinta musculatura. Esquemas de <strong>45 minutos de trabajo + 5 de pausa</strong> dan buenos resultados.</li>
+            <li>⚡ La rotación se debe activar <strong>antes de que aparezca la fatiga</strong>.</li>
+          </ul>
+          <h4>Higiene Postural</h4>
+          <ul>
+            <li>🪑 <strong>Sentado:</strong> pies apoyados, rodillas al nivel de caderas, espalda recta con apoyo lumbar, pantalla a 45 cm y altura de ojos, codos a 90°.</li>
+            <li>🧍 <strong>De pie:</strong> alternar postura frecuentemente, un pie elevado, evitar tacones altos.</li>
+            <li>📦 <strong>Al levantar carga:</strong> rodillas flexionadas, espalda recta, carga pegada al cuerpo, sin torsión del tronco.</li>
+          </ul>
+          <h4>Elementos de Protección Personal (EPP)</h4>
+          <ul>
+            <li>⛑️ <strong>Cabeza:</strong> casco de seguridad</li>
+            <li>👁️ <strong>Ojos/rostro:</strong> lentes o protector facial</li>
+            <li>👂 <strong>Oídos:</strong> tapones o orejeras</li>
+            <li>🧤 <strong>Manos:</strong> guantes adecuados al riesgo</li>
+            <li>👢 <strong>Pies:</strong> calzado de seguridad con punta de acero</li>
+            <li>🫁 <strong>Vías respiratorias:</strong> respirador con filtro según contaminante</li>
+          </ul>
+          <h4>Gimnasia de Pausa</h4>
+          <p>Conjunto de ejercicios de flexibilidad, movilidad articular y estiramiento. Se estructura en 3 partes: <strong>calentamiento → activación muscular → vuelta a la calma/elongaciones</strong>. Beneficios: reduce estrés, mejora postura, disminuye riesgo de enfermedad profesional y mejora el desempeño laboral.</p>
+          <div class="tip">🩺 <strong>Recuerda:</strong> los EPP no eliminan el riesgo, pero protegen al trabajador. Siempre deben usarse como complemento de las medidas ingenieriles y administrativas.</div>
+        </div>
+      </div>
+
+    </div><!-- fin mat-ergo -->
 
     <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:1.5rem;">
       <button class="btn btn-orange" style="flex:1;justify-content:center" onclick="sp('psi')">✏️ Ir a la evaluación →</button>
@@ -956,7 +1152,16 @@ async function loadResults(){
 }
 
 function sp(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);if(id==='pmat')loadMat();}
-function loadMat(){const isLid=selQid&&selQid.includes('liderazgo');document.getElementById('mat-rcp').style.display=isLid?'none':'block';document.getElementById('mat-lid').style.display=isLid?'block':'none';document.getElementById('mat-header-rcp').style.display=isLid?'none':'flex';document.getElementById('mat-header-lid').style.display=isLid?'flex':'none';}
+function loadMat(){
+  const isLid=selQid&&selQid.includes('liderazgo');
+  const isErgo=selQid&&selQid.includes('ergonomia');
+  document.getElementById('mat-rcp').style.display=(!isLid&&!isErgo)?'block':'none';
+  document.getElementById('mat-lid').style.display=isLid?'block':'none';
+  document.getElementById('mat-ergo').style.display=isErgo?'block':'none';
+  document.getElementById('mat-header-rcp').style.display=(!isLid&&!isErgo)?'flex':'none';
+  document.getElementById('mat-header-lid').style.display=isLid?'flex':'none';
+  document.getElementById('mat-header-ergo').style.display=isErgo?'flex':'none';
+}
 function goMat(){
   if(selQid){sp('pmat');return;}
   // Mostrar pantalla de selección de curso para material
