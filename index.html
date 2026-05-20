@@ -921,6 +921,7 @@ async function initDB(){
   await loadQuizzes();
   await insertRCPQuiz();
   await insertLiderazgoQuiz();
+  await insertErgonomiaQuiz();
   const params=new URLSearchParams(window.location.search);
   const qp=params.get('quiz');
   if(qp&&DB.quizzes.find(q=>q.id===qp)){selQid=qp;showQuizEntry(qp);}
@@ -1407,6 +1408,37 @@ async function insertLiderazgoQuiz(){
   }catch(e){console.error('Error actualizando Liderazgo quiz:',e);}
 }
 
+
+async function insertErgonomiaQuiz(){
+  const ergId = 'ergonomia-2026';
+  const ergQuiz = {
+    id: ergId,
+    name: 'Protocolos de Prevención de Riesgo Ergonómico',
+    icon: '🦴',
+    questions: [
+      {text:'¿Qué significa MMC?',options:['Manejo Manual de Carga','Método Médico Clínico','Medida de Control','Manual de Capacitación'],answer:0},
+      {text:'¿Qué son TMERT-EESS?',options:['Trastornos musculoesqueléticos relacionados con el trabajo','Equipo de seguridad','Tipo de empresa','Examen médico'],answer:0},
+      {text:'Un factor de riesgo aumenta la probabilidad de daño.',options:['Verdadero','Falso'],answer:0},
+      {text:'Los movimientos repetitivos nunca generan TME.',options:['Verdadero','Falso'],answer:1},
+      {text:'La postura y fuerza son factores de riesgo.',options:['Verdadero','Falso'],answer:0},
+      {text:'El ambiente de trabajo no influye en TME.',options:['Verdadero','Falso'],answer:1},
+      {text:'¿Qué comprende las extremidades superiores (EESS)?',options:['Solo manos','Hombro a mano','Solo brazo','Solo muñeca'],answer:1},
+      {text:'¿Quién desarrolla los protocolos de evaluación de riesgo ergonómico?',options:['MINSAL','Municipalidad','Banco','Colegio'],answer:0},
+      {text:'¿Cuál es una recomendación de higiene postural?',options:['Mantener la misma postura','Alternar posturas y descansar','Correr con carga','Ninguna'],answer:1},
+      {text:'¿Qué EPP protege los pies?',options:['Casco','Guantes','Calzado de seguridad','Lentes'],answer:2}
+    ]
+  };
+  try{
+    await sb.from('quizzes').upsert([{
+      id: ergQuiz.id,
+      name: ergQuiz.name,
+      icon: ergQuiz.icon,
+      questions: ergQuiz.questions
+    }]);
+    console.log('Ergonomía quiz insertado!');
+    await loadQuizzes();
+  }catch(e){console.error('Error insertando Ergonomía quiz:',e);}
+}
 
 async function delResult(rid){
   if(!confirm('¿Eliminar este resultado? Esta acción no se puede deshacer.'))return;
