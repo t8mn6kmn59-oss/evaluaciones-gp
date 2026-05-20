@@ -297,11 +297,18 @@ textarea{resize:vertical;min-height:64px;}
 <div class="page" id="pmat">
   <div class="wrap" style="max-width:680px">
     <div class="back" onclick="gh()">← Volver al inicio</div>
-    <div style="background:linear-gradient(135deg,#C0392B 0%,#922B21 100%);border-radius:var(--r);padding:1.75rem 1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+    <div id="mat-header-rcp" style="background:linear-gradient(135deg,#C0392B 0%,#922B21 100%);border-radius:var(--r);padding:1.75rem 1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
       <div style="font-size:2.5rem">🫀</div>
       <div>
         <div style="font-size:20px;font-weight:900;color:white">Material de Estudio</div>
         <div style="font-size:12px;color:rgba(255,255,255,0.65);margin-top:3px">RCP Básica · GP Empresas · 5 Módulos</div>
+      </div>
+    </div>
+    <div id="mat-header-lid" style="display:none;background:linear-gradient(135deg,#1B2A4A 0%,#2d4270 100%);border-radius:var(--r);padding:1.75rem 1.5rem;margin-bottom:1.5rem;display:none;align-items:center;gap:1rem;flex-wrap:wrap;">
+      <div style="font-size:2.5rem">🎯</div>
+      <div>
+        <div style="font-size:20px;font-weight:900;color:white">Material de Estudio</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.65);margin-top:3px">Técnicas de Liderazgo Efectivo · GP Empresas · 4 Módulos</div>
       </div>
     </div>
 
@@ -310,6 +317,8 @@ textarea{resize:vertical;min-height:64px;}
       <div style="font-size:13px;color:var(--textMid);line-height:1.6;">Revisa los contenidos de cada módulo antes de rendir la evaluación. Puedes expandir cada sección tocando el título.</div>
     </div>
 
+    <!-- CONTENIDO RCP -->
+    <div id="mat-rcp">
     <!-- MÓDULO I -->
     <div class="modulo-card">
       <div class="modulo-hdr" onclick="toggleMod('m1')">
@@ -461,6 +470,120 @@ textarea{resize:vertical;min-height:64px;}
         <div class="tip">🧠 <strong>Estrés postraumático:</strong> vivenciar un PCR puede generar impacto emocional. Es normal sentir mareos, insomnio, irritabilidad o ansiedad después. Busca apoyo si lo necesitas.</div>
       </div>
     </div>
+
+    </div><!-- fin mat-rcp -->
+
+    <!-- CONTENIDO LIDERAZGO -->
+    <div id="mat-lid" style="display:none">
+      <div class="modulo-card">
+        <div class="modulo-hdr" onclick="toggleMod('l1')">
+          <div class="modulo-icon" style="background:#EDE7F6;">🏆</div>
+          <div class="modulo-title">
+            <h3>Módulo 1 · Definición de Liderazgo y Tipología</h3>
+            <p>Tipos de liderazgo · Modelo GROW · Líder vs Jefe</p>
+          </div>
+          <div class="modulo-chevron" id="ch-l1">▾</div>
+        </div>
+        <div class="modulo-body" id="l1">
+          <h4>¿Qué es el Liderazgo?</h4>
+          <p>Es el conjunto de habilidades que tiene una persona para guiar a otras, ejercer influencia y lograr que con entusiasmo alcancen los objetivos planteados. No se define por las órdenes que imparte, sino por la capacidad de fijar metas claras, motivar y generar compromiso.</p>
+          <h4>Tipos de Liderazgo</h4>
+          <ul>
+            <li>🟢 <strong>Democrático:</strong> comparte decisiones e involucra al equipo en el proceso. Los miembros participan en la lluvia de ideas, aunque el líder tiene la última palabra.</li>
+            <li>🟡 <strong>Permisivo:</strong> ejerce poco control sobre los miembros, toma decisiones con prontitud influenciado por emociones. Es accesible y le agrada escuchar.</li>
+            <li>🔴 <strong>Autocrático:</strong> centraliza todo el poder y la toma de decisiones. Nunca justifica sus decisiones, la comunicación es unidireccional.</li>
+          </ul>
+          <h4>Modelo GROW (Líder Coach)</h4>
+          <ul>
+            <li>🅖 <strong>Goal (Meta):</strong> identificar objetivos para el desempeño. Deben ser medibles y con fecha límite.</li>
+            <li>🅡 <strong>Reality (Realidad):</strong> describir la situación actual y la distancia al reto.</li>
+            <li>🅞 <strong>Options (Opciones):</strong> considerar alternativas para superar las limitaciones.</li>
+            <li>🅦 <strong>Will (Acción):</strong> establecer un plan de acción con el que comprometerse.</li>
+          </ul>
+          <div class="tip">💡 <strong>Diferencia clave:</strong> El jefe manda e inspira miedo. El líder guía, dice "nuestra empresa", comparte éxitos y se preocupa por las personas.</div>
+        </div>
+      </div>
+
+      <div class="modulo-card">
+        <div class="modulo-hdr" onclick="toggleMod('l2')">
+          <div class="modulo-icon" style="background:#FFF8E1;">🤝</div>
+          <div class="modulo-title">
+            <h3>Módulo 2 · Equipos de Trabajo</h3>
+            <p>Grupo vs Equipo · Etapas de formación · Sinergia</p>
+          </div>
+          <div class="modulo-chevron" id="ch-l2">▾</div>
+        </div>
+        <div class="modulo-body" id="l2">
+          <h4>Grupo vs Equipo de Trabajo</h4>
+          <ul>
+            <li>👥 <strong>Grupo:</strong> líder fuerte y centrado en la tarea, responsabilidad individual, producto generado en forma individual.</li>
+            <li>⚡ <strong>Equipo:</strong> <strong>liderazgo compartido</strong>, responsabilidad individual y conjunta, objetivo específico del equipo, fomenta discusiones abiertas y resolución activa de problemas.</li>
+          </ul>
+          <h4>Etapas de Formación del Equipo</h4>
+          <ul>
+            <li>1️⃣ <strong>Formación:</strong> los miembros se conocen, bajo compromiso, sin identidad de equipo.</li>
+            <li>2️⃣ <strong>Conflicto:</strong> expresan diferencias, cada uno quiere imponer su forma de trabajar.</li>
+            <li>3️⃣ <strong>Normalización:</strong> meta clara, se valoran las habilidades de cada uno, cohesión.</li>
+            <li>4️⃣ <strong>Desempeño:</strong> autonomía, gestión del conflicto, liderazgos situacionales.</li>
+            <li>5️⃣ <strong>Terminación:</strong> solo equipos formados para proyectos específicos que se disuelven al terminar.</li>
+          </ul>
+          <div class="tip">⚡ <strong>Sinergia:</strong> el todo es más que la suma de sus partes. En un equipo, las habilidades son complementarias, la responsabilidad es individual y mutua, y la sinergia es positiva.</div>
+        </div>
+      </div>
+
+      <div class="modulo-card">
+        <div class="modulo-hdr" onclick="toggleMod('l3')">
+          <div class="modulo-icon" style="background:#E0F7FA;">💬</div>
+          <div class="modulo-title">
+            <h3>Módulo 3 · Motivación y Comunicación</h3>
+            <p>Tipos de motivación · Proceso comunicativo · Escucha activa</p>
+          </div>
+          <div class="modulo-chevron" id="ch-l3">▾</div>
+        </div>
+        <div class="modulo-body" id="l3">
+          <h4>Tipos de Motivación Laboral</h4>
+          <ul>
+            <li>🌟 <strong>Motivación intrínseca:</strong> viene de adentro, no requiere estímulo externo. Se relaciona con la <strong>satisfacción personal</strong> de realizar una tarea. Ejemplo: aprender algo nuevo por el placer de aprender.</li>
+            <li>🎁 <strong>Motivación extrínseca:</strong> viene de fuera, estimulada por terceros. Se asocia a recompensas externas como un premio, ascenso o reconocimiento.</li>
+          </ul>
+          <h4>El Proceso de Comunicación</h4>
+          <p>La comunicación involucra: <strong>Emisor</strong> → codifica el mensaje → lo envía por un <strong>Canal</strong> → el <strong>Receptor</strong> decodifica → genera una <strong>Respuesta</strong> (retroalimentación). Puede ser afectada por el <strong>ruido</strong> (distorsiones en el proceso).</p>
+          <ul>
+            <li>📢 <strong>Emisor:</strong> quien envía el mensaje</li>
+            <li>📡 <strong>Canal:</strong> medio por el que se transmite</li>
+            <li>👂 <strong>Receptor:</strong> quien recibe y decodifica</li>
+            <li>↩️ <strong>Retroalimentación:</strong> respuesta del receptor</li>
+          </ul>
+          <div class="tip">📊 <strong>Dato clave:</strong> más del 65% del significado social de cualquier comunicación se expresa de forma no verbal (gestos, postura, tono de voz).</div>
+        </div>
+      </div>
+
+      <div class="modulo-card">
+        <div class="modulo-hdr" onclick="toggleMod('l4')">
+          <div class="modulo-icon" style="background:#E8F5E8;">📋</div>
+          <div class="modulo-title">
+            <h3>Módulo 4 · Técnicas de Empoderamiento y Reuniones</h3>
+            <p>Empowerment · Etapas de la reunión · Resolución de conflictos</p>
+          </div>
+          <div class="modulo-chevron" id="ch-l4">▾</div>
+        </div>
+        <div class="modulo-body" id="l4">
+          <h4>Etapas de una Reunión Efectiva</h4>
+          <ul>
+            <li>1️⃣ <strong>Antes de la reunión → C (Preparación y selección del tipo):</strong> determinar si es necesaria, seleccionar el tipo, preparar agenda, enviar citaciones.</li>
+            <li>2️⃣ <strong>Durante la reunión → A (Inicio, conducción y cierre):</strong> puntualidad, revisión de agenda, fomentar participación, registrar acuerdos.</li>
+            <li>3️⃣ <strong>Después de la reunión → B (Evaluación y seguimiento):</strong> enviar acta, evaluar la reunión, monitorear cumplimiento de acuerdos.</li>
+          </ul>
+          <h4>Reuniones Efectivas para la Organización</h4>
+          <ul>
+            <li>🏢 <strong>Para la organización → D:</strong> contribuyen al despliegue de la estrategia institucional y son oportunidad para la gestión participativa.</li>
+            <li>👥 Para los equipos: aprenden a trabajar juntos orientados a objetivos.</li>
+            <li>👤 Para las personas: oportunidad de inclusión y compromiso con resultados.</li>
+          </ul>
+          <div class="tip">🤝 <strong>Resolución de conflictos:</strong> los conflictos no son positivos ni negativos, es lo que hacemos con ellos. El enfoque ganar/ganar busca satisfacer las necesidades de todas las partes practicando escucha activa y empatía.</div>
+        </div>
+      </div>
+    </div><!-- fin mat-lid -->
 
     <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:1.5rem;">
       <button class="btn btn-orange" style="flex:1;justify-content:center" onclick="sp('psi')">✏️ Ir a la evaluación →</button>
@@ -816,7 +939,8 @@ async function loadResults(){
   }catch(e){console.error(e);}
 }
 
-function sp(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
+function sp(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);if(id==='pmat')loadMat();}
+function loadMat(){const isLid=selQid&&selQid.includes('liderazgo');document.getElementById('mat-rcp').style.display=isLid?'none':'block';document.getElementById('mat-lid').style.display=isLid?'block':'none';document.getElementById('mat-header-rcp').style.display=isLid?'none':'flex';document.getElementById('mat-header-lid').style.display=isLid?'flex':'none';}
 function showQuizEntry(qid){
   const q=DB.quizzes.find(x=>x.id===qid);
   if(q){
