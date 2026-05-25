@@ -904,6 +904,7 @@ textarea{resize:vertical;min-height:64px;}
       <button class="tab active" onclick="st('tr')">📊 Reporte</button>
       <button class="tab" onclick="st('tqr')">📋 Evaluaciones</button>
       <button class="tab" onclick="st('tqc')">📲 Códigos QR</button>
+      <button class="tab" onclick="st('tnom')">👥 Nóminas</button>
       <button class="tab" onclick="st('tn')">➕ Nueva</button>
       <button class="tab" onclick="st('ts')">⚙️ Ajustes</button>
     </div>
@@ -981,6 +982,38 @@ textarea{resize:vertical;min-height:64px;}
       </div>
       <div id="url-ok" class="alert as hidden">✓ URL actualizada.</div>
       <div class="qr-grid" id="qrgrid"></div>
+    </div>
+
+    <!-- NÓMINAS -->
+    <div id="tnom" class="hidden">
+      <div class="shdr"><h2>Nóminas de Participantes</h2>
+        <button class="btn btn-orange btn-sm" onclick="showCrearNomina()">+ Nueva nómina</button>
+      </div>
+
+      <!-- Formulario crear nómina -->
+      <div id="nom-form" class="card hidden" style="margin-bottom:1.5rem">
+        <h3 style="font-size:15px;font-weight:800;color:var(--navy);margin-bottom:1.25rem">Nueva nómina</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem">
+          <div class="fg" style="margin:0"><label>Empresa</label><input type="text" id="nom-empresa" placeholder="Ej: Incolur SpA"></div>
+          <div class="fg" style="margin:0"><label>Fecha inicio</label><input type="date" id="nom-fecha"></div>
+        </div>
+        <div class="fg">
+          <label>Evaluación que rendirán</label>
+          <select id="nom-quiz"></select>
+        </div>
+        <div class="fg">
+          <label>Participantes (un RUT;Nombre por línea)</label>
+          <textarea id="nom-participantes" style="min-height:140px" placeholder="14431904-4;Leonardo Ulloa Hidalgo&#10;21091545-1;Martín Ulloa Canales"></textarea>
+        </div>
+        <div id="nom-err" class="alert ae hidden"></div>
+        <div style="display:flex;gap:.75rem">
+          <button class="btn btn-orange" onclick="guardarNomina()">💾 Crear nómina y generar QR</button>
+          <button class="btn btn-ghost" onclick="document.getElementById('nom-form').classList.add('hidden')">Cancelar</button>
+        </div>
+      </div>
+
+      <!-- Lista nóminas -->
+      <div id="nom-lista"><div class="empty"><div>👥</div><p>Cargando nóminas...</p></div></div>
     </div>
 
     <!-- NUEVA -->
@@ -1077,8 +1110,13 @@ async function initDB(){
   await insertLiderazgoQuiz();
   await insertErgonomiaQuiz();
   const params=new URLSearchParams(window.location.search);
+  const nomId=params.get('nom');
   const qp=params.get('quiz');
-  if(qp&&DB.quizzes.find(q=>q.id===qp)){selQid=qp;showQuizEntry(qp);}
+  if(nomId){
+    await cargarNominaDesdeParams();
+  } else if(qp&&DB.quizzes.find(q=>q.id===qp)){
+    selQid=qp;showQuizEntry(qp);
+  }
 }
 
 async function loadQuizzes(){
@@ -1147,6 +1185,8 @@ function toggleMod(id){
 function gh(){selQid=null;curQ=null;curS=null;for(const k in ans)delete ans[k];sp('ph');}
 
 const PARTICIPANTES=[
+  // RUT DEMO (para mostrar el sistema a clientes)
+  {rut:'12345678-9',nombre:'Empresas GP'},
   // Prueba 15-05-2026
   {rut:'10031095-3',nombre:'Patricia Elizabeth Villanueva Villagran'},
   {rut:'11167299-7',nombre:'Jose Alejandro Castro Pereira'},
@@ -1182,6 +1222,7 @@ const PARTICIPANTES=[
 function normRut(r){return r.replace(/\./g,'').replace(/\s/g,'').toUpperCase();}
 function findParticipante(rut){const nr=normRut(rut);return PARTICIPANTES.find(p=>normRut(p.rut)===nr);}
 function autoNombre(rut){
+  if(curNomina){autoNombreNomina(rut);return;}
   const p=findParticipante(rut);
   const inp=document.getElementById('sn');
   if(p){inp.value=p.nombre;inp.style.color='var(--navy)';}
@@ -1191,12 +1232,23 @@ function autoNombre(rut){
 function gtsq(){
   const n=document.getElementById('sn').value.trim(),d=document.getElementById('sd').value,rut=document.getElementById('srut').value.trim(),email=document.getElementById('semail').value.trim();
   if(!rut){document.getElementById('ie').textContent='Por favor ingresa tu RUT.';document.getElementById('ie').classList.remove('hidden');return;}
-  const part=findParticipante(rut);
-  if(!part){document.getElementById('ie').textContent='RUT no autorizado. Verifica que esté bien escrito o consulta al instructor.';document.getElementById('ie').classList.remove('hidden');return;}
+  
+  let nombre=n;
+  if(curNomina){
+    // Validar contra nómina
+    const nr=normRut(rut);
+    const part=(curNomina.participantes||[]).find(x=>normRut(x.rut)===nr);
+    if(!part){document.getElementById('ie').textContent='RUT no está en la nómina de '+curNomina.empresa+'. Verifica que esté bien escrito o consulta al instructor.';document.getElementById('ie').classList.remove('hidden');return;}
+    nombre=part.nombre;
+  } else {
+    const part=findParticipante(rut);
+    if(!part){document.getElementById('ie').textContent='RUT no autorizado. Verifica que esté bien escrito o consulta al instructor.';document.getElementById('ie').classList.remove('hidden');return;}
+    nombre=n||part.nombre;
+  }
+  
   if(!d){document.getElementById('ie').textContent='Por favor selecciona la fecha.';document.getElementById('ie').classList.remove('hidden');return;}
   document.getElementById('ie').classList.add('hidden');
-  const nombre=n||part.nombre;
-  curS={name:nombre,date:d,rut:rut,email:email};
+  curS={name:nombre,date:d,rut:rut,email:email,nomina_id:curNomina?curNomina.id:null,empresa:curNomina?curNomina.empresa:null};
   if(selQid){startQ();return;}
   document.getElementById('qsgrid').innerHTML=DB.quizzes.map(q=>`<div class="qsc" id="qc-${q.id}" onclick="selQ('${q.id}')"><div class="qsc-body"><div class="qi">${q.icon||'📋'}</div><h3>${q.name}</h3><p>${q.questions.length} preguntas</p></div><button class="btn btn-orange btn-sm" style="margin-top:10px;width:100%;justify-content:center" onclick="event.stopPropagation();selQ('${q.id}');startQ()">Comenzar →</button></div>`).join('');
   sp('psq');
@@ -1280,13 +1332,160 @@ function doLogin(){
 }
 async function rIns(){pfs();await loadResults();renderReport();rql();}
 function st(id){
-  ['tr','tqr','tqc','tn','ts'].forEach(t=>document.getElementById(t).classList.toggle('hidden',t!==id));
-  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['tr','tqr','tqc','tn','ts'][i]===id));
+  ['tr','tqr','tqc','tnom','tn','ts'].forEach(t=>document.getElementById(t).classList.toggle('hidden',t!==id));
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['tr','tqr','tqc','tnom','tn','ts'][i]===id));
   if(id==='tr'){loadResults().then(()=>renderReport());}
   if(id==='tqr')rql();
   if(id==='tqc'){document.getElementById('surl').value=DB.siteUrl;renderQR();}
+  if(id==='tnom')cargarNominas();
   if(id==='tn')initNQ();
 }
+
+// ====== SISTEMA DE NÓMINAS ======
+let DB_NOMINAS=[];
+
+async function cargarNominas(){
+  try{
+    const {data,error}=await sb.from('nominas').select('*').order('created_at',{ascending:false});
+    if(error)throw error;
+    DB_NOMINAS=data||[];
+    renderNominas();
+  }catch(e){
+    document.getElementById('nom-lista').innerHTML='<div class="alert ae">Error al cargar nóminas. ¿Existe la tabla en Supabase?</div>';
+  }
+}
+
+function renderNominas(){
+  const el=document.getElementById('nom-lista');
+  if(!DB_NOMINAS.length){
+    el.innerHTML='<div class="empty"><div>👥</div><p>No hay nóminas creadas aún.</p></div>';return;
+  }
+  el.innerHTML=DB_NOMINAS.map(n=>{
+    const q=DB.quizzes.find(x=>x.id===n.quiz_id);
+    const inicio=new Date(n.fecha_inicio);
+    const vence=new Date(inicio);vence.setDate(vence.getDate()+30);
+    const hoy=new Date();
+    const vigente=hoy<=vence;
+    const dias=Math.ceil((vence-hoy)/(1000*60*60*24));
+    const ruts=(n.participantes||[]);
+    return`<div class="card" style="margin-bottom:1rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:1rem">
+        <div>
+          <div style="font-size:16px;font-weight:900;color:var(--navy)">🏢 ${n.empresa}</div>
+          <div style="font-size:12px;color:var(--textLight);margin-top:2px">${q?q.name:'Evaluación'} · ${ruts.length} participantes · Inició ${n.fecha_inicio}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="badge ${vigente?'badge-green':'badge-red'}">${vigente?`Vigente (${dias}d)`:'Vencida'}</span>
+          <button class="btn btn-outline btn-sm" onclick="verQRNomina('${n.id}','${n.empresa}')">📲 QR</button>
+          <button class="btn btn-danger btn-sm" onclick="eliminarNomina('${n.id}')">🗑</button>
+        </div>
+      </div>
+      <div style="background:var(--gray);border-radius:var(--rs);padding:.75rem;font-size:12px;color:var(--textMid);line-height:1.8">
+        ${ruts.map(p=>`<span style="display:inline-block;margin-right:1rem">👤 ${p.nombre} <span style="color:var(--textLight)">${p.rut}</span></span>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function showCrearNomina(){
+  document.getElementById('nom-form').classList.remove('hidden');
+  document.getElementById('nom-fecha').value=new Date().toISOString().split('T')[0];
+  const sel=document.getElementById('nom-quiz');
+  sel.innerHTML=DB.quizzes.map(q=>`<option value="${q.id}">${q.name}</option>`).join('');
+  document.getElementById('nom-err').classList.add('hidden');
+  document.getElementById('nom-participantes').value='14431904-4;Leonardo Ulloa Hidalgo\n21091545-1;Martín Ulloa Canales\n6376305-5;Rosa Hidalgo Zárate\n7018108-8;Oscar Millas Lama';
+  document.getElementById('nom-empresa').value='Empresa Alfa';
+}
+
+async function guardarNomina(){
+  const empresa=document.getElementById('nom-empresa').value.trim();
+  const fecha=document.getElementById('nom-fecha').value;
+  const quiz_id=document.getElementById('nom-quiz').value;
+  const txt=document.getElementById('nom-participantes').value.trim();
+  const errEl=document.getElementById('nom-err');
+  if(!empresa||!fecha||!quiz_id||!txt){errEl.textContent='Completa todos los campos.';errEl.classList.remove('hidden');return;}
+  const participantes=txt.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>{
+    const [rut,...rest]=l.split(';');
+    return{rut:normRut(rut.trim()),nombre:(rest.join(';')||'').trim()};
+  }).filter(p=>p.rut&&p.nombre);
+  if(!participantes.length){errEl.textContent='Ingresa al menos un participante válido (RUT;Nombre).';errEl.classList.remove('hidden');return;}
+  errEl.classList.add('hidden');
+  try{
+    const{data,error}=await sb.from('nominas').insert([{empresa,fecha_inicio:fecha,quiz_id,participantes}]).select();
+    if(error)throw error;
+    DB_NOMINAS.unshift(data[0]);
+    document.getElementById('nom-form').classList.add('hidden');
+    renderNominas();
+    setTimeout(()=>verQRNomina(data[0].id,empresa),300);
+  }catch(e){errEl.textContent='Error al guardar: '+e.message;errEl.classList.remove('hidden');}
+}
+
+async function eliminarNomina(id){
+  if(!confirm('¿Eliminar esta nómina?'))return;
+  await sb.from('nominas').delete().eq('id',id);
+  DB_NOMINAS=DB_NOMINAS.filter(n=>n.id!==id);
+  renderNominas();
+}
+
+function nomUrl(nomId){return DB.siteUrl+'?nom='+nomId;}
+
+function verQRNomina(id,empresa){
+  document.getElementById('pm-t').textContent='🏢 '+empresa;
+  document.getElementById('pm-s').textContent='Escanea para rendir la evaluación · GP Empresas';
+  const url=nomUrl(id);
+  document.getElementById('pm-u').textContent=url;
+  const c=document.getElementById('pm-c');c.width=200;c.height=200;
+  const t=document.createElement('div');t.style.display='none';document.body.appendChild(t);
+  new QRCode(t,{text:url,width:200,height:200,colorDark:'#1B2A4A',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+  setTimeout(()=>{const img=t.querySelector('img');if(img){const i=new Image();i.onload=()=>c.getContext('2d').drawImage(i,0,0,200,200);i.src=img.src;}document.body.removeChild(t);},350);
+  document.getElementById('pm').classList.remove('hidden');
+}
+
+// Validación por nómina
+let curNomina=null;
+
+async function cargarNominaDesdeParams(){
+  const params=new URLSearchParams(window.location.search);
+  const nomId=params.get('nom');
+  if(!nomId)return false;
+  try{
+    const{data,error}=await sb.from('nominas').select('*').eq('id',nomId).single();
+    if(error||!data)return false;
+    // Verificar vigencia (30 días)
+    const inicio=new Date(data.fecha_inicio);
+    const vence=new Date(inicio);vence.setDate(vence.getDate()+30);
+    if(new Date()>vence){
+      alert('Esta nómina ya venció. Consulta con tu instructor.');return false;
+    }
+    curNomina=data;
+    selQid=data.quiz_id;
+    // Mostrar banner de empresa en la página de ingreso
+    const q=DB.quizzes.find(x=>x.id===data.quiz_id);
+    if(q){
+      document.getElementById('qr-name').textContent=q.name;
+      document.getElementById('qr-icon').textContent=q.icon||'📋';
+    }
+    // Agregar badge de empresa
+    const banner=document.createElement('div');
+    banner.style.cssText='background:linear-gradient(135deg,var(--navy),#2d4270);border-radius:var(--r);padding:1rem 1.5rem;margin-bottom:1rem;display:flex;align-items:center;gap:12px;';
+    banner.innerHTML=`<div style="font-size:1.5rem">🏢</div><div><div style="font-weight:900;color:white">${data.empresa}</div><div style="font-size:12px;color:rgba(255,255,255,0.6)">Nómina registrada · Ingresa tu RUT para continuar</div></div>`;
+    const card=document.querySelector('#psi .card');
+    if(card)card.prepend(banner);
+    sp('psi');
+    return true;
+  }catch(e){return false;}
+}
+
+function autoNombreNomina(rut){
+  if(!curNomina)return autoNombre(rut);
+  const nr=normRut(rut);
+  const p=(curNomina.participantes||[]).find(x=>normRut(x.rut)===nr);
+  const inp=document.getElementById('sn');
+  if(p){inp.value=p.nombre;inp.style.color='var(--navy)';}
+  else{inp.value='';inp.style.color='#555';}
+}
+
+
 function pfs(){const s=document.getElementById('fq');const cv=s.value;s.innerHTML='<option value="">Todas las evaluaciones</option>'+DB.quizzes.map(q=>`<option value="${q.id}"${cv===q.id?' selected':''}>${q.name}</option>`).join('');}
 
 function renderReport(){
