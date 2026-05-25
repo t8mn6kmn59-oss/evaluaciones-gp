@@ -920,6 +920,9 @@ textarea{resize:vertical;min-height:64px;}
         <select id="fq" onchange="renderReport()">
           <option value="">Todas las evaluaciones</option>
         </select>
+        <select id="fe" onchange="renderReport()">
+          <option value="">Todas las empresas</option>
+        </select>
         <button class="btn btn-navy btn-sm" onclick="renderReport()">🔄 Actualizar</button>
         <button class="btn btn-orange btn-sm" onclick="generarPDF()">📄 Generar PDF</button>
       </div>
@@ -1143,7 +1146,7 @@ async function loadResults(){
   try{
     const {data,error}=await sb.from('results').select('*').order('created_at',{ascending:false});
     if(error)throw error;
-    DB.results=(data||[]).map(r=>({id:r.id,quizId:r.quiz_id,quizName:r.quiz_name,student:r.student,rut:r.rut||'',email:r.email||'',date:r.date,score:r.score,correct:r.correct,total:r.total,answers:r.answers,enc1:r.enc1||null,enc2:r.enc2||null,enc3:r.enc3||null}));
+    DB.results=(data||[]).map(r=>({id:r.id,quizId:r.quiz_id,quizName:r.quiz_name,student:r.student,rut:r.rut||'',email:r.email||'',date:r.date,score:r.score,correct:r.correct,total:r.total,answers:r.answers,enc1:r.enc1||null,enc2:r.enc2||null,enc3:r.enc3||null,empresa:r.empresa||''}));
   }catch(e){console.error(e);}
 }
 
@@ -1307,7 +1310,7 @@ async function submitQ(){
   const ua=curQ.questions.map((_,i)=>ans[i]);
   const corr=ua.filter((a,i)=>a===curQ.questions[i].answer).length;
   const score=Math.round(corr/tot*100);
-  const rec={id:Date.now()+'',quiz_id:curQ.id,quiz_name:curQ.name,student:curS.name,rut:curS.rut||'',email:curS.email||'',date:curS.date,score,correct:corr,total:tot,answers:ua};
+  const rec={id:Date.now()+'',quiz_id:curQ.id,quiz_name:curQ.name,student:curS.name,rut:curS.rut||'',email:curS.email||'',date:curS.date,score,correct:corr,total:tot,answers:ua,empresa:curS.empresa||''};
   try{await sb.from('results').insert([rec]);}catch(e){console.error(e);}
   showRes({...rec,quizId:rec.quiz_id,quizName:rec.quiz_name});
 }
@@ -1490,7 +1493,14 @@ function pfs(){const s=document.getElementById('fq');const cv=s.value;s.innerHTM
 
 function renderReport(){
   const fq=document.getElementById('fq').value;
-  const f=fq?DB.results.filter(r=>r.quizId===fq):DB.results;
+  const fe=document.getElementById('fe').value;
+  // Poblar selector empresas
+  const empresas=[...new Set(DB.results.map(r=>r.empresa).filter(Boolean))].sort();
+  const feEl=document.getElementById('fe');
+  const feVal=feEl.value;
+  feEl.innerHTML='<option value="">Todas las empresas</option>'+empresas.map(e=>`<option value="${e}"${feVal===e?' selected':''}>${e}</option>`).join('');
+  let f=fq?DB.results.filter(r=>r.quizId===fq):DB.results;
+  if(fe)f=f.filter(r=>r.empresa===fe);
   const tot=f.length;
   const avg=tot?Math.round(f.reduce((s,r)=>s+r.score,0)/tot):0;
   const pass=f.filter(r=>r.score>=60).length;
@@ -1537,10 +1547,11 @@ function renderReport(){
   list.innerHTML=f.map((r,idx)=>{
     const p=r.score>=60;
     const initials=r.student.split(' ').slice(0,2).map(n=>n[0]||'').join('').toUpperCase();
+    const empresaBadge=r.empresa?`<span style="display:inline-block;background:#EEF2FF;color:#3730a3;font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;margin-left:6px">🏢 ${r.empresa}</span>`:'';
     return`<div class="student-row" style="cursor:pointer;">
       <div class="student-avatar ${p?'pass':'fail'}" onclick="showStudentDetail('${r.id}')">${initials}</div>
       <div class="student-info" onclick="showStudentDetail('${r.id}')">
-        <div class="name">${r.student}</div>
+        <div class="name">${r.student}${empresaBadge}</div>
         <div class="meta">${r.rut?r.rut+' · ':''}${r.email?'📧 '+r.email+' · ':''}${r.quizName} · ${r.date} · ${r.correct}/${r.total} correctas</div>
       </div>
       <div style="text-align:right;display:flex;align-items:center;gap:8px;">
