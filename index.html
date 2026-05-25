@@ -866,6 +866,9 @@ textarea{resize:vertical;min-height:64px;}
       <button id="enc-submit-btn" class="btn btn-orange btn-block" style="margin-top:1.25rem;opacity:0.45;pointer-events:none" onclick="submitEnc()">Enviar y finalizar ✓</button>
       <div style="margin-top:.75rem;text-align:center;font-size:11px;color:rgba(255,255,255,0.4)">I = Insuficiente (1-3) &nbsp;|&nbsp; S = Suficiente (4) &nbsp;|&nbsp; B = Bueno (5-6) &nbsp;|&nbsp; MB = Muy Bueno (7)</div>
     </div>
+    <div style="margin-top:1.25rem;text-align:center;">
+      <button class="btn btn-outline" onclick="exportarMiPDF()" style="gap:8px">📥 Exportar mi resultado en PDF</button>
+    </div>
   </div>
 </div>
 
@@ -1695,6 +1698,34 @@ function selEnc(idx, val){
   checkEncComplete();
 }
 
+function exportarMiPDF(){
+  const r=window._lastRec;
+  if(!r){alert('No hay resultado para exportar.');return;}
+  const quiz=DB.quizzes.find(q=>q.id===(r.quizId||r.quiz_id));
+  if(!quiz){alert('No se encontró la evaluación.');return;}
+  const pass=r.score>=60;
+  const LT2=['A','B','C','D','E'];
+  const encLabels={'I':'Insuficiente','S':'Suficiente','B':'Bueno','MB':'Muy Bueno'};
+  const e1=encResp[0]||r.enc1;const e2=encResp[1]||r.enc2;const e3=encResp[2]||r.enc3;
+  const encSection=(e1||e2||e3)?`
+  <div class="enc-box">
+    <div class="enc-title">📝 Encuesta de Satisfacción</div>
+    ${ENC_PREGUNTAS.map((q,i)=>{const val=[e1,e2,e3][i];return`<div class="enc-row"><span class="enc-q">${q}</span><span class="enc-val">${val||'-'}${val?' — '+encLabels[val]:''}</span></div>`;}).join('')}
+  </div>`:'';
+  const win=window.open('','_blank','width=800,height=700');
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Resultado · ${r.student}</title>
+  <style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:10.5px;color:#1B2A4A;background:white;padding:14px 16px;max-width:700px;}.header{background:#1B2A4A;color:white;padding:10px 14px;border-radius:6px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}.header h1{font-size:12px;font-weight:900;margin-bottom:2px;}.header p{font-size:9.5px;opacity:.6;}.score-row{display:flex;gap:8px;margin-bottom:10px;}.score-box{flex:1;border:1.5px solid #D8E0EE;border-radius:6px;padding:7px;text-align:center;}.score-box .val{font-size:17px;font-weight:900;}.score-box .lbl{font-size:8.5px;color:#8A96AA;margin-top:2px;text-transform:uppercase;}.pass{color:#2D7D2D;}.fail{color:#C0392B;}.status-badge{display:inline-block;padding:4px 10px;border-radius:99px;font-size:10px;font-weight:800;}.status-badge.pass{background:#E8F5E8;color:#2D7D2D;}.status-badge.fail{background:#FDECEA;color:#C0392B;}.q{border:1px solid #e0e0e0;border-radius:5px;margin-bottom:7px;overflow:hidden;page-break-inside:avoid;}.qh{padding:6px 10px;font-size:9.5px;font-weight:700;line-height:1.4;}.qh.ok{background:#f0fff0;color:#2D7D2D;}.qh.bad{background:#fff0f0;color:#C0392B;}.opts{padding:5px 10px 7px;display:flex;flex-direction:column;gap:3px;}.opt{border:1px solid #eee;border-radius:4px;padding:3px 8px;font-size:9.5px;line-height:1.4;display:flex;gap:5px;}.opt.correct{border-color:#2D7D2D;background:#e8f5e8;color:#2D7D2D;font-weight:700;}.opt.wrong{border-color:#C0392B;background:#fdecea;color:#C0392B;font-weight:700;}.opt-letter{font-weight:800;min-width:14px;}.enc-box{border:1.5px solid #D8E0EE;border-radius:6px;padding:10px 14px;margin-top:10px;background:#f8faff;}.enc-title{font-size:11px;font-weight:900;color:#1B2A4A;margin-bottom:8px;}.enc-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #eee;font-size:9.5px;}.enc-row:last-child{border-bottom:none;}.enc-q{color:#444;flex:1;padding-right:8px;}.enc-val{font-weight:800;color:#1B2A4A;}.footer{margin-top:10px;text-align:center;font-size:8.5px;color:#8A96AA;border-top:1px solid #eee;padding-top:8px;}@media print{.no-print{display:none!important;}.q{page-break-inside:avoid;}}</style>
+  </head><body>
+  <div class="header"><div><h1>GP Empresas · ${quiz.name}</h1><p>${r.student}${r.rut?' · RUT: '+r.rut:''} · ${r.date}</p></div><span class="status-badge ${pass?'pass':'fail'}">${pass?'✓ APROBADO':'✗ REPROBADO'}</span></div>
+  <div class="score-row"><div class="score-box"><div class="val ${pass?'pass':'fail'}">${r.score}%</div><div class="lbl">Puntaje</div></div><div class="score-box"><div class="val">${r.correct}/${r.total}</div><div class="lbl">Correctas</div></div><div class="score-box"><div class="val">${r.total-r.correct}</div><div class="lbl">Incorrectas</div></div></div>
+  ${quiz.questions.map((q,i)=>{const ua=r.answers[i];const ok=ua===q.answer;return`<div class="q"><div class="qh ${ok?'ok':'bad'}">${ok?'✅':'❌'} P${i+1}: ${q.text}</div><div class="opts">${q.options.map((o,j)=>{let cls='opt';if(j===q.answer)cls+=' correct';else if(j===ua&&!ok)cls+=' wrong';const mk=j===q.answer?' ✓':(j===ua&&!ok?' ✗':'');return`<div class="${cls}"><span class="opt-letter">${LT2[j]}.</span><span>${o}${mk}</span></div>`;}).join('')}</div></div>`;}).join('')}
+  ${encSection}
+  <div class="footer">GP Empresas · Plataforma de Evaluaciones · Generado ${new Date().toLocaleDateString('es-CL')}</div>
+  <div class="no-print" style="margin-top:12px"><button onclick="window.print()" style="padding:7px 18px;background:#1B2A4A;color:white;border:none;border-radius:4px;cursor:pointer;font-size:11px;font-weight:700;">📥 Guardar como PDF</button></div>
+  </body></html>`);
+  win.document.close();
+}
+
 async function submitEnc(){
   const seleccionadas=[encResp[0]||null,encResp[1]||null,encResp[2]||null];
   if(seleccionadas.some(v=>!v)){document.getElementById('enc-err').classList.remove('hidden');return;}
@@ -1830,6 +1861,15 @@ function printResult(rid){
   if(!quiz)return;
   const pass=r.score>=60;
   const LT2=['A','B','C','D','E'];
+  const encLabels={'I':'Insuficiente','S':'Suficiente','B':'Bueno','MB':'Muy Bueno'};
+  const encSection=(r.enc1||r.enc2||r.enc3)?`
+  <div class="enc-box">
+    <div class="enc-title">📝 Encuesta de Satisfacción</div>
+    ${ENC_PREGUNTAS.map((q,i)=>{
+      const val=[r.enc1,r.enc2,r.enc3][i];
+      return`<div class="enc-row"><span class="enc-q">${q}</span><span class="enc-val">${val||'-'} ${val?'— '+encLabels[val]:''}</span></div>`;
+    }).join('')}
+  </div>`:'';
   const win=window.open('','_blank','width=800,height=600');
   win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
   <title>Resultado · ${r.student}</title>
@@ -1856,11 +1896,19 @@ function printResult(rid){
     .opt.correct{border-color:#2D7D2D;background:#e8f5e8;color:#2D7D2D;font-weight:700;}
     .opt.wrong{border-color:#C0392B;background:#fdecea;color:#C0392B;font-weight:700;}
     .opt-letter{font-weight:800;min-width:14px;}
+    .enc-box{border:1.5px solid #D8E0EE;border-radius:6px;padding:10px 14px;margin-top:10px;background:#f8faff;}
+    .enc-title{font-size:11px;font-weight:900;color:#1B2A4A;margin-bottom:8px;}
+    .enc-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #eee;font-size:9.5px;}
+    .enc-row:last-child{border-bottom:none;}
+    .enc-q{color:#444;flex:1;padding-right:8px;}
+    .enc-val{font-weight:800;color:#1B2A4A;white-space:nowrap;}
     .footer{margin-top:10px;text-align:center;font-size:8.5px;color:#8A96AA;border-top:1px solid #eee;padding-top:8px;}
-    @media print{body{padding:8px;}button{display:none!important;}.q{page-break-inside:avoid;}}
+    .btn-bar{display:flex;gap:8px;margin-top:12px;}
+    .btn-bar button{padding:7px 16px;border:none;border-radius:4px;cursor:pointer;font-size:11px;font-weight:700;}
+    @media print{body{padding:8px;}.btn-bar{display:none!important;}.q{page-break-inside:avoid;}}
   </style></head><body>
   <div class="header">
-    <div><h1>GP Empresas · ${quiz.name}</h1><p>${r.student}${r.rut?' · RUT: '+r.rut:''} · ${r.date}</p></div>
+    <div><h1>GP Empresas · ${quiz.name}</h1><p>${r.student}${r.rut?' · RUT: '+r.rut:''}${r.empresa?' · '+r.empresa:''} · ${r.date}</p></div>
     <span class="status-badge ${pass?'pass':'fail'}">${pass?'✓ APROBADO':'✗ REPROBADO'}</span>
   </div>
   <div class="score-row">
@@ -1881,11 +1929,13 @@ function printResult(rid){
       }).join('')}</div>
     </div>`;
   }).join('')}
+  ${encSection}
   <div class="footer">GP Empresas · Plataforma de Evaluaciones · Generado ${new Date().toLocaleDateString('es-CL')}</div>
-  <br><button onclick="window.print()" style="padding:6px 16px;background:#1B2A4A;color:white;border:none;border-radius:4px;cursor:pointer;font-size:11px;margin-top:8px;">🖨 Imprimir</button>
+  <div class="btn-bar">
+    <button onclick="window.print()" style="background:#1B2A4A;color:white;">📥 Exportar PDF</button>
+  </div>
   </body></html>`);
   win.document.close();
-  setTimeout(()=>win.print(),500);
 }
 
 function showStudentDetail(rid){
