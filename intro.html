@@ -8,15 +8,13 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
   --navy:#1B2A4A;
-  --navy2:#243558;
   --orange:#F5811E;
   --orange2:#E06A08;
 }
-
-body{
-  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+html,body{
+  width:100%;height:100%;
   background:var(--navy);
-  min-height:100vh;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -24,210 +22,101 @@ body{
   overflow:hidden;
   position:relative;
 }
-
-.bg-glow{
-  position:absolute;
-  width:600px;height:600px;
-  border-radius:50%;
-  background:radial-gradient(circle,rgba(245,129,30,0.12) 0%,transparent 70%);
-  top:-100px;right:-150px;
-  pointer-events:none;
+.bg1{
+  position:fixed;width:500px;height:500px;border-radius:50%;
+  background:radial-gradient(circle,rgba(245,129,30,0.13) 0%,transparent 70%);
+  top:-120px;right:-120px;pointer-events:none;
 }
-.bg-glow2{
-  position:absolute;
-  width:400px;height:400px;
-  border-radius:50%;
+.bg2{
+  position:fixed;width:350px;height:350px;border-radius:50%;
   background:radial-gradient(circle,rgba(245,129,30,0.07) 0%,transparent 70%);
-  bottom:-80px;left:-100px;
-  pointer-events:none;
+  bottom:-80px;left:-80px;pointer-events:none;
 }
-
 .container{
-  width:100%;
-  max-width:480px;
-  padding:2rem 1.25rem;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  position:relative;
-  z-index:1;
+  width:100%;max-width:460px;
+  padding:1.5rem 1.25rem;
+  display:flex;flex-direction:column;align-items:center;
+  position:relative;z-index:1;
+  gap:1.25rem;
 }
-
 .logo-wrap{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  margin-bottom:1.75rem;
-  opacity:0;
-  animation:fadeDown .5s ease .1s forwards;
+  display:flex;align-items:center;gap:10px;
+  opacity:0;animation:fadeDown .5s ease .1s forwards;
 }
-.logo-dot{
-  width:10px;height:10px;
-  border-radius:50%;
-  background:var(--orange);
-}
-.logo-text{
-  font-size:13px;
-  font-weight:900;
-  color:white;
-  letter-spacing:.12em;
-  text-transform:uppercase;
-}
-.logo-sub{
-  font-size:10px;
-  color:rgba(255,255,255,0.35);
-  letter-spacing:.06em;
-}
+.logo-dot{width:10px;height:10px;border-radius:50%;background:var(--orange);}
+.logo-text{font-size:13px;font-weight:900;color:white;letter-spacing:.1em;text-transform:uppercase;}
+.logo-sub{font-size:10px;color:rgba(255,255,255,0.35);letter-spacing:.05em;}
 
-.video-container{
-  width:100%;
-  border-radius:16px;
-  overflow:hidden;
-  position:relative;
+.video-wrap{
+  width:100%;border-radius:16px;overflow:hidden;
   background:#000;
   box-shadow:0 20px 60px rgba(0,0,0,0.5);
-  opacity:0;
-  animation:fadeUp .6s ease .3s forwards;
+  opacity:0;animation:fadeUp .6s ease .3s forwards;
+  position:relative;
 }
-.video-container iframe{
-  width:100%;
+video{
+  width:100%;display:block;
   aspect-ratio:16/9;
-  display:block;
-  border:none;
+  object-fit:cover;
 }
 
-.progress-wrap{
-  width:100%;
-  height:4px;
+.prog-wrap{
+  width:100%;height:4px;
   background:rgba(255,255,255,0.1);
-  border-radius:2px;
-  margin-top:1.25rem;
-  overflow:hidden;
-  opacity:0;
-  animation:fadeUp .5s ease .5s forwards;
+  border-radius:2px;overflow:hidden;
+  opacity:0;animation:fadeUp .5s ease .5s forwards;
 }
-.progress-bar{
-  height:100%;
-  background:var(--orange);
-  border-radius:2px;
-  width:0%;
-  transition:width 1s linear;
+.prog-bar{
+  height:100%;background:var(--orange);
+  border-radius:2px;width:0%;
+  transition:width .3s linear;
 }
 
 .info-row{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  width:100%;
-  margin-top:.6rem;
-  opacity:0;
-  animation:fadeUp .5s ease .6s forwards;
+  width:100%;display:flex;justify-content:space-between;align-items:center;
+  opacity:0;animation:fadeUp .5s ease .55s forwards;
+  margin-top:-.5rem;
 }
-.info-label{
-  font-size:11px;
-  color:rgba(255,255,255,0.35);
-  font-weight:600;
-}
-.timer{
-  font-size:11px;
-  color:rgba(255,255,255,0.35);
-  font-weight:700;
-  font-variant-numeric:tabular-nums;
-}
-
-.cta-wrap{
-  width:100%;
-  margin-top:1.5rem;
-  opacity:0;
-  animation:fadeUp .5s ease .7s forwards;
-}
+.info-label{font-size:11px;color:rgba(255,255,255,0.35);font-weight:600;}
+.timer{font-size:11px;color:rgba(255,255,255,0.35);font-weight:700;font-variant-numeric:tabular-nums;}
 
 .btn-cta{
-  width:100%;
-  padding:15px;
-  background:var(--orange);
-  color:white;
-  border:none;
-  border-radius:12px;
-  font-size:15px;
-  font-weight:900;
-  cursor:pointer;
-  font-family:inherit;
+  width:100%;padding:15px;
+  background:var(--orange);color:white;
+  border:none;border-radius:12px;
+  font-size:15px;font-weight:900;
+  cursor:pointer;font-family:inherit;
   letter-spacing:.02em;
   transition:all .2s;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:10px;
-  position:relative;
-  overflow:hidden;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  opacity:0;animation:fadeUp .5s ease .7s forwards;
+  position:relative;overflow:hidden;
 }
-.btn-cta:not(:disabled):hover{
-  background:var(--orange2);
-  transform:translateY(-2px);
-  box-shadow:0 8px 24px rgba(245,129,30,0.35);
+.btn-cta:not(:disabled):hover{background:var(--orange2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(245,129,30,0.35);}
+.btn-cta:disabled{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.25);cursor:not-allowed;}
+.pulse{
+  position:absolute;inset:0;border-radius:12px;
+  border:2px solid var(--orange);opacity:0;
 }
-.btn-cta:not(:disabled):active{
-  transform:translateY(0);
-}
-.btn-cta:disabled{
-  background:rgba(255,255,255,0.08);
-  color:rgba(255,255,255,0.25);
-  cursor:not-allowed;
-}
-.btn-cta svg{
-  flex-shrink:0;
-}
-
-.btn-hint{
-  text-align:center;
-  font-size:11px;
-  color:rgba(255,255,255,0.25);
-  margin-top:.75rem;
+.btn-cta.ready .pulse{animation:pulse 1.5s ease infinite;}
+.hint{
+  font-size:11px;color:rgba(255,255,255,0.25);
+  text-align:center;margin-top:-.5rem;
+  opacity:0;animation:fadeUp .5s ease .8s forwards;
   transition:color .3s;
 }
-.btn-hint.ready{
-  color:rgba(245,129,30,0.7);
-}
+.hint.ready{color:rgba(245,129,30,0.8);}
 
-.pulse-ring{
-  position:absolute;
-  inset:0;
-  border-radius:12px;
-  border:2px solid var(--orange);
-  opacity:0;
-  animation:none;
-}
-.btn-cta.ready .pulse-ring{
-  animation:pulse 1.5s ease infinite;
-}
-
-@keyframes fadeDown{
-  from{opacity:0;transform:translateY(-12px);}
-  to{opacity:1;transform:translateY(0);}
-}
-@keyframes fadeUp{
-  from{opacity:0;transform:translateY(12px);}
-  to{opacity:1;transform:translateY(0);}
-}
-@keyframes pulse{
-  0%{opacity:.6;transform:scale(1);}
-  70%{opacity:0;transform:scale(1.05);}
-  100%{opacity:0;transform:scale(1.05);}
-}
-
-@media(max-width:480px){
-  .container{padding:1.5rem 1rem;}
-}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+@keyframes pulse{0%{opacity:.6;transform:scale(1);}70%{opacity:0;transform:scale(1.04);}100%{opacity:0;}}
 </style>
 </head>
 <body>
-
-<div class="bg-glow"></div>
-<div class="bg-glow2"></div>
+<div class="bg1"></div>
+<div class="bg2"></div>
 
 <div class="container">
-
   <div class="logo-wrap">
     <div class="logo-dot"></div>
     <div>
@@ -236,90 +125,76 @@ body{
     </div>
   </div>
 
-  <div class="video-container">
-    <iframe
-      id="yt-player"
-      src="https://www.youtube.com/embed/9Rif0HlWm2Y?autoplay=1&mute=1&controls=1&rel=0&modestbranding=1&enablejsapi=1&origin=https://t8mn6kmn59-oss.github.io"
-      allow="autoplay; encrypted-media"
-      allowfullscreen>
-    </iframe>
+  <div class="video-wrap">
+    <video id="vid" playsinline muted autoplay>
+      <source src="https://drive.google.com/uc?export=download&id=1oXTvJ9LInQ_Xzw9QR5Vju8s5-IHt30Kr" type="video/mp4">
+    </video>
   </div>
 
-  <div class="progress-wrap">
-    <div class="progress-bar" id="prog"></div>
+  <div class="prog-wrap">
+    <div class="prog-bar" id="prog"></div>
   </div>
 
   <div class="info-row">
-    <span class="info-label" id="info-label">Mira el video antes de continuar</span>
-    <span class="timer" id="timer">0:13</span>
+    <span class="info-label" id="lbl">Mira el video antes de continuar</span>
+    <span class="timer" id="tmr">--</span>
   </div>
 
-  <div class="cta-wrap">
-    <button class="btn-cta" id="btn" disabled>
-      <div class="pulse-ring"></div>
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10"/>
-        <polyline points="12 8 16 12 12 16"/>
-        <line x1="8" y1="12" x2="16" y2="12"/>
-      </svg>
-      Ir a la evaluación
-    </button>
-    <div class="btn-hint" id="hint">Disponible al finalizar el video</div>
-  </div>
-
+  <button class="btn-cta" id="btn" disabled>
+    <div class="pulse"></div>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <polyline points="12 8 16 12 12 16"/>
+      <line x1="8" y1="12" x2="16" y2="12"/>
+    </svg>
+    Ir a la evaluación
+  </button>
+  <div class="hint" id="hint">Disponible al finalizar el video</div>
 </div>
 
 <script>
-  var DURACION = 13;
-  var DESTINO = 'https://t8mn6kmn59-oss.github.io/evaluaciones-gp/';
+var DESTINO = 'https://t8mn6kmn59-oss.github.io/evaluaciones-gp/';
+var vid = document.getElementById('vid');
+var prog = document.getElementById('prog');
+var tmr = document.getElementById('tmr');
+var lbl = document.getElementById('lbl');
+var btn = document.getElementById('btn');
+var hint = document.getElementById('hint');
 
-  var segundos = DURACION;
-  var intervalo = null;
-  var btn = document.getElementById('btn');
-  var prog = document.getElementById('prog');
-  var timerEl = document.getElementById('timer');
-  var hint = document.getElementById('hint');
-  var infoLabel = document.getElementById('info-label');
+vid.addEventListener('loadedmetadata', function(){
+  tmr.textContent = fmt(Math.round(vid.duration));
+});
 
-  function formatTime(s){
-    return '0:' + (s < 10 ? '0' : '') + s;
-  }
+vid.addEventListener('timeupdate', function(){
+  if(!vid.duration) return;
+  var pct = (vid.currentTime / vid.duration) * 100;
+  prog.style.width = pct + '%';
+  var restante = Math.ceil(vid.duration - vid.currentTime);
+  tmr.textContent = fmt(restante);
+});
 
-  function iniciarContador(){
-    intervalo = setInterval(function(){
-      segundos--;
-      if(segundos < 0) segundos = 0;
-      timerEl.textContent = formatTime(segundos);
-      var pct = ((DURACION - segundos) / DURACION) * 100;
-      prog.style.width = pct + '%';
-      if(segundos <= 0){
-        clearInterval(intervalo);
-        habilitarBoton();
-      }
-    }, 1000);
-  }
+vid.addEventListener('ended', function(){
+  prog.style.width = '100%';
+  prog.style.background = '#2D7D2D';
+  tmr.textContent = '✓';
+  lbl.textContent = '¡Video completado!';
+  btn.disabled = false;
+  btn.classList.add('ready');
+  hint.classList.add('ready');
+  hint.textContent = '¡Todo listo! Haz clic para comenzar.';
+  setTimeout(function(){ window.location.href = DESTINO; }, 1500);
+});
 
-  function habilitarBoton(){
-    btn.disabled = false;
-    btn.classList.add('ready');
-    hint.classList.add('ready');
-    hint.textContent = '¡Todo listo! Haz clic para comenzar.';
-    infoLabel.textContent = '¡Video completado!';
-    timerEl.textContent = '✓';
-    prog.style.width = '100%';
-    prog.style.background = '#2D7D2D';
-  }
+btn.addEventListener('click', function(){
+  if(!btn.disabled) window.location.href = DESTINO;
+});
 
-  btn.addEventListener('click', function(){
-    if(!btn.disabled){
-      window.location.href = DESTINO;
-    }
-  });
+function fmt(s){
+  if(isNaN(s)) return '--';
+  return '0:' + (s < 10 ? '0' : '') + s;
+}
 
-  window.addEventListener('load', function(){
-    setTimeout(iniciarContador, 1200);
-  });
+vid.play().catch(function(){});
 </script>
-
 </body>
 </html>
