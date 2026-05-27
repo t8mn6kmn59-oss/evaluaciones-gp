@@ -6,107 +6,36 @@
 <title>Bienvenido · GP Empresas</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-:root{
-  --navy:#1B2A4A;
-  --orange:#F5811E;
-  --orange2:#E06A08;
-}
+:root{--navy:#1B2A4A;--orange:#F5811E;--orange2:#E06A08;}
 html,body{
-  width:100%;height:100%;
+  width:100%;min-height:100vh;
   background:var(--navy);
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
-  position:relative;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  position:relative;overflow:hidden;
 }
-.bg1{
-  position:fixed;width:500px;height:500px;border-radius:50%;
-  background:radial-gradient(circle,rgba(245,129,30,0.13) 0%,transparent 70%);
-  top:-120px;right:-120px;pointer-events:none;
-}
-.bg2{
-  position:fixed;width:350px;height:350px;border-radius:50%;
-  background:radial-gradient(circle,rgba(245,129,30,0.07) 0%,transparent 70%);
-  bottom:-80px;left:-80px;pointer-events:none;
-}
-.container{
-  width:100%;max-width:460px;
-  padding:1.5rem 1.25rem;
-  display:flex;flex-direction:column;align-items:center;
-  position:relative;z-index:1;
-  gap:1.25rem;
-}
-.logo-wrap{
-  display:flex;align-items:center;gap:10px;
-  opacity:0;animation:fadeDown .5s ease .1s forwards;
-}
+.bg1{position:fixed;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(245,129,30,0.13) 0%,transparent 70%);top:-120px;right:-120px;pointer-events:none;}
+.bg2{position:fixed;width:350px;height:350px;border-radius:50%;background:radial-gradient(circle,rgba(245,129,30,0.07) 0%,transparent 70%);bottom:-80px;left:-80px;pointer-events:none;}
+.container{width:100%;max-width:460px;padding:1.5rem 1.25rem;display:flex;flex-direction:column;align-items:center;position:relative;z-index:1;gap:1.25rem;}
+.logo-wrap{display:flex;align-items:center;gap:10px;opacity:0;animation:fadeDown .5s ease .1s forwards;}
 .logo-dot{width:10px;height:10px;border-radius:50%;background:var(--orange);}
 .logo-text{font-size:13px;font-weight:900;color:white;letter-spacing:.1em;text-transform:uppercase;}
 .logo-sub{font-size:10px;color:rgba(255,255,255,0.35);letter-spacing:.05em;}
-
-.video-wrap{
-  width:100%;border-radius:16px;overflow:hidden;
-  background:#000;
-  box-shadow:0 20px 60px rgba(0,0,0,0.5);
-  opacity:0;animation:fadeUp .6s ease .3s forwards;
-  position:relative;
-}
-video{
-  width:100%;display:block;
-  aspect-ratio:16/9;
-  object-fit:cover;
-}
-
-.prog-wrap{
-  width:100%;height:4px;
-  background:rgba(255,255,255,0.1);
-  border-radius:2px;overflow:hidden;
-  opacity:0;animation:fadeUp .5s ease .5s forwards;
-}
-.prog-bar{
-  height:100%;background:var(--orange);
-  border-radius:2px;width:0%;
-  transition:width .3s linear;
-}
-
-.info-row{
-  width:100%;display:flex;justify-content:space-between;align-items:center;
-  opacity:0;animation:fadeUp .5s ease .55s forwards;
-  margin-top:-.5rem;
-}
+.video-wrap{width:100%;border-radius:16px;overflow:hidden;background:#000;box-shadow:0 20px 60px rgba(0,0,0,0.5);opacity:0;animation:fadeUp .6s ease .3s forwards;position:relative;}
+.video-wrap iframe{width:100%;aspect-ratio:16/9;display:block;border:none;}
+.prog-wrap{width:100%;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;opacity:0;animation:fadeUp .5s ease .5s forwards;}
+.prog-bar{height:100%;background:var(--orange);border-radius:2px;width:0%;transition:width .5s linear;}
+.info-row{width:100%;display:flex;justify-content:space-between;align-items:center;opacity:0;animation:fadeUp .5s ease .55s forwards;margin-top:-.5rem;}
 .info-label{font-size:11px;color:rgba(255,255,255,0.35);font-weight:600;}
-.timer{font-size:11px;color:rgba(255,255,255,0.35);font-weight:700;font-variant-numeric:tabular-nums;}
-
-.btn-cta{
-  width:100%;padding:15px;
-  background:var(--orange);color:white;
-  border:none;border-radius:12px;
-  font-size:15px;font-weight:900;
-  cursor:pointer;font-family:inherit;
-  letter-spacing:.02em;
-  transition:all .2s;
-  display:flex;align-items:center;justify-content:center;gap:10px;
-  opacity:0;animation:fadeUp .5s ease .7s forwards;
-  position:relative;overflow:hidden;
-}
+.timer{font-size:11px;color:rgba(255,255,255,0.35);font-weight:700;}
+.btn-cta{width:100%;padding:15px;background:var(--orange);color:white;border:none;border-radius:12px;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;opacity:0;animation:fadeUp .5s ease .7s forwards;position:relative;overflow:hidden;}
 .btn-cta:not(:disabled):hover{background:var(--orange2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(245,129,30,0.35);}
 .btn-cta:disabled{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.25);cursor:not-allowed;}
-.pulse{
-  position:absolute;inset:0;border-radius:12px;
-  border:2px solid var(--orange);opacity:0;
-}
+.pulse{position:absolute;inset:0;border-radius:12px;border:2px solid var(--orange);opacity:0;}
 .btn-cta.ready .pulse{animation:pulse 1.5s ease infinite;}
-.hint{
-  font-size:11px;color:rgba(255,255,255,0.25);
-  text-align:center;margin-top:-.5rem;
-  opacity:0;animation:fadeUp .5s ease .8s forwards;
-  transition:color .3s;
-}
+.hint{font-size:11px;color:rgba(255,255,255,0.25);text-align:center;margin-top:-.5rem;opacity:0;animation:fadeUp .5s ease .8s forwards;transition:color .3s;}
 .hint.ready{color:rgba(245,129,30,0.8);}
-
 @keyframes fadeDown{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 @keyframes pulse{0%{opacity:.6;transform:scale(1);}70%{opacity:0;transform:scale(1.04);}100%{opacity:0;}}
@@ -115,7 +44,6 @@ video{
 <body>
 <div class="bg1"></div>
 <div class="bg2"></div>
-
 <div class="container">
   <div class="logo-wrap">
     <div class="logo-dot"></div>
@@ -126,15 +54,16 @@ video{
   </div>
 
   <div class="video-wrap">
-    <video id="vid" playsinline muted autoplay>
-      <source src="https://drive.google.com/uc?export=download&id=1oXTvJ9LInQ_Xzw9QR5Vju8s5-IHt30Kr" type="video/mp4">
-    </video>
+    <iframe id="vimeo-player"
+      src="https://player.vimeo.com/video/1195842006?autoplay=1&muted=1&controls=0&loop=0&title=0&byline=0&portrait=0&transparent=0"
+      allow="autoplay; fullscreen"
+      allowfullscreen>
+    </iframe>
   </div>
 
   <div class="prog-wrap">
     <div class="prog-bar" id="prog"></div>
   </div>
-
   <div class="info-row">
     <span class="info-label" id="lbl">Mira el video antes de continuar</span>
     <span class="timer" id="tmr">--</span>
@@ -152,28 +81,29 @@ video{
   <div class="hint" id="hint">Disponible al finalizar el video</div>
 </div>
 
+<script src="https://player.vimeo.com/api/player.js"></script>
 <script>
 var DESTINO = 'https://t8mn6kmn59-oss.github.io/evaluaciones-gp/';
-var vid = document.getElementById('vid');
+var btn = document.getElementById('btn');
 var prog = document.getElementById('prog');
 var tmr = document.getElementById('tmr');
 var lbl = document.getElementById('lbl');
-var btn = document.getElementById('btn');
 var hint = document.getElementById('hint');
 
-vid.addEventListener('loadedmetadata', function(){
-  tmr.textContent = fmt(Math.round(vid.duration));
+var player = new Vimeo.Player('vimeo-player');
+
+player.getDuration().then(function(dur){
+  tmr.textContent = fmt(Math.round(dur));
 });
 
-vid.addEventListener('timeupdate', function(){
-  if(!vid.duration) return;
-  var pct = (vid.currentTime / vid.duration) * 100;
+player.on('timeupdate', function(data){
+  var pct = (data.seconds / data.duration) * 100;
   prog.style.width = pct + '%';
-  var restante = Math.ceil(vid.duration - vid.currentTime);
+  var restante = Math.ceil(data.duration - data.seconds);
   tmr.textContent = fmt(restante);
 });
 
-vid.addEventListener('ended', function(){
+player.on('ended', function(){
   prog.style.width = '100%';
   prog.style.background = '#2D7D2D';
   tmr.textContent = '✓';
@@ -190,11 +120,9 @@ btn.addEventListener('click', function(){
 });
 
 function fmt(s){
-  if(isNaN(s)) return '--';
-  return '0:' + (s < 10 ? '0' : '') + s;
+  if(isNaN(s)||s<0) return '--';
+  return '0:' + (s < 10 ? '0' : '') + Math.max(0,s);
 }
-
-vid.play().catch(function(){});
 </script>
 </body>
 </html>
