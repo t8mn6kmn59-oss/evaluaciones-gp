@@ -24,6 +24,32 @@ html,body{
 .logo-sub{font-size:10px;color:rgba(255,255,255,0.35);letter-spacing:.05em;}
 .video-wrap{width:100%;border-radius:16px;overflow:hidden;background:#000;box-shadow:0 20px 60px rgba(0,0,0,0.5);opacity:0;animation:fadeUp .6s ease .3s forwards;position:relative;}
 .video-wrap iframe{width:100%;aspect-ratio:16/9;display:block;border:none;}
+
+.sound-overlay{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:12px;
+  background:rgba(0,0,0,0.55);
+  cursor:pointer;
+  z-index:10;
+  transition:opacity .3s;
+  border-radius:16px;
+}
+.sound-overlay.hidden{opacity:0;pointer-events:none;}
+.sound-btn{
+  width:64px;height:64px;border-radius:50%;
+  background:var(--orange);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 0 12px rgba(245,129,30,0.2);
+  animation:popIn .4s ease .8s both;
+}
+.sound-btn svg{width:28px;height:28px;}
+.sound-text{
+  font-size:13px;font-weight:700;color:white;
+  text-align:center;line-height:1.4;
+  animation:popIn .4s ease 1s both;
+}
+
 .prog-wrap{width:100%;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;opacity:0;animation:fadeUp .5s ease .5s forwards;}
 .prog-bar{height:100%;background:var(--orange);border-radius:2px;width:0%;transition:width .5s linear;}
 .info-row{width:100%;display:flex;justify-content:space-between;align-items:center;opacity:0;animation:fadeUp .5s ease .55s forwards;margin-top:-.5rem;}
@@ -39,6 +65,7 @@ html,body{
 @keyframes fadeDown{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 @keyframes pulse{0%{opacity:.6;transform:scale(1);}70%{opacity:0;transform:scale(1.04);}100%{opacity:0;}}
+@keyframes popIn{from{opacity:0;transform:scale(.8);}to{opacity:1;transform:scale(1);}}
 </style>
 </head>
 <body>
@@ -59,6 +86,16 @@ html,body{
       allow="autoplay; fullscreen"
       allowfullscreen>
     </iframe>
+    <div class="sound-overlay" id="sound-overlay" onclick="activarSonido()">
+      <div class="sound-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+        </svg>
+      </div>
+      <div class="sound-text">Toca para activar el sonido<br>y ver el video</div>
+    </div>
   </div>
 
   <div class="prog-wrap">
@@ -89,8 +126,19 @@ var prog = document.getElementById('prog');
 var tmr = document.getElementById('tmr');
 var lbl = document.getElementById('lbl');
 var hint = document.getElementById('hint');
+var overlay = document.getElementById('sound-overlay');
 
 var player = new Vimeo.Player('vimeo-player');
+
+function activarSonido(){
+  player.setVolume(1).then(function(){
+    player.play();
+    overlay.classList.add('hidden');
+  }).catch(function(){
+    player.play();
+    overlay.classList.add('hidden');
+  });
+}
 
 player.getDuration().then(function(dur){
   tmr.textContent = fmt(Math.round(dur));
@@ -111,7 +159,7 @@ player.on('ended', function(){
   btn.disabled = false;
   btn.classList.add('ready');
   hint.classList.add('ready');
-  hint.textContent = '¡Todo listo! Haz clic para comenzar.';
+  hint.textContent = '¡Todo listo! Redirigiendo...';
   setTimeout(function(){ window.location.href = DESTINO; }, 1500);
 });
 
