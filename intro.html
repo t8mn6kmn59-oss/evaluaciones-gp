@@ -24,32 +24,22 @@ html,body{
 .logo-sub{font-size:10px;color:rgba(255,255,255,0.35);letter-spacing:.05em;}
 .video-wrap{width:100%;border-radius:16px;overflow:hidden;background:#000;box-shadow:0 20px 60px rgba(0,0,0,0.5);opacity:0;animation:fadeUp .6s ease .3s forwards;position:relative;}
 .video-wrap iframe{width:100%;aspect-ratio:16/9;display:block;border:none;}
-
 .sound-overlay{
   position:absolute;inset:0;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:12px;
-  background:rgba(0,0,0,0.55);
-  cursor:pointer;
-  z-index:10;
-  transition:opacity .3s;
-  border-radius:16px;
+  gap:12px;background:rgba(0,0,0,0.65);
+  cursor:pointer;z-index:10;transition:opacity .3s;
 }
 .sound-overlay.hidden{opacity:0;pointer-events:none;}
 .sound-btn{
-  width:64px;height:64px;border-radius:50%;
+  width:68px;height:68px;border-radius:50%;
   background:var(--orange);
   display:flex;align-items:center;justify-content:center;
-  box-shadow:0 0 0 12px rgba(245,129,30,0.2);
-  animation:popIn .4s ease .8s both;
+  box-shadow:0 0 0 14px rgba(245,129,30,0.2);
+  animation:popIn .4s ease .6s both;
 }
-.sound-btn svg{width:28px;height:28px;}
-.sound-text{
-  font-size:13px;font-weight:700;color:white;
-  text-align:center;line-height:1.4;
-  animation:popIn .4s ease 1s both;
-}
-
+.sound-btn svg{width:30px;height:30px;}
+.sound-text{font-size:13px;font-weight:700;color:white;text-align:center;line-height:1.5;animation:popIn .4s ease .7s both;}
 .prog-wrap{width:100%;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;opacity:0;animation:fadeUp .5s ease .5s forwards;}
 .prog-bar{height:100%;background:var(--orange);border-radius:2px;width:0%;transition:width .5s linear;}
 .info-row{width:100%;display:flex;justify-content:space-between;align-items:center;opacity:0;animation:fadeUp .5s ease .55s forwards;margin-top:-.5rem;}
@@ -82,7 +72,7 @@ html,body{
 
   <div class="video-wrap">
     <iframe id="vimeo-player"
-      src="https://player.vimeo.com/video/1195842006?autoplay=1&muted=1&controls=0&loop=0&title=0&byline=0&portrait=0&transparent=0"
+      src="https://player.vimeo.com/video/1195845822?autoplay=0&muted=1&controls=0&loop=0&title=0&byline=0&portrait=0&transparent=0"
       allow="autoplay; fullscreen"
       allowfullscreen>
     </iframe>
@@ -94,7 +84,7 @@ html,body{
           <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
         </svg>
       </div>
-      <div class="sound-text">Toca para activar el sonido<br>y ver el video</div>
+      <div class="sound-text">Toca para ver el video<br>con sonido</div>
     </div>
   </div>
 
@@ -131,8 +121,11 @@ var overlay = document.getElementById('sound-overlay');
 var player = new Vimeo.Player('vimeo-player');
 
 function activarSonido(){
-  player.setVolume(1).then(function(){
-    player.play();
+  player.setCurrentTime(0).then(function(){
+    return player.setVolume(1);
+  }).then(function(){
+    return player.play();
+  }).then(function(){
     overlay.classList.add('hidden');
   }).catch(function(){
     player.play();
