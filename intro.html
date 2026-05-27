@@ -22,13 +22,38 @@ html,body{
 .logo-dot{width:10px;height:10px;border-radius:50%;background:var(--orange);}
 .logo-text{font-size:13px;font-weight:900;color:white;letter-spacing:.1em;text-transform:uppercase;}
 .logo-sub{font-size:10px;color:rgba(255,255,255,0.35);letter-spacing:.05em;}
-.video-wrap{width:100%;border-radius:16px;overflow:hidden;background:#000;box-shadow:0 20px 60px rgba(0,0,0,0.5);opacity:0;animation:fadeUp .6s ease .3s forwards;position:relative;}
+
+.video-wrap{
+  width:100%;border-radius:16px;overflow:hidden;
+  background:#000;box-shadow:0 20px 60px rgba(0,0,0,0.5);
+  opacity:0;animation:fadeUp .6s ease .3s forwards;
+  position:relative;
+}
 .video-wrap iframe{width:100%;aspect-ratio:16/9;display:block;border:none;}
+
+/* Tapa la barra superior de YouTube (nombre, título) */
+.cover-top{
+  position:absolute;top:0;left:0;right:0;
+  height:20%;
+  background:#000;
+  z-index:5;
+  pointer-events:none;
+}
+/* Tapa la barra inferior de YouTube (controles, logo) */
+.cover-bottom{
+  position:absolute;bottom:0;left:0;right:0;
+  height:22%;
+  background:#000;
+  z-index:5;
+  pointer-events:none;
+}
+
+/* Overlay de sonido inicial */
 .sound-overlay{
   position:absolute;inset:0;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:12px;background:rgba(0,0,0,0.65);
-  cursor:pointer;z-index:10;transition:opacity .3s;
+  gap:12px;background:rgba(0,0,0,0.7);
+  cursor:pointer;z-index:10;transition:opacity .4s;
 }
 .sound-overlay.hidden{opacity:0;pointer-events:none;}
 .sound-btn{
@@ -40,8 +65,9 @@ html,body{
 }
 .sound-btn svg{width:30px;height:30px;}
 .sound-text{font-size:13px;font-weight:700;color:white;text-align:center;line-height:1.5;animation:popIn .4s ease .7s both;}
+
 .prog-wrap{width:100%;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;opacity:0;animation:fadeUp .5s ease .5s forwards;}
-.prog-bar{height:100%;background:var(--orange);border-radius:2px;width:0%;transition:width .5s linear;}
+.prog-bar{height:100%;background:var(--orange);border-radius:2px;width:0%;transition:width 1s linear;}
 .info-row{width:100%;display:flex;justify-content:space-between;align-items:center;opacity:0;animation:fadeUp .5s ease .55s forwards;margin-top:-.5rem;}
 .info-label{font-size:11px;color:rgba(255,255,255,0.35);font-weight:600;}
 .timer{font-size:11px;color:rgba(255,255,255,0.35);font-weight:700;}
@@ -71,12 +97,14 @@ html,body{
   </div>
 
   <div class="video-wrap">
-    <iframe id="vimeo-player"
-      src="https://player.vimeo.com/video/1195845822?autoplay=0&muted=1&controls=0&loop=0&title=0&byline=0&portrait=0&transparent=0"
-      allow="autoplay; fullscreen"
+    <iframe id="yt"
+      src="https://www.youtube.com/embed/9Rif0HlWm2Y?autoplay=0&mute=0&controls=0&rel=0&modestbranding=1&enablejsapi=1&origin=https://t8mn6kmn59-oss.github.io"
+      allow="autoplay; encrypted-media"
       allowfullscreen>
     </iframe>
-    <div class="sound-overlay" id="sound-overlay" onclick="activarSonido()">
+    <div class="cover-top"></div>
+    <div class="cover-bottom"></div>
+    <div class="sound-overlay" id="overlay" onclick="iniciar()">
       <div class="sound-btn">
         <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
@@ -88,12 +116,10 @@ html,body{
     </div>
   </div>
 
-  <div class="prog-wrap">
-    <div class="prog-bar" id="prog"></div>
-  </div>
+  <div class="prog-wrap"><div class="prog-bar" id="prog"></div></div>
   <div class="info-row">
     <span class="info-label" id="lbl">Mira el video antes de continuar</span>
-    <span class="timer" id="tmr">--</span>
+    <span class="timer" id="tmr">0:13</span>
   </div>
 
   <button class="btn-cta" id="btn" disabled>
@@ -108,43 +134,61 @@ html,body{
   <div class="hint" id="hint">Disponible al finalizar el video</div>
 </div>
 
-<script src="https://player.vimeo.com/api/player.js"></script>
+<script src="https://www.youtube.com/iframe_api"></script>
 <script>
 var DESTINO = 'https://t8mn6kmn59-oss.github.io/evaluaciones-gp/';
+var DURACION = 13;
 var btn = document.getElementById('btn');
 var prog = document.getElementById('prog');
 var tmr = document.getElementById('tmr');
 var lbl = document.getElementById('lbl');
 var hint = document.getElementById('hint');
-var overlay = document.getElementById('sound-overlay');
+var overlay = document.getElementById('overlay');
+var player;
+var intervalo;
+var iniciado = false;
 
-var player = new Vimeo.Player('vimeo-player');
-
-function activarSonido(){
-  player.setCurrentTime(0).then(function(){
-    return player.setVolume(1);
-  }).then(function(){
-    return player.play();
-  }).then(function(){
-    overlay.classList.add('hidden');
-  }).catch(function(){
-    player.play();
-    overlay.classList.add('hidden');
+function onYouTubeIframeAPIReady(){
+  player = new YT.Player('yt', {
+    events:{
+      'onStateChange': onStateChange
+    }
   });
 }
 
-player.getDuration().then(function(dur){
-  tmr.textContent = fmt(Math.round(dur));
-});
+function iniciar(){
+  if(!player) return;
+  player.seekTo(0);
+  player.unMute();
+  player.setVolume(100);
+  player.playVideo();
+  overlay.classList.add('hidden');
+}
 
-player.on('timeupdate', function(data){
-  var pct = (data.seconds / data.duration) * 100;
+function onStateChange(e){
+  if(e.data === YT.PlayerState.PLAYING && !iniciado){
+    iniciado = true;
+    DURACION = Math.round(player.getDuration()) || 13;
+    tmr.textContent = fmt(DURACION);
+    intervalo = setInterval(tick, 500);
+  }
+  if(e.data === YT.PlayerState.ENDED){
+    clearInterval(intervalo);
+    terminar();
+  }
+}
+
+function tick(){
+  if(!player) return;
+  var cur = player.getCurrentTime();
+  var dur = player.getDuration() || DURACION;
+  var pct = (cur / dur) * 100;
   prog.style.width = pct + '%';
-  var restante = Math.ceil(data.duration - data.seconds);
+  var restante = Math.ceil(dur - cur);
   tmr.textContent = fmt(restante);
-});
+}
 
-player.on('ended', function(){
+function terminar(){
   prog.style.width = '100%';
   prog.style.background = '#2D7D2D';
   tmr.textContent = '✓';
@@ -154,7 +198,7 @@ player.on('ended', function(){
   hint.classList.add('ready');
   hint.textContent = '¡Todo listo! Redirigiendo...';
   setTimeout(function(){ window.location.href = DESTINO; }, 1500);
-});
+}
 
 btn.addEventListener('click', function(){
   if(!btn.disabled) window.location.href = DESTINO;
