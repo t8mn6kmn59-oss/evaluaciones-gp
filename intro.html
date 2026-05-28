@@ -237,7 +237,7 @@ function terminar(){
   prog.style.background = '#2D7D2D';
   tmr.textContent = '✓';
   lbl.textContent = '¡Video completado!';
-  endOverlay.classList.add('visible');
+  setTimeout(function(){ window.location.href = URL_PRUEBA; }, 800);
 }
 
 function irA(destino){
