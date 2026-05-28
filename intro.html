@@ -2,296 +2,244 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bienvenida · GP Empresas</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bienvenido · GP Empresas</title>
 <style>
-  :root {
-    --navy: #1B2A4A;
-    --navy2: #243558;
-    --orange: #F5811E;
-    --orange2: #E06A08;
-    --gray: #F4F6FA;
-    --border: #D8E0EE;
-  }
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--navy:#1B2A4A;--orange:#F5811E;--orange2:#E06A08;}
+html,body{
+  width:100%;min-height:100vh;
+  background:var(--navy);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  position:relative;overflow:hidden;
+}
+.bg1{position:fixed;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(245,129,30,0.13) 0%,transparent 70%);top:-120px;right:-120px;pointer-events:none;}
+.bg2{position:fixed;width:350px;height:350px;border-radius:50%;background:radial-gradient(circle,rgba(245,129,30,0.07) 0%,transparent 70%);bottom:-80px;left:-80px;pointer-events:none;}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+.container{width:100%;max-width:460px;padding:1.5rem 1.25rem;display:flex;flex-direction:column;align-items:center;position:relative;z-index:1;gap:1.25rem;}
+.logo-wrap{display:flex;align-items:center;gap:10px;opacity:0;animation:fadeDown .5s ease .1s forwards;}
+.logo-dot{width:10px;height:10px;border-radius:50%;background:var(--orange);}
+.logo-text{font-size:13px;font-weight:900;color:white;letter-spacing:.1em;text-transform:uppercase;}
+.logo-sub{font-size:10px;color:rgba(255,255,255,0.35);letter-spacing:.05em;}
 
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: var(--navy);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 1.5rem;
-  }
+.video-wrap{
+  width:100%;border-radius:16px;overflow:hidden;
+  background:#000;box-shadow:0 20px 60px rgba(0,0,0,0.5);
+  opacity:0;animation:fadeUp .6s ease .3s forwards;
+  position:relative;
+}
+.video-wrap iframe{width:100%;aspect-ratio:16/9;display:block;border:none;}
+.cover-top{position:absolute;top:0;left:0;right:0;height:20%;background:#000;z-index:5;pointer-events:none;}
+.cover-bottom{position:absolute;bottom:0;left:0;right:0;height:22%;background:#000;z-index:5;pointer-events:none;}
 
-  .logo {
-    margin-bottom: 1.5rem;
-    text-align: center;
-  }
+.sound-overlay{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:12px;background:rgba(0,0,0,0.7);
+  cursor:pointer;z-index:10;transition:opacity .4s;
+}
+.sound-overlay.hidden{opacity:0;pointer-events:none;}
+.sound-btn{
+  width:68px;height:68px;border-radius:50%;
+  background:var(--orange);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 0 14px rgba(245,129,30,0.2);
+  animation:popIn .4s ease .6s both;
+}
+.sound-btn svg{width:30px;height:30px;}
+.sound-text{font-size:13px;font-weight:700;color:white;text-align:center;line-height:1.5;animation:popIn .4s ease .7s both;}
 
-  .logo-title {
-    font-size: 22px;
-    font-weight: 900;
-    color: white;
-    letter-spacing: .04em;
-  }
+.prog-wrap{width:100%;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;opacity:0;animation:fadeUp .5s ease .5s forwards;}
+.prog-bar{height:100%;background:var(--orange);border-radius:2px;width:0%;transition:width 1s linear;}
+.info-row{width:100%;display:flex;justify-content:space-between;align-items:center;opacity:0;animation:fadeUp .5s ease .55s forwards;margin-top:-.5rem;}
+.info-label{font-size:11px;color:rgba(255,255,255,0.35);font-weight:600;}
+.timer{font-size:11px;color:rgba(255,255,255,0.35);font-weight:700;}
 
-  .logo-sub {
-    font-size: 12px;
-    color: rgba(255,255,255,0.45);
-    margin-top: 2px;
-  }
+.hint{font-size:11px;color:rgba(255,255,255,0.25);text-align:center;opacity:0;animation:fadeUp .5s ease .8s forwards;}
+.hint.ready{color:rgba(245,129,30,0.8);}
 
-  .video-wrapper {
-    width: 100%;
-    max-width: 780px;
-    background: #000;
-    border-radius: 14px;
-    overflow: hidden;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
-    position: relative;
-    aspect-ratio: 16/9;
-  }
+/* ── OVERLAY POST-VIDEO ── */
+.end-overlay{
+  position:fixed;inset:0;z-index:100;
+  background:var(--navy);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:2rem 1.5rem;gap:1.5rem;
+  opacity:0;pointer-events:none;
+  transition:opacity .5s ease;
+}
+.end-overlay.visible{opacity:1;pointer-events:all;}
 
-  .video-wrapper iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-    display: block;
-  }
+.end-check{
+  width:72px;height:72px;border-radius:50%;
+  background:#2D7D2D;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 0 16px rgba(45,125,45,0.15);
+  animation:popIn .4s ease both;
+}
+.end-check svg{width:36px;height:36px;}
+.end-title{font-size:22px;font-weight:900;color:white;text-align:center;}
+.end-sub{font-size:14px;color:rgba(255,255,255,0.45);text-align:center;}
+.end-buttons{width:100%;max-width:340px;display:flex;flex-direction:column;gap:.85rem;}
+.btn-primary{
+  width:100%;padding:16px;
+  background:var(--orange);color:white;
+  border:none;border-radius:12px;
+  font-size:16px;font-weight:900;cursor:pointer;
+  font-family:inherit;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:all .2s;
+}
+.btn-primary:hover{background:var(--orange2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(245,129,30,0.35);}
+.btn-secondary{
+  width:100%;padding:14px;
+  background:rgba(255,255,255,0.07);
+  color:rgba(255,255,255,0.7);
+  border:1.5px solid rgba(255,255,255,0.12);border-radius:12px;
+  font-size:15px;font-weight:700;cursor:pointer;
+  font-family:inherit;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:all .2s;
+}
+.btn-secondary:hover{background:rgba(255,255,255,0.12);color:white;border-color:rgba(255,255,255,0.25);}
 
-  /* Overlay que cubre el video al terminar */
-  .video-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(27, 42, 74, 0.92);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1.25rem;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity .5s ease;
-    border-radius: 14px;
-    padding: 2rem;
-  }
-
-  .video-overlay.visible {
-    opacity: 1;
-    pointer-events: all;
-  }
-
-  .overlay-icon {
-    font-size: 3rem;
-    margin-bottom: .25rem;
-  }
-
-  .overlay-title {
-    font-size: 20px;
-    font-weight: 900;
-    color: white;
-    text-align: center;
-  }
-
-  .overlay-sub {
-    font-size: 13px;
-    color: rgba(255,255,255,0.55);
-    text-align: center;
-    margin-top: -.5rem;
-    margin-bottom: .25rem;
-  }
-
-  .btn-group {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 13px 26px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 800;
-    cursor: pointer;
-    border: none;
-    text-decoration: none;
-    font-family: inherit;
-    transition: all .18s;
-  }
-
-  .btn-orange {
-    background: var(--orange);
-    color: white;
-  }
-
-  .btn-orange:hover {
-    background: var(--orange2);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(245,129,30,0.4);
-  }
-
-  .btn-outline {
-    background: rgba(255,255,255,0.08);
-    color: white;
-    border: 1.5px solid rgba(255,255,255,0.25);
-  }
-
-  .btn-outline:hover {
-    background: rgba(255,255,255,0.15);
-    border-color: rgba(255,255,255,0.5);
-    transform: translateY(-2px);
-  }
-
-  /* Barra de progreso decorativa */
-  .progress-bar {
-    width: 100%;
-    max-width: 780px;
-    height: 4px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 2px;
-    margin-top: .75rem;
-    overflow: hidden;
-  }
-
-  .progress-fill {
-    height: 100%;
-    width: 0%;
-    background: linear-gradient(90deg, var(--navy2), var(--orange));
-    border-radius: 2px;
-    transition: width .5s linear;
-  }
-
-  .hint {
-    margin-top: .75rem;
-    font-size: 11px;
-    color: rgba(255,255,255,0.3);
-    text-align: center;
-  }
-
-  @media(max-width: 520px) {
-    .btn { padding: 12px 18px; font-size: 13px; }
-    .overlay-title { font-size: 17px; }
-  }
+@keyframes fadeDown{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+@keyframes popIn{from{opacity:0;transform:scale(.8);}to{opacity:1;transform:scale(1);}}
 </style>
 </head>
 <body>
+<div class="bg1"></div>
+<div class="bg2"></div>
 
-<div class="logo">
-  <div class="logo-title">GP Empresas</div>
-  <div class="logo-sub">Plataforma de Evaluaciones</div>
+<div class="container">
+  <div class="logo-wrap">
+    <div class="logo-dot"></div>
+    <div>
+      <div class="logo-text">GP Empresas</div>
+      <div class="logo-sub">Somos Calidad de Vida Laboral</div>
+    </div>
+  </div>
+
+  <div class="video-wrap">
+    <iframe id="yt"
+      src="https://www.youtube.com/embed/CHuOS6fRR1k?autoplay=0&mute=0&controls=0&rel=0&modestbranding=1&enablejsapi=1&origin=https://t8mn6kmn59-oss.github.io"
+      allow="autoplay; encrypted-media"
+      allowfullscreen>
+    </iframe>
+    <div class="cover-top"></div>
+    <div class="cover-bottom"></div>
+    <div class="sound-overlay" id="overlay" onclick="iniciar()">
+      <div class="sound-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+        </svg>
+      </div>
+      <div class="sound-text">Toca para ver el video<br>con sonido</div>
+    </div>
+  </div>
+
+  <div class="prog-wrap"><div class="prog-bar" id="prog"></div></div>
+  <div class="info-row">
+    <span class="info-label" id="lbl">Mira el video antes de continuar</span>
+    <span class="timer" id="tmr">--</span>
+  </div>
+  <div class="hint" id="hint">El video comenzará automáticamente</div>
 </div>
 
-<div class="video-wrapper" id="videoWrapper">
-  <!-- 
-    autoplay=1 → reproduce automático
-    enablejsapi=1 → permite detectar cuando termina
-    rel=0 → no muestra videos relacionados al terminar
-    modestbranding=1 → menos branding de YouTube
-  -->
-  <iframe
-    id="ytPlayer"
-    src="https://www.youtube.com/embed/CHuOS6fRR1k?autoplay=1&enablejsapi=1&rel=0&modestbranding=1&playsinline=1"
-    allow="autoplay; encrypted-media"
-    allowfullscreen>
-  </iframe>
-
-  <div class="video-overlay" id="overlay">
-    <div class="overlay-icon">✅</div>
-    <div class="overlay-title">¡Video completado!</div>
-    <div class="overlay-sub">¿Qué quieres hacer ahora?</div>
-    <div class="btn-group">
-      <a class="btn btn-orange" href="index.html#quiz">
-        📝 Ir a la prueba
-      </a>
-      <a class="btn btn-outline" href="index.html#material">
-        📖 Revisar el manual
-      </a>
-    </div>
+<!-- OVERLAY FULLSCREEN POST-VIDEO -->
+<div class="end-overlay" id="endOverlay">
+  <div class="end-check">
+    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+  </div>
+  <div class="end-title">¡Video completado!</div>
+  <div class="end-sub">¿Qué quieres hacer ahora?</div>
+  <div class="end-buttons">
+    <button class="btn-primary" onclick="irA('prueba')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      Ir a la prueba
+    </button>
+    <button class="btn-secondary" onclick="irA('manual')">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      Revisar el manual
+    </button>
   </div>
 </div>
 
-<div class="progress-bar">
-  <div class="progress-fill" id="progressFill"></div>
-</div>
-
-<div class="hint">El video comenzará automáticamente</div>
-
+<script src="https://www.youtube.com/iframe_api"></script>
 <script>
-  // API de YouTube para detectar cuando termina el video
-  var tag = document.createElement('script');
-  tag.src = "https://www.youtube.com/iframe_api";
-  var firstScriptTag = document.getElementsByTagName('script')[0];
-  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+var DESTINO = 'https://t8mn6kmn59-oss.github.io/evaluaciones-gp/';
+var player;
+var intervalo;
+var iniciado = false;
 
-  var player;
-  var progressInterval;
+var prog    = document.getElementById('prog');
+var tmr     = document.getElementById('tmr');
+var lbl     = document.getElementById('lbl');
+var hint    = document.getElementById('hint');
+var overlay = document.getElementById('overlay');
+var endOverlay = document.getElementById('endOverlay');
 
-  function onYouTubeIframeAPIReady() {
-    player = new YT.Player('ytPlayer', {
-      events: {
-        'onStateChange': onPlayerStateChange,
-        'onReady': onPlayerReady
-      }
-    });
-  }
-
-  function onPlayerReady(event) {
-    // El autoplay ya está en la URL, pero por si acaso:
-    // event.target.playVideo();
-  }
-
-  function onPlayerStateChange(event) {
-    // YT.PlayerState.PLAYING = 1
-    if (event.data === YT.PlayerState.PLAYING) {
-      startProgress();
+function onYouTubeIframeAPIReady(){
+  player = new YT.Player('yt', {
+    events:{
+      'onStateChange': onStateChange
     }
-    // YT.PlayerState.ENDED = 0
-    if (event.data === YT.PlayerState.ENDED) {
-      clearInterval(progressInterval);
-      document.getElementById('progressFill').style.width = '100%';
-      showOverlay();
-    }
-    // YT.PlayerState.PAUSED = 2
-    if (event.data === YT.PlayerState.PAUSED) {
-      clearInterval(progressInterval);
-    }
-  }
+  });
+}
 
-  function startProgress() {
-    clearInterval(progressInterval);
-    progressInterval = setInterval(function() {
-      if (!player || !player.getDuration) return;
-      var duration = player.getDuration();
-      var current = player.getCurrentTime();
-      if (duration > 0) {
-        var pct = (current / duration) * 100;
-        document.getElementById('progressFill').style.width = pct + '%';
-      }
-    }, 500);
-  }
+function iniciar(){
+  if(!player) return;
+  player.seekTo(0);
+  player.unMute();
+  player.setVolume(100);
+  player.playVideo();
+  overlay.classList.add('hidden');
+}
 
-  function showOverlay() {
-    document.getElementById('overlay').classList.add('visible');
+function onStateChange(e){
+  if(e.data === YT.PlayerState.PLAYING && !iniciado){
+    iniciado = true;
+    var dur = Math.round(player.getDuration()) || 13;
+    tmr.textContent = fmt(dur);
+    intervalo = setInterval(tick, 500);
   }
+  if(e.data === YT.PlayerState.ENDED){
+    clearInterval(intervalo);
+    terminar();
+  }
+}
 
-  // Fallback: si el usuario no tiene JS de la API activo,
-  // mostrar botones después de X segundos (duración del video + 2s)
-  // El video dura ~13s según la captura
-  setTimeout(function() {
-    var overlay = document.getElementById('overlay');
-    if (!overlay.classList.contains('visible')) {
-      overlay.classList.add('visible');
-    }
-  }, 20000); // 20 segundos de fallback
+function tick(){
+  if(!player) return;
+  var cur = player.getCurrentTime();
+  var dur = player.getDuration();
+  prog.style.width = ((cur / dur) * 100) + '%';
+  tmr.textContent = fmt(Math.ceil(dur - cur));
+}
+
+function terminar(){
+  prog.style.width = '100%';
+  prog.style.background = '#2D7D2D';
+  tmr.textContent = '✓';
+  lbl.textContent = '¡Video completado!';
+  // Mostrar overlay fullscreen
+  endOverlay.classList.add('visible');
+}
+
+function irA(destino){
+  window.location.href = DESTINO;
+}
+
+function fmt(s){
+  if(isNaN(s)||s<0) return '--';
+  return '0:' + (s < 10 ? '0' : '') + Math.max(0,s);
+}
 </script>
-
 </body>
 </html>
