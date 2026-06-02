@@ -1122,7 +1122,7 @@ const SUPA_URL='https://xztqfvaksurqymbfwckb.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6dHFmdmFrc3VycXltYmZ3Y2tiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwOTUzMzcsImV4cCI6MjA5MzY3MTMzN30.WBLF5Zuih2mvEXKQp7ozZjJFNoKEb_fDYZ8mxq0hjwQ';
 const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
 let DB={quizzes:[],results:[],pw:'admin123',siteUrl:'https://t8mn6kmn59-oss.github.io/evaluaciones-gp'};
-let selQid=null,curQ=null,curS=null,ciDist=null,ciPie=null,nqc=0;
+let selQid=null,curQ=null,curS=null,ciDist=null,ciPie=null,nqc=0,selNomina=null;
 const ans={};const LT=['A','B','C','D','E'];
 function sv(k,v){try{localStorage.setItem('gp_'+k,JSON.stringify(v));}catch(e){}}
 function lv(k,d){try{const v=localStorage.getItem('gp_'+k);return v?JSON.parse(v):d;}catch(e){return d;}}
@@ -1136,7 +1136,17 @@ async function initDB(){
   await insertErgonomiaQuiz();
   const params=new URLSearchParams(window.location.search);
   const qp=params.get('quiz');
-  if(qp&&DB.quizzes.find(q=>q.id===qp)){selQid=qp;showQuizEntry(qp);}
+  const np=params.get('nom');
+  if(np){
+    try{
+      const {data,error}=await sb.from('nominas').select('*').eq('id',np).single();
+      if(!error&&data){
+        selNomina=data;
+        selQid=data.quiz_id;
+        showQuizEntry(data.quiz_id);
+      }
+    }catch(e){console.error('Error cargando nomina:',e);}
+  } else if(qp&&DB.quizzes.find(q=>q.id===qp)){selQid=qp;showQuizEntry(qp);}
 }
 
 async function loadQuizzes(){
@@ -1204,7 +1214,7 @@ function toggleMod(id){
   body.classList.toggle('open',!open);
   ch.classList.toggle('open',!open);
 }
-function gh(){selQid=null;curQ=null;curS=null;for(const k in ans)delete ans[k];sp('ph');}
+function gh(){selQid=null;curQ=null;curS=null;selNomina=null;for(const k in ans)delete ans[k];sp('ph');}
 
 const PARTICIPANTES=[
   // Prueba 15-05-2026
