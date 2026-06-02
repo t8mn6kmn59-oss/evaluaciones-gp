@@ -1482,14 +1482,11 @@ function verQRNomina(id,empresa){
   document.getElementById('pm-t').textContent=empresa;
   document.getElementById('pm-s').textContent='Escanea para rendir la evaluación';
   document.getElementById('pm-u').textContent=url;
+  const c=document.getElementById('pm-c');c.width=200;c.height=200;
+  const t=document.createElement('div');t.style.display='none';document.body.appendChild(t);
+  new QRCode(t,{text:url,width:200,height:200,colorDark:'#1B2A4A',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+  setTimeout(()=>{const img=t.querySelector('img');if(img){const i=new Image();i.onload=()=>c.getContext('2d').drawImage(i,0,0,200,200);i.src=img.src;}document.body.removeChild(t);},350);
   document.getElementById('pm').classList.remove('hidden');
-  const wrap=document.querySelector('.modal-qr-wrap');
-  const old=document.getElementById('pm-c');
-  if(old)old.remove();
-  const c=document.createElement('canvas');
-  c.id='pm-c';c.width=200;c.height=200;
-  wrap.appendChild(c);
-  new QRCode(c,{text:url,width:200,height:200,correctLevel:QRCode.CorrectLevel.M});
 }
 function pfs(){const s=document.getElementById('fq');const cv=s.value;s.innerHTML='<option value="">Todas las evaluaciones</option>'+DB.quizzes.map(q=>`<option value="${q.id}"${cv===q.id?' selected':''}>${q.name}</option>`).join('');}
 
