@@ -223,7 +223,7 @@ textarea{resize:vertical;min-height:64px;}
             <span style="color:#F5811E;">AHORA VEAMOS</span><br><span style="color:#1B2A4A;">CUÁNTO HEMOS<br>APRENDIDO</span>
           </div>
           <div style="display:flex;flex-direction:column;gap:10px;">
-            <button onclick="goMat()" style="display:inline-flex;align-items:center;gap:8px;background:#F5811E;color:white;font-size:13px;font-weight:800;letter-spacing:.08em;padding:14px 28px;border-radius:999px;border:none;cursor:pointer;width:fit-content;">📖 VER MATERIAL PRIMERO</button>
+            <button id="btn-material" onclick="goMat()" style="display:inline-flex;align-items:center;gap:8px;background:#F5811E;color:white;font-size:13px;font-weight:800;letter-spacing:.08em;padding:14px 28px;border-radius:999px;border:none;cursor:pointer;width:fit-content;">📖 VER MATERIAL PRIMERO</button>
             <button onclick="sp('psi')" style="display:inline-flex;align-items:center;gap:8px;background:#1B2A4A;color:white;font-size:13px;font-weight:700;letter-spacing:.06em;padding:14px 28px;border-radius:999px;border:1.5px solid #1B2A4A;cursor:pointer;width:fit-content;">✏️ IR DIRECTO A LA PRUEBA</button>
           </div>
         </div>
@@ -1193,6 +1193,8 @@ function showQuizEntry(qid){
     document.getElementById('qr-name').textContent=q.name;
     document.getElementById('qr-icon').textContent=q.icon||'📋';
   }
+  const btnMat=document.getElementById('btn-material');
+  if(btnMat) btnMat.style.display=(qid==='ia2')?'none':'inline-flex';
   sp('pqr');
 }
 function toggleMod(id){
