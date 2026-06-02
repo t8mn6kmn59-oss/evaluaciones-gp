@@ -1250,7 +1250,7 @@ const PARTICIPANTES=[
   {rut:'16115025-8',nombre:'Yenny Espinoza'}
 ];
 function normRut(r){return r.replace(/\./g,'').replace(/\s/g,'').toUpperCase();}
-function findParticipante(rut){const nr=normRut(rut);return PARTICIPANTES.find(p=>normRut(p.rut)===nr);}
+function findParticipante(rut){const nr=normRut(rut);const lista=selNomina?selNomina.participantes:PARTICIPANTES;return lista.find(p=>normRut(p.rut)===nr);}
 function autoNombre(rut){
   const p=findParticipante(rut);
   const inp=document.getElementById('sn');
