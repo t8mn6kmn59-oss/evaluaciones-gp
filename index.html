@@ -1267,7 +1267,18 @@ async function initDB(){
   await insertErgonomiaQuiz();
   const params=new URLSearchParams(window.location.search);
   const qp=params.get('quiz');
-  if(qp&&DB.quizzes.find(q=>q.id===qp)){selQid=qp;showQuizEntry(qp);}
+  if(qp&&DB.quizzes.find(q=>q.id===qp)){selQid=qp;showQuizEntry(qp);return;}
+  const np=params.get('nom');
+  if(np){
+    try{
+      const {data,error}=await sb.from('nominas').select('quiz_id').eq('id',np).single();
+      if(!error&&data&&data.quiz_id){
+        selQid=data.quiz_id;
+        showQuizEntry(data.quiz_id);
+        return;
+      }
+    }catch(e){console.error('Error cargando nomina:',e);}
+  }
 }
 
 async function loadQuizzes(){
