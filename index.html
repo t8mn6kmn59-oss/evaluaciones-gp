@@ -1617,7 +1617,14 @@ function verQRNomina(id,empresa){
   document.getElementById('pm').classList.remove('hidden');
   const c=document.getElementById('pm-c');
   const ctx=c.getContext('2d');ctx.clearRect(0,0,200,200);
-  new QRCode(c,{text:url,width:200,height:200});
+  const tmp=document.createElement('div');
+  document.body.appendChild(tmp);
+  new QRCode(tmp,{text:url,width:200,height:200,colorDark:'#1B2A4A',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+  setTimeout(()=>{
+    const img=tmp.querySelector('img');
+    if(img){const i=new Image();i.onload=()=>ctx.drawImage(i,0,0,200,200);i.src=img.src;}
+    document.body.removeChild(tmp);
+  },350);
 }
 function pfs(){const s=document.getElementById('fq');const cv=s.value;s.innerHTML='<option value="">Todas las evaluaciones</option>'+DB.quizzes.map(q=>`<option value="${q.id}"${cv===q.id?' selected':''}>${q.name}</option>`).join('');}
 
