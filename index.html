@@ -1035,9 +1035,7 @@ textarea{resize:vertical;min-height:64px;}
       <button class="tab active" onclick="st('tr')">📊 Reporte</button>
       <button class="tab" onclick="st('tqr')">📋 Evaluaciones</button>
       <button class="tab" onclick="st('tqc')">📲 Códigos QR</button>
-      <button class="tab" onclick="st('tn')">➕ Nueva</button>
       <button class="tab" onclick="st('ts')">⚙️ Ajustes</button>
-      <button id="btn-nom" class="tab hidden" onclick="st('tnom')">👥 Nóminas</button>
     </div>
 
     <!-- REPORTE VISUAL -->
@@ -1519,7 +1517,6 @@ function verificarClaveNom(){
   const rutOk=rut.toLowerCase()===NOM_RUT.toLowerCase();
   if(nomOk&&rutOk){
     document.getElementById('modal-nom-clave').classList.add('hidden');
-    document.getElementById('btn-nom').classList.remove('hidden');
     st('tnom');
   } else {
     err.textContent='Clave incorrecta. Intenta nuevamente.';
@@ -1528,7 +1525,6 @@ function verificarClaveNom(){
 }
 
 function cerrarNom(){
-  document.getElementById('btn-nom').classList.add('hidden');
   st('ts');
 }
 
@@ -1567,7 +1563,10 @@ function renderNominas(){
           <div style="font-weight:800;font-size:15px;color:var(--navy)">${n.empresa}</div>
           <div style="font-size:12px;color:var(--textLight);margin-top:2px">${qName} · ${pCount} participante${pCount!==1?'s':''} · ${n.fecha_inicio||''}</div>
         </div>
-        <button class="btn btn-ghost btn-sm" onclick="eliminarNomina('${n.id}')">&#128465; Eliminar</button>
+        <div style="display:flex;gap:.5rem">
+          <button class="btn btn-outline btn-sm" onclick="editarNomina('${n.id}')">✏️ Editar</button>
+          <button class="btn btn-ghost btn-sm" onclick="eliminarNomina('${n.id}')">&#128465; Eliminar</button>
+        </div>
       </div>
       <div style="margin-top:.75rem;padding:.75rem;background:#f8f9fb;border-radius:8px;font-size:11px;color:var(--textLight);word-break:break-all">${url}</div>
       <div style="margin-top:.75rem;display:flex;gap:.5rem;flex-wrap:wrap">
@@ -1618,7 +1617,14 @@ function verQRNomina(id,empresa){
   document.getElementById('pm').classList.remove('hidden');
   const c=document.getElementById('pm-c');
   const ctx=c.getContext('2d');ctx.clearRect(0,0,200,200);
-  new QRCode(c,{text:url,width:200,height:200});
+  const tmp=document.createElement('div');
+  document.body.appendChild(tmp);
+  new QRCode(tmp,{text:url,width:200,height:200,colorDark:'#1B2A4A',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+  setTimeout(()=>{
+    const img=tmp.querySelector('img');
+    if(img){const i=new Image();i.onload=()=>ctx.drawImage(i,0,0,200,200);i.src=img.src;}
+    document.body.removeChild(tmp);
+  },350);
 }
 function pfs(){const s=document.getElementById('fq');const cv=s.value;s.innerHTML='<option value="">Todas las evaluaciones</option>'+DB.quizzes.map(q=>`<option value="${q.id}"${cv===q.id?' selected':''}>${q.name}</option>`).join('');}
 
@@ -2006,7 +2012,29 @@ function printResult(rid){
   }).join('')}
   <div class="footer">GP Empresas · Plataforma de Evaluaciones · Generado ${new Date().toLocaleDateString('es-CL')}</div>
   <br><button onclick="window.print()" style="padding:6px 16px;background:#1B2A4A;color:white;border:none;border-radius:4px;cursor:pointer;font-size:11px;margin-top:8px;">🖨 Imprimir</button>
-  </body></html>`);
+  
+<!-- MODAL EDITAR NÓMINA -->
+<div class="modal-bg hidden" id="modal-edit-nom">
+  <div class="modal" style="max-width:480px;width:100%">
+    <div class="modal-hdr">
+      <h2>✏️ Editar Nómina</h2>
+      <p id="modal-edit-nom-empresa" style="color:rgba(255,255,255,0.6);font-size:12px;margin-top:3px"></p>
+    </div>
+    <div class="modal-body" style="text-align:left">
+      <div class="fg">
+        <label>Participantes (un RUT;Nombre por línea)</label>
+        <textarea id="edit-nom-participantes" style="min-height:160px;font-size:13px" placeholder="14431904-4;Leonardo Ulloa Hidalgo&#10;21091545-1;Martín Ulloa Canales"></textarea>
+      </div>
+      <div id="edit-nom-err" class="alert ae hidden" style="margin-bottom:.75rem"></div>
+      <div style="display:flex;gap:.75rem;justify-content:flex-end">
+        <button class="btn btn-ghost" onclick="document.getElementById('modal-edit-nom').classList.add('hidden')">Cancelar</button>
+        <button class="btn btn-orange" onclick="guardarEdicionNomina()">💾 Guardar cambios</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body></html>`);
   win.document.close();
   setTimeout(()=>win.print(),500);
 }
@@ -2276,6 +2304,33 @@ async function generarPDF(){
   doc.save(filename);
 }
 
+
+let editNominaId = null;
+function editarNomina(id){
+  const nom=DB_NOMINAS.find(n=>n.id===id);
+  if(!nom)return;
+  editNominaId=id;
+  document.getElementById('modal-edit-nom-empresa').textContent=nom.empresa;
+  const txt=(nom.participantes||[]).map(p=>p.rut+';'+p.nombre).join('\n');
+  document.getElementById('edit-nom-participantes').value=txt;
+  document.getElementById('edit-nom-err').classList.add('hidden');
+  document.getElementById('modal-edit-nom').classList.remove('hidden');
+}
+async function guardarEdicionNomina(){
+  const raw=document.getElementById('edit-nom-participantes').value.trim();
+  const err=document.getElementById('edit-nom-err');
+  if(!raw){err.textContent='Agrega al menos un participante.';err.classList.remove('hidden');return;}
+  const participantes=raw.split('\n').map(l=>{const[rut,...n]=l.split(';');return{rut:rut.trim(),nombre:n.join(';').trim()};}).filter(p=>p.rut&&p.nombre);
+  if(!participantes.length){err.textContent='Formato incorrecto. Usa RUT;Nombre por línea.';err.classList.remove('hidden');return;}
+  err.classList.add('hidden');
+  try{
+    await sb.from('nominas').update({participantes}).eq('id',editNominaId);
+    document.getElementById('modal-edit-nom').classList.add('hidden');
+    editNominaId=null;
+    cargarNominas();
+  }catch(e){err.textContent='Error: '+e.message;err.classList.remove('hidden');}
+}
+
 </script>
 
 <!-- FOOTER -->
@@ -2314,6 +2369,28 @@ async function generarPDF(){
     </div>
   </div>
 </footer>
+
+
+<!-- MODAL EDITAR NÓMINA -->
+<div class="modal-bg hidden" id="modal-edit-nom">
+  <div class="modal" style="max-width:480px;width:100%">
+    <div class="modal-hdr">
+      <h2>✏️ Editar Nómina</h2>
+      <p id="modal-edit-nom-empresa" style="color:rgba(255,255,255,0.6);font-size:12px;margin-top:3px"></p>
+    </div>
+    <div class="modal-body" style="text-align:left">
+      <div class="fg">
+        <label>Participantes (un RUT;Nombre por línea)</label>
+        <textarea id="edit-nom-participantes" style="min-height:160px;font-size:13px" placeholder="14431904-4;Leonardo Ulloa Hidalgo&#10;21091545-1;Martín Ulloa Canales"></textarea>
+      </div>
+      <div id="edit-nom-err" class="alert ae hidden" style="margin-bottom:.75rem"></div>
+      <div style="display:flex;gap:.75rem;justify-content:flex-end">
+        <button class="btn btn-ghost" onclick="document.getElementById('modal-edit-nom').classList.add('hidden')">Cancelar</button>
+        <button class="btn btn-orange" onclick="guardarEdicionNomina()">💾 Guardar cambios</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
