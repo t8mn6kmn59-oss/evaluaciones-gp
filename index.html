@@ -223,7 +223,7 @@ textarea{resize:vertical;min-height:64px;}
             <span style="color:#F5811E;">AHORA VEAMOS</span><br><span style="color:#1B2A4A;">CUÁNTO HEMOS<br>APRENDIDO</span>
           </div>
           <div style="display:flex;flex-direction:column;gap:10px;">
-            <button id="btn-material" onclick="goMat()" style="display:none;">📖 VER MATERIAL PRIMERO</button>
+            <button onclick="goMat()" style="display:inline-flex;align-items:center;gap:8px;background:#F5811E;color:white;font-size:13px;font-weight:800;letter-spacing:.08em;padding:14px 28px;border-radius:999px;border:none;cursor:pointer;width:fit-content;">📖 VER MATERIAL PRIMERO</button>
             <button onclick="sp('psi')" style="display:inline-flex;align-items:center;gap:8px;background:#1B2A4A;color:white;font-size:13px;font-weight:700;letter-spacing:.06em;padding:14px 28px;border-radius:999px;border:1.5px solid #1B2A4A;cursor:pointer;width:fit-content;">✏️ IR DIRECTO A LA PRUEBA</button>
           </div>
         </div>
@@ -289,6 +289,13 @@ textarea{resize:vertical;min-height:64px;}
       <div>
         <div style="font-size:20px;font-weight:900;color:white">Material de Estudio</div>
         <div style="font-size:12px;color:rgba(255,255,255,0.65);margin-top:3px">Protocolos de Prevención de Riesgo Ergonómico · GP Empresas · 5 Módulos</div>
+      </div>
+    </div>
+    <div id="mat-header-ia" style="display:none;background:linear-gradient(135deg,#2C1B6B 0%,#5B21B6 100%);border-radius:var(--r);padding:1.75rem 1.5rem;margin-bottom:1.5rem;align-items:center;gap:1rem;flex-wrap:wrap;">
+      <div style="font-size:2.5rem">🤖</div>
+      <div>
+        <div style="font-size:20px;font-weight:900;color:white">Material de Estudio</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.65);margin-top:3px">Herramientas de Inteligencia Artificial · GP Empresas · 4 Módulos</div>
       </div>
     </div>
 
@@ -754,6 +761,130 @@ textarea{resize:vertical;min-height:64px;}
 
     </div><!-- fin mat-ergo -->
 
+    <!-- CONTENIDO IA -->
+    <div id="mat-ia" style="display:none">
+
+    <!-- MÓDULO 1 -->
+    <div class="modulo-card">
+      <div class="modulo-hdr" onclick="toggleMod('ia-m1')">
+        <div class="modulo-icon" style="background:#EDE9FE;">🤖</div>
+        <div class="modulo-title">
+          <h3>Módulo I · Conceptos Básicos de IA</h3>
+          <p>¿Qué es la IA? · Machine Learning · IA Generativa · Historia y evolución</p>
+        </div>
+        <div class="modulo-chevron" id="ch-ia-m1">▾</div>
+      </div>
+      <div class="modulo-body" id="ia-m1">
+        <h4>¿Qué es la Inteligencia Artificial?</h4>
+        <p>Rama de la informática que desarrolla sistemas capaces de realizar tareas que requieren inteligencia humana. Busca que las máquinas puedan <strong>percibir</strong> (recopilar información), <strong>razonar</strong> (procesar para tomar decisiones) y <strong>aprender de datos</strong> (mejorar con el tiempo).</p>
+        <h4>Pilares de la IA Moderna</h4>
+        <ul>
+          <li><strong>Machine Learning (ML):</strong> los sistemas aprenden de datos sin ser programados explícitamente. Detectan patrones y hacen predicciones. Base del spam, reconocimiento facial, etc.</li>
+          <li><strong>IA Generativa:</strong> crea contenido original: texto, imágenes, audio y video. Aprende de grandes conjuntos de datos y genera salidas nuevas similares a los ejemplos.</li>
+        </ul>
+        <h4>Historia y Evolución</h4>
+        <ul>
+          <li>🗓️ <strong>1956 – Conferencia de Dartmouth:</strong> nace el término "Inteligencia Artificial". Primeros sistemas simbólicos.</li>
+          <li>🗓️ <strong>Años 90–2000 – Machine Learning:</strong> el foco pasa del enfoque simbólico al aprendizaje automático.</li>
+          <li>🗓️ <strong>2010s – Deep Learning:</strong> redes neuronales profundas revolucionan el reconocimiento de imágenes y voz.</li>
+          <li>🗓️ <strong>2020s – IA Generativa:</strong> ChatGPT, DALL-E, Midjourney llevan la IA al público masivo.</li>
+        </ul>
+        <div class="tip">🧠 <strong>Clave:</strong> la IA no reemplaza el juicio humano — lo potencia. El profesional sigue siendo responsable de las decisiones.</div>
+      </div>
+    </div>
+
+    <!-- MÓDULO 2 -->
+    <div class="modulo-card">
+      <div class="modulo-hdr" onclick="toggleMod('ia-m2')">
+        <div class="modulo-icon" style="background:#EDE9FE;">🛠️</div>
+        <div class="modulo-title">
+          <h3>Módulo II · Herramientas de IA más Utilizadas</h3>
+          <p>ChatGPT · Copilot · Gemini · DALL-E · Midjourney · Comparación</p>
+        </div>
+        <div class="modulo-chevron" id="ch-ia-m2">▾</div>
+      </div>
+      <div class="modulo-body" id="ia-m2">
+        <h4>Herramientas de Texto e Imagen</h4>
+        <ul>
+          <li>🟢 <strong>ChatGPT (OpenAI):</strong> generación de texto, respuestas, resúmenes, código. Versión gratuita y Plus.</li>
+          <li>🔵 <strong>Microsoft Copilot:</strong> integrado en Office 365 (Word, Excel, Teams). Redacta, resume y analiza documentos.</li>
+          <li>🟡 <strong>Google Gemini:</strong> integrado en Gmail y Google Docs. Genera texto y analiza imágenes.</li>
+          <li>🎨 <strong>DALL-E (OpenAI):</strong> genera imágenes a partir de descripciones de texto.</li>
+          <li>🎨 <strong>Midjourney:</strong> imágenes artísticas de alta calidad a través de prompts.</li>
+        </ul>
+        <h4>¿Cómo elegir la herramienta correcta?</h4>
+        <ul>
+          <li>Para <strong>redactar y resumir textos</strong> → ChatGPT, Copilot, Gemini</li>
+          <li>Para <strong>análisis de datos en Excel</strong> → Copilot</li>
+          <li>Para <strong>crear imágenes</strong> → DALL-E, Midjourney</li>
+          <li>Para <strong>integración con correo y docs</strong> → Gemini o Copilot</li>
+        </ul>
+        <div class="tip">💡 <strong>Consejo práctico:</strong> ninguna herramienta es perfecta para todo. Lo importante es saber cuál usar según la tarea.</div>
+      </div>
+    </div>
+
+    <!-- MÓDULO 3 -->
+    <div class="modulo-card">
+      <div class="modulo-hdr" onclick="toggleMod('ia-m3')">
+        <div class="modulo-icon" style="background:#EDE9FE;">⚖️</div>
+        <div class="modulo-title">
+          <h3>Módulo III · Uso Ético y Responsable de la IA</h3>
+          <p>Sesgos · Privacidad · Transparencia · Buenas prácticas</p>
+        </div>
+        <div class="modulo-chevron" id="ch-ia-m3">▾</div>
+      </div>
+      <div class="modulo-body" id="ia-m3">
+        <h4>Principios Éticos de la IA</h4>
+        <ul>
+          <li>⚖️ <strong>Transparencia:</strong> los usuarios deben saber cuándo interactúan con una IA.</li>
+          <li>🔒 <strong>Privacidad:</strong> no ingresar datos personales sensibles en herramientas de IA públicas.</li>
+          <li>🎯 <strong>Equidad:</strong> los modelos pueden heredar sesgos de los datos con que fueron entrenados.</li>
+          <li>✅ <strong>Responsabilidad:</strong> el humano es siempre responsable del resultado final.</li>
+        </ul>
+        <h4>Sesgos en la IA</h4>
+        <p>Un sesgo ocurre cuando el modelo favorece ciertos grupos o resultados por patrones en los datos de entrenamiento. Ejemplo: sistemas de selección de personal que discriminan por género o etnia sin que el programador lo haya indicado explícitamente.</p>
+        <h4>Buenas Prácticas</h4>
+        <ul>
+          <li>✅ Verificar siempre la información generada por la IA (puede "alucinar" datos falsos)</li>
+          <li>✅ No compartir datos confidenciales de la empresa o de clientes</li>
+          <li>✅ Informar a las personas cuando el contenido fue generado con IA</li>
+          <li>✅ Usar la IA como asistente, no como tomador de decisiones final</li>
+        </ul>
+        <div class="tip">⚠️ <strong>Alucinaciones:</strong> los modelos de IA pueden generar información incorrecta pero presentada con confianza. Siempre contrasta con fuentes confiables.</div>
+      </div>
+    </div>
+
+    <!-- MÓDULO 4 -->
+    <div class="modulo-card">
+      <div class="modulo-hdr" onclick="toggleMod('ia-m4')">
+        <div class="modulo-icon" style="background:#EDE9FE;">🏢</div>
+        <div class="modulo-title">
+          <h3>Módulo IV · IA en el Entorno Laboral</h3>
+          <p>Aplicaciones prácticas · Automatización · Impacto en el trabajo</p>
+        </div>
+        <div class="modulo-chevron" id="ch-ia-m4">▾</div>
+      </div>
+      <div class="modulo-body" id="ia-m4">
+        <h4>Aplicaciones de la IA en el Trabajo</h4>
+        <ul>
+          <li>📝 <strong>Redacción y comunicación:</strong> correos, informes, presentaciones, resúmenes de reuniones.</li>
+          <li>📊 <strong>Análisis de datos:</strong> interpretación de tablas, gráficos y tendencias en minutos.</li>
+          <li>🎨 <strong>Diseño y contenido visual:</strong> creación de imágenes, infografías y materiales de marketing.</li>
+          <li>🤝 <strong>Atención al cliente:</strong> chatbots que responden consultas frecuentes 24/7.</li>
+          <li>🔍 <strong>Búsqueda e investigación:</strong> síntesis de documentos extensos y búsqueda semántica.</li>
+        </ul>
+        <h4>Impacto en el Empleo</h4>
+        <ul>
+          <li>La IA <strong>automatiza tareas repetitivas</strong>, liberando tiempo para actividades de mayor valor.</li>
+          <li>Crea nuevas <strong>profesiones y roles</strong> (ej: Prompt Engineer, AI Trainer).</li>
+          <li>Las habilidades más valoradas serán: pensamiento crítico, creatividad y colaboración humano-IA.</li>
+        </ul>
+        <div class="tip">🚀 <strong>Adaptación:</strong> las organizaciones que integren la IA estratégicamente tendrán ventajas competitivas. La clave es capacitar a las personas para trabajar junto a la IA, no contra ella.</div>
+      </div>
+    </div>
+
+    </div><!-- fin mat-ia -->
+
     <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:1.5rem;">
       <button class="btn btn-orange" style="flex:1;justify-content:center" onclick="sp('psi')">✏️ Ir a la evaluación →</button>
       <button class="btn btn-outline" style="flex:1;justify-content:center" onclick="gh()">← Volver al inicio</button>
@@ -1122,7 +1253,7 @@ const SUPA_URL='https://xztqfvaksurqymbfwckb.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6dHFmdmFrc3VycXltYmZ3Y2tiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwOTUzMzcsImV4cCI6MjA5MzY3MTMzN30.WBLF5Zuih2mvEXKQp7ozZjJFNoKEb_fDYZ8mxq0hjwQ';
 const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
 let DB={quizzes:[],results:[],pw:'admin123',siteUrl:'https://t8mn6kmn59-oss.github.io/evaluaciones-gp'};
-let selQid=null,curQ=null,curS=null,ciDist=null,ciPie=null,nqc=0,selNomina=null;
+let selQid=null,curQ=null,curS=null,ciDist=null,ciPie=null,nqc=0;
 const ans={};const LT=['A','B','C','D','E'];
 function sv(k,v){try{localStorage.setItem('gp_'+k,JSON.stringify(v));}catch(e){}}
 function lv(k,d){try{const v=localStorage.getItem('gp_'+k);return v?JSON.parse(v):d;}catch(e){return d;}}
@@ -1136,17 +1267,7 @@ async function initDB(){
   await insertErgonomiaQuiz();
   const params=new URLSearchParams(window.location.search);
   const qp=params.get('quiz');
-  const np=params.get('nom');
-  if(np){
-    try{
-      const {data,error}=await sb.from('nominas').select('*').eq('id',np).single();
-      if(!error&&data){
-        selNomina=data;
-        selQid=data.quiz_id;
-        showQuizEntry(data.quiz_id);
-      }
-    }catch(e){console.error('Error cargando nomina:',e);}
-  } else if(qp&&DB.quizzes.find(q=>q.id===qp)){selQid=qp;showQuizEntry(qp);}
+  if(qp&&DB.quizzes.find(q=>q.id===qp)){selQid=qp;showQuizEntry(qp);}
 }
 
 async function loadQuizzes(){
@@ -1181,12 +1302,15 @@ function sp(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove
 function loadMat(){
   const isLid=selQid&&selQid.includes('liderazgo');
   const isErgo=selQid&&selQid.includes('ergonomia');
-  document.getElementById('mat-rcp').style.display=(!isLid&&!isErgo)?'block':'none';
+  const isIA=selQid&&selQid.includes('inteligencia');
+  document.getElementById('mat-rcp').style.display=(!isLid&&!isErgo&&!isIA)?'block':'none';
   document.getElementById('mat-lid').style.display=isLid?'block':'none';
   document.getElementById('mat-ergo').style.display=isErgo?'block':'none';
-  document.getElementById('mat-header-rcp').style.display=(!isLid&&!isErgo)?'flex':'none';
+  document.getElementById('mat-ia').style.display=isIA?'block':'none';
+  document.getElementById('mat-header-rcp').style.display=(!isLid&&!isErgo&&!isIA)?'flex':'none';
   document.getElementById('mat-header-lid').style.display=isLid?'flex':'none';
   document.getElementById('mat-header-ergo').style.display=isErgo?'flex':'none';
+  document.getElementById('mat-header-ia').style.display=isIA?'flex':'none';
 }
 function goMat(){
   if(selQid){sp('pmat');return;}
@@ -1203,8 +1327,6 @@ function showQuizEntry(qid){
     document.getElementById('qr-name').textContent=q.name;
     document.getElementById('qr-icon').textContent=q.icon||'📋';
   }
-  const btnMat=document.getElementById('btn-material');
-  if(btnMat) btnMat.style.display=(qid==='ia2')?'none':'inline-flex';
   sp('pqr');
 }
 function toggleMod(id){
@@ -1214,7 +1336,7 @@ function toggleMod(id){
   body.classList.toggle('open',!open);
   ch.classList.toggle('open',!open);
 }
-function gh(){selQid=null;curQ=null;curS=null;selNomina=null;for(const k in ans)delete ans[k];sp('ph');}
+function gh(){selQid=null;curQ=null;curS=null;for(const k in ans)delete ans[k];sp('ph');}
 
 const PARTICIPANTES=[
   // Prueba 15-05-2026
@@ -1250,7 +1372,7 @@ const PARTICIPANTES=[
   {rut:'16115025-8',nombre:'Yenny Espinoza'}
 ];
 function normRut(r){return r.replace(/\./g,'').replace(/\s/g,'').toUpperCase();}
-function findParticipante(rut){const nr=normRut(rut);const lista=selNomina?selNomina.participantes:PARTICIPANTES;return lista.find(p=>normRut(p.rut)===nr);}
+function findParticipante(rut){const nr=normRut(rut);return PARTICIPANTES.find(p=>normRut(p.rut)===nr);}
 function autoNombre(rut){
   const p=findParticipante(rut);
   const inp=document.getElementById('sn');
@@ -1482,11 +1604,10 @@ function verQRNomina(id,empresa){
   document.getElementById('pm-t').textContent=empresa;
   document.getElementById('pm-s').textContent='Escanea para rendir la evaluación';
   document.getElementById('pm-u').textContent=url;
-  const c=document.getElementById('pm-c');c.width=200;c.height=200;
-  const t=document.createElement('div');t.style.display='none';document.body.appendChild(t);
-  new QRCode(t,{text:url,width:200,height:200,colorDark:'#1B2A4A',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
-  setTimeout(()=>{const img=t.querySelector('img');if(img){const i=new Image();i.onload=()=>c.getContext('2d').drawImage(i,0,0,200,200);i.src=img.src;}document.body.removeChild(t);},350);
   document.getElementById('pm').classList.remove('hidden');
+  const c=document.getElementById('pm-c');
+  const ctx=c.getContext('2d');ctx.clearRect(0,0,200,200);
+  new QRCode(c,{text:url,width:200,height:200});
 }
 function pfs(){const s=document.getElementById('fq');const cv=s.value;s.innerHTML='<option value="">Todas las evaluaciones</option>'+DB.quizzes.map(q=>`<option value="${q.id}"${cv===q.id?' selected':''}>${q.name}</option>`).join('');}
 
