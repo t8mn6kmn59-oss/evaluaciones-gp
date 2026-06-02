@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resumen – Herramientas de Inteligencia Artificial</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; color: #1B2A4A; }
+
+  .header {
+    background: linear-gradient(135deg, #1B2A4A 60%, #2a4a7a);
+    color: white;
+    padding: 2.5rem 2rem 2rem;
+    text-align: center;
+  }
+  .header .icon { font-size: 3rem; margin-bottom: 0.5rem; }
+  .header h1 { font-size: 1.7rem; font-weight: 900; margin-bottom: 0.3rem; }
+  .header p { font-size: 0.95rem; opacity: 0.8; }
+
+  .badge {
+    display: inline-block;
+    background: #F5811E;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 900;
+    padding: 3px 12px;
+    border-radius: 99px;
+    margin-top: 0.8rem;
+    letter-spacing: 0.05em;
+  }
+
+  .container { max-width: 860px; margin: 0 auto; padding: 2rem 1.2rem 3rem; }
+
+  .modulo {
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(27,42,74,0.08);
+    margin-bottom: 1.8rem;
+    overflow: hidden;
+  }
+
+  .modulo-header {
+    background: #1B2A4A;
+    color: white;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .modulo-header .num {
+    background: #F5811E;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 900;
+    padding: 3px 10px;
+    border-radius: 99px;
+    white-space: nowrap;
+  }
+  .modulo-header h2 { font-size: 1rem; font-weight: 800; }
+
+  .modulo-body { padding: 1.5rem; }
+
+  .objetivo {
+    background: #e8f0fb;
+    border-left: 4px solid #1B2A4A;
+    border-radius: 6px;
+    padding: 0.7rem 1rem;
+    font-size: 0.88rem;
+    margin-bottom: 1.2rem;
+    color: #1B2A4A;
+  }
+  .objetivo strong { color: #F5811E; }
+
+  .seccion { margin-bottom: 1.3rem; }
+  .seccion h3 {
+    font-size: 0.92rem;
+    font-weight: 900;
+    color: #F5811E;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.5rem;
+    border-bottom: 2px solid #fde8d0;
+    padding-bottom: 4px;
+  }
+
+  ul { list-style: none; padding: 0; }
+  ul li {
+    font-size: 0.88rem;
+    line-height: 1.6;
+    padding: 4px 0 4px 18px;
+    position: relative;
+    color: #2d3a52;
+  }
+  ul li::before {
+    content: '▸';
+    color: #F5811E;
+    position: absolute;
+    left: 0;
+    font-size: 0.8rem;
+    top: 5px;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 0.8rem;
+  }
+  .tag {
+    background: #1B2A4A;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 99px;
+  }
+  .tag.orange { background: #F5811E; }
+
+  .clave-box {
+    background: #fff8f0;
+    border: 2px solid #F5811E;
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    margin-top: 1rem;
+  }
+  .clave-box h4 {
+    font-size: 0.85rem;
+    font-weight: 900;
+    color: #F5811E;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+  }
+  .clave-box p, .clave-box li { font-size: 0.85rem; color: #2d3a52; }
+
+  .grid2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 0.8rem;
+  }
+  @media (max-width: 580px) { .grid2 { grid-template-columns: 1fr; } }
+
+  .mini-card {
+    background: #f5f7fb;
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    border-left: 3px solid #1B2A4A;
+  }
+  .mini-card h4 { font-size: 0.82rem; font-weight: 900; color: #1B2A4A; margin-bottom: 4px; }
+  .mini-card p { font-size: 0.82rem; color: #4a5568; line-height: 1.5; }
+
+  .timeline {
+    position: relative;
+    padding-left: 24px;
+    border-left: 3px solid #F5811E;
+    margin-top: 0.8rem;
+  }
+  .timeline-item { margin-bottom: 1rem; position: relative; }
+  .timeline-item::before {
+    content: '';
+    width: 12px; height: 12px;
+    background: #F5811E;
+    border-radius: 50%;
+    position: absolute;
+    left: -31px; top: 3px;
+  }
+  .timeline-item .year {
+    font-size: 0.78rem;
+    font-weight: 900;
+    color: #F5811E;
+    margin-bottom: 2px;
+  }
+  .timeline-item p { font-size: 0.83rem; color: #2d3a52; line-height: 1.5; }
+
+  .alert {
+    background: #fff3cd;
+    border-left: 4px solid #F5811E;
+    border-radius: 6px;
+    padding: 0.7rem 1rem;
+    font-size: 0.85rem;
+    margin-top: 0.8rem;
+    color: #5a3e00;
+  }
+
+  .footer {
+    text-align: center;
+    color: #8A96AA;
+    font-size: 0.8rem;
+    margin-top: 1rem;
+  }
+  .footer strong { color: #1B2A4A; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="icon">🤖</div>
+  <h1>Herramientas de Inteligencia Artificial</h1>
+  <p>Material de estudio — Resumen por módulos</p>
+  <div class="badge">GP EMPRESAS · CAPACITACIÓN</div>
+</div>
+
+<div class="container">
+
+  <!-- MÓDULO 1 -->
+  <div class="modulo">
+    <div class="modulo-header">
+      <span class="num">MÓDULO 1</span>
+      <h2>Conceptos Básicos de IA</h2>
+    </div>
+    <div class="modulo-body">
+      <div class="objetivo"><strong>Objetivo:</strong> Comprender las principales aplicaciones de la IA —procesamiento del lenguaje, reconocimiento de imágenes, recomendaciones y apoyo en decisiones— junto con sus fundamentos y alcance.</div>
+
+      <div class="seccion">
+        <h3>¿Qué es la Inteligencia Artificial?</h3>
+        <ul>
+          <li>Rama de la informática que desarrolla sistemas capaces de realizar tareas que requieren inteligencia humana.</li>
+          <li>Busca que las máquinas puedan <strong>percibir</strong> (recopilar información), <strong>razonar</strong> (procesar para tomar decisiones) y <strong>aprender de datos</strong> (mejorar con el tiempo).</li>
+          <li>Ejecuta tareas con juicio humano: reconocimiento de imágenes, diagnóstico médico, vehículos autónomos, etc.</li>
+        </ul>
+      </div>
+
+      <div class="seccion">
+        <h3>Pilares de la IA Moderna</h3>
+        <div class="grid2">
+          <div class="mini-card">
+            <h4>1. Machine Learning (ML)</h4>
+            <p>Los sistemas aprenden de datos sin ser programados explícitamente. Detectan patrones y hacen predicciones. Base del spam, reconocimiento facial, etc.</p>
+          </div>
+          <div class="mini-card">
+            <h4>2. IA Generativa</h4>
+            <p>Crea contenido original: texto, imágenes, audio y video. Aprende de grandes conjuntos de datos y genera salidas nuevas similares a los ejemplos.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="seccion">
+        <h3>Historia y Evolución</h3>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="year">1956 — Conferencia de Dartmouth</div>
+            <p>Nace el término "Inteligencia Artificial". Primeros sistemas simbólicos basados en reglas lógicas.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="year">Años 90–2000 — Machine Learning</div>
+            <p>El foco pasa del enfoque simbólico al aprendizaje automático. Aumenta disponibilidad de datos y capacidad de cómputo.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="year">2012 — Deep Learning (ImageNet)</div>
+            <p>AlexNet demuestra el poder de las redes neuronales profundas (CNN) con precisión sin precedentes en reconocimiento de imágenes.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="year">2017 — Transformers</div>
+            <p>Google publica "Attention Is All You Need". Base de modelos como BERT, GPT-2, GPT-3. Revoluciona el procesamiento del lenguaje natural.</p>
+          </div>
+          <div class="timeline-item">
+            <div class="year">2022–2025 — Asistentes todo-en-uno</div>
+            <p>Combinan texto, imagen, audio, herramientas y acciones. Programan citas, envían correos, escriben código. IA integrada en la vida cotidiana y profesional.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MÓDULO 2 -->
+  <div class="modulo">
+    <div class="modulo-header">
+      <span class="num">MÓDULO 2</span>
+      <h2>Interactuar con IA — Los Prompts</h2>
+    </div>
+    <div class="modulo-body">
+      <div class="objetivo"><strong>Objetivo:</strong> Comprender qué es un prompt y cómo formular instrucciones claras que mejoren la calidad de las respuestas de la IA.</div>
+
+      <div class="seccion">
+        <h3>Tipos de Prompts</h3>
+        <div class="grid2">
+          <div class="mini-card">
+            <h4>Prompt de Usuario</h4>
+            <p>La instrucción que <em>tú escribes</em> en el chat. Es tu petición directa a la IA. Lo controlas tú.</p>
+          </div>
+          <div class="mini-card">
+            <h4>Prompt de Sistema</h4>
+            <p>Instrucciones "detrás de cámaras" que configuran la personalidad y reglas de la IA. Lo definen los desarrolladores.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="seccion">
+        <h3>5 Elementos de un Buen Prompt</h3>
+        <ul>
+          <li><strong>Rol:</strong> Qué papel debe adoptar la IA. (Ej: "Actúa como experto en marketing")</li>
+          <li><strong>Contexto:</strong> Escenario o antecedentes necesarios. (Ej: "Estoy lanzando un producto nuevo")</li>
+          <li><strong>Tarea:</strong> La acción concreta a realizar. (Ej: "Resume las tres principales ventajas")</li>
+          <li><strong>Formato:</strong> Cómo debe ser la salida. (Ej: "En lista con viñetas")</li>
+          <li><strong>Restricciones:</strong> Límites de largo, estilo, fuentes. (Ej: "Máximo 100 palabras, tono informal")</li>
+        </ul>
+      </div>
+
+      <div class="seccion">
+        <h3>Errores Comunes a Evitar</h3>
+        <ul>
+          <li>Pedidos vagos: "Háblame de autos" → sin contexto ni objetivo claro.</li>
+          <li>Mezclar múltiples tareas en un solo prompt.</li>
+          <li>No indicar el formato de salida deseado.</li>
+          <li>No dar ejemplos para tareas complejas.</li>
+          <li>No pedir verificación o citas cuando los hechos importan.</li>
+        </ul>
+      </div>
+
+      <div class="clave-box">
+        <h4>✅ Clave para recordar</h4>
+        <p>Un buen prompt especifica: <strong>Identidad · Propósito · Audiencia · Restricciones · Insumos</strong>. Mayor claridad = menor ambigüedad = mejores resultados. El refinamiento es esencial: prueba, analiza y ajusta.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MÓDULO 3 -->
+  <div class="modulo">
+    <div class="modulo-header">
+      <span class="num">MÓDULO 3</span>
+      <h2>Herramientas y Aplicaciones Prácticas</h2>
+    </div>
+    <div class="modulo-body">
+      <div class="objetivo"><strong>Objetivo:</strong> Conocer las principales herramientas de IA disponibles y sus aplicaciones en contextos laborales reales.</div>
+
+      <div class="seccion">
+        <h3>IA en el Ámbito Laboral</h3>
+        <ul>
+          <li><strong>Automatización de tareas repetitivas:</strong> transcripción de reuniones, resumen de documentos, clasificación de correos.</li>
+          <li><strong>Asistencia en redacción:</strong> borradores, revisión gramatical, generación de informes.</li>
+          <li><strong>Aceleración de investigación:</strong> procesa vastas bases de datos identificando patrones.</li>
+          <li><strong>Mejora en toma de decisiones:</strong> analiza datos y entrega recomendaciones basadas en evidencia.</li>
+        </ul>
+      </div>
+
+      <div class="seccion">
+        <h3>Herramientas Principales</h3>
+        <div class="grid2">
+          <div class="mini-card">
+            <h4>Microsoft Copilot</h4>
+            <p>Resume reuniones, organiza información, redacta correos y genera presentaciones integrado en Office 365.</p>
+          </div>
+          <div class="mini-card">
+            <h4>Gemini (Google Workspace)</h4>
+            <p>Redacción inteligente, creación de resúmenes, análisis de datos en Gmail, Docs, Sheets y Meet.</p>
+          </div>
+          <div class="mini-card">
+            <h4>Chatbots de Soporte</h4>
+            <p>Responden preguntas frecuentes, resuelven problemas comunes y liberan al personal para tareas más complejas.</p>
+          </div>
+          <div class="mini-card">
+            <h4>Asistentes de Programación</h4>
+            <p>Ayudan a escribir código más rápido, detectar errores y sugerir optimizaciones (ej: GitHub Copilot).</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="seccion">
+        <h3>Aplicaciones en la Vida Cotidiana</h3>
+        <ul>
+          <li><strong>Motores de recomendación:</strong> Netflix, Spotify, Amazon usan IA para personalizar sugerencias.</li>
+          <li><strong>Filtros de spam y seguridad:</strong> detectan correos no deseados y actividades fraudulentas.</li>
+          <li><strong>Traducción en tiempo real:</strong> comunicación fluida entre idiomas en texto y voz.</li>
+          <li><strong>Subtítulos automáticos:</strong> accesibilidad para personas con discapacidad auditiva.</li>
+          <li><strong>Detección de fraude:</strong> identifica anomalías en transacciones financieras en tiempo real.</li>
+          <li><strong>Mantenimiento predictivo:</strong> predice fallas en maquinaria antes de que ocurran.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- MÓDULO 4 -->
+  <div class="modulo">
+    <div class="modulo-header">
+      <span class="num">MÓDULO 4</span>
+      <h2>Futuro y Desarrollo de Competencias</h2>
+    </div>
+    <div class="modulo-body">
+      <div class="objetivo"><strong>Objetivo:</strong> Entender el impacto de la IA en el futuro laboral y las competencias necesarias para aprovecharla con éxito.</div>
+
+      <div class="seccion">
+        <h3>La "Ventaja Invisible" — IA en PYMES</h3>
+        <ul>
+          <li>La IA democratiza el acceso a capacidades antes exclusivas de grandes empresas.</li>
+          <li><strong>Informes superiores:</strong> análisis profundos con visualizaciones dinámicas.</li>
+          <li><strong>Prototipos rápidos:</strong> iteración veloz para validar ideas con mínima inversión.</li>
+          <li><strong>Campañas de alto impacto:</strong> generación de contenido (texto, imagen, video) adaptado a distintas plataformas.</li>
+          <li><strong>Propuestas persuasivas:</strong> redacción personalizada según el público objetivo.</li>
+        </ul>
+      </div>
+
+      <div class="seccion">
+        <h3>3 Pilares para el Éxito con IA</h3>
+        <div class="grid2">
+          <div class="mini-card">
+            <h4>1. Prompting Efectivo</h4>
+            <p>Formular instrucciones claras y precisas. Requiere entender cómo procesan la información los modelos y experimentar constantemente.</p>
+          </div>
+          <div class="mini-card">
+            <h4>2. Verificación y Curación</h4>
+            <p>La supervisión humana es indispensable. Verificar datos, corregir sesgos y curar el contenido para asegurar calidad y alineación.</p>
+          </div>
+          <div class="mini-card" style="grid-column: 1 / -1;">
+            <h4>3. Orquestación de Herramientas</h4>
+            <p>El verdadero poder surge al integrar múltiples herramientas de IA en flujos de trabajo: una IA genera borradores, otra analiza datos, otra optimiza la distribución. Esto permite escalar la producción y mantener ventaja competitiva.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="seccion">
+        <h3>Términos Clave — Para la Prueba</h3>
+        <div class="tags">
+          <span class="tag">Sesgos en IA → Resultados influenciados por datos discriminatorios</span>
+        </div>
+        <div class="tags">
+          <span class="tag orange">Eficiencia laboral → Optimización de tareas mediante herramientas IA</span>
+        </div>
+        <div class="tags">
+          <span class="tag">Prompt efectivo → Instrucción clara, específica y con contexto</span>
+        </div>
+        <div class="tags">
+          <span class="tag orange">Validación de resultados → Revisión humana de respuestas generadas por IA</span>
+        </div>
+      </div>
+
+      <div class="alert">
+        💡 <strong>Recuerda:</strong> La IA no reemplaza el juicio humano — lo potencia. La clave está en saber usarla con criterio, verificar sus resultados y dominar los flujos de trabajo.
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <strong>GP Empresas</strong> · Material de estudio interno · Herramientas de Inteligencia Artificial
+  </div>
+
+</div>
+</body>
+</html>
