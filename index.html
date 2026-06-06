@@ -912,7 +912,8 @@ textarea{resize:vertical;min-height:64px;}
       </div>
       <div class="fg">
         <label>RUT / Cédula de identidad <span style="color:var(--red);font-size:10px;font-weight:700">* Obligatorio</span></label>
-        <input type="text" id="srut" placeholder="Ej: 12.345.678-9" oninput="autoNombre(this.value)">
+        <input type="text" id="srut" placeholder="Ej: 12345678-9 (sin puntos, con guión)" oninput="autoNombre(this.value)">
+        <div style="font-size:11px;color:var(--textLight);margin-top:3px">⚠️ Ingresa tu RUT <strong>sin puntos y con guión</strong> — Ej: 12345678-9</div>
       </div>
       <div class="fg">
         <label>Nombre completo <span style="color:var(--textLight);font-size:10px;font-weight:600">Se autocompleta con tu RUT</span></label>
@@ -1269,8 +1270,12 @@ async function initDB(){
   const np=params.get('nom');
   if(np){
     try{
-      const {data,error}=await sb.from('nominas').select('quiz_id').eq('id',np).single();
+      const {data,error}=await sb.from('nominas').select('quiz_id,participantes').eq('id',np).single();
       if(!error&&data&&data.quiz_id){
+        if(data.participantes&&data.participantes.length>0){
+          PARTICIPANTES.length=0;
+          data.participantes.forEach(p=>PARTICIPANTES.push(p));
+        }
         selQid=data.quiz_id;
         showQuizEntry(data.quiz_id);
         return;
@@ -1393,7 +1398,7 @@ function gtsq(){
   const n=document.getElementById('sn').value.trim(),d=document.getElementById('sd').value,rut=document.getElementById('srut').value.trim(),email=document.getElementById('semail').value.trim();
   if(!rut){document.getElementById('ie').textContent='Por favor ingresa tu RUT.';document.getElementById('ie').classList.remove('hidden');return;}
   const part=findParticipante(rut);
-  if(!part){document.getElementById('ie').textContent='RUT no autorizado. Verifica que esté bien escrito o consulta al instructor.';document.getElementById('ie').classList.remove('hidden');return;}
+  if(!part){document.getElementById('ie').textContent='RUT no encontrado. Asegúrate de ingresarlo sin puntos y con guión (Ej: 12345678-9) o consulta al instructor.';document.getElementById('ie').classList.remove('hidden');return;}
   if(!d){document.getElementById('ie').textContent='Por favor selecciona la fecha.';document.getElementById('ie').classList.remove('hidden');return;}
   document.getElementById('ie').classList.add('hidden');
   const nombre=n||part.nombre;
