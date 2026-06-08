@@ -1327,14 +1327,9 @@ function goMat(){
   sp('pmatsel');
 }
 function showQuizEntry(qid){
-  const q=DB.quizzes.find(x=>x.id===qid);
-  if(q){
-    document.getElementById('qr-name').textContent=q.name;
-    document.getElementById('qr-icon').textContent=q.icon||'📋';
-  }
   const btn=document.getElementById('btn-continuar');
   if(btn){btn.disabled=false;btn.style.opacity='1';btn.style.cursor='pointer';btn.textContent='Continuar →';}
-  sp('pqr');
+  sp('psi');
 }
 function toggleMod(id){
   const body=document.getElementById(id);
