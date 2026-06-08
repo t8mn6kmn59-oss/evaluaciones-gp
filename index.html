@@ -1255,9 +1255,6 @@ async function initDB(){
   DB.pw=lv('pw','admin123');
   DB.siteUrl=lv('siteUrl','https://t8mn6kmn59-oss.github.io/evaluaciones-gp');
   await loadQuizzes();
-  await insertRCPQuiz();
-  await insertLiderazgoQuiz();
-  await insertErgonomiaQuiz();
   const params=new URLSearchParams(window.location.search);
   const qp=params.get('quiz');
   if(qp&&DB.quizzes.find(q=>q.id===qp)){selQid=qp;showQuizEntry(qp);return;}
