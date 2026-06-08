@@ -1663,20 +1663,34 @@ function renderReport(){
     ciPie=new Chart(cvPie,{type:'doughnut',data:{labels:['Aprobados','Reprobados'],datasets:[{data:[pass,fail],backgroundColor:['#2D7D2D','#C0392B'],borderWidth:0,hoverOffset:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:12},padding:16,boxWidth:12,boxHeight:12}},tooltip:{callbacks:{label:(c)=>c.label+': '+c.raw+' ('+Math.round(c.raw/tot*100)+'%)'}}}},cutout:'65%'});
   }
 
-  // Lista alumnos
+  // Lista alumnos agrupada por fecha
   const list=document.getElementById('students-list');
   const em=document.getElementById('rem');
   document.getElementById('total-label').textContent=tot+' resultado'+(tot!==1?'s':'');
   if(!f.length){list.innerHTML='';em.classList.remove('hidden');return;}
   em.classList.add('hidden');
-  list.innerHTML=f.map((r,idx)=>{
+
+  // Agrupar por fecha, más reciente primero
+  const byDate={};
+  f.forEach(r=>{if(!byDate[r.date])byDate[r.date]=[];byDate[r.date].push(r);});
+  const dates=Object.keys(byDate).sort((a,b)=>b.localeCompare(a));
+
+  const fmtDate=d=>{
+    const [y,m,dd]=d.split('-');
+    const meses=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+    const dias=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+    const fecha=new Date(y,m-1,dd);
+    return dias[fecha.getDay()]+' '+parseInt(dd)+' de '+meses[m-1]+' '+y;
+  };
+
+  const rowHtml=r=>{
     const p=r.score>=60;
     const initials=r.student.split(' ').slice(0,2).map(n=>n[0]||'').join('').toUpperCase();
     return`<div class="student-row" style="cursor:pointer;">
       <div class="student-avatar ${p?'pass':'fail'}" onclick="showStudentDetail('${r.id}')">${initials}</div>
       <div class="student-info" onclick="showStudentDetail('${r.id}')">
         <div class="name">${r.student}</div>
-        <div class="meta">${r.rut?r.rut+' · ':''}${r.email?'📧 '+r.email+' · ':''}${r.quizName} · ${r.date} · ${r.correct}/${r.total} correctas</div>
+        <div class="meta">${r.rut?r.rut+' · ':''}${r.email?'📧 '+r.email+' · ':''}${r.quizName} · ${r.correct}/${r.total} correctas</div>
       </div>
       <div style="text-align:right;display:flex;align-items:center;gap:8px;">
         <div onclick="showStudentDetail('${r.id}')">
@@ -1687,6 +1701,22 @@ function renderReport(){
         <button class="btn btn-sm" style="background:white;color:var(--navy);border:1.5px solid var(--border);font-size:11px;padding:4px 10px;" onclick="event.stopPropagation();printResult('${r.id}')">🖨</button>
         <div style="font-size:18px;color:var(--textLight)" onclick="showStudentDetail('${r.id}')">›</div>
       </div>
+    </div>`;
+  };
+
+  list.innerHTML=dates.map(d=>{
+    const isToday=d===new Date().toISOString().slice(0,10);
+    const rows=byDate[d];
+    const pass=rows.filter(r=>r.score>=60).length;
+    return`<div style="margin-bottom:1.5rem;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:.75rem;padding:10px 16px;background:${isToday?'var(--navy)':'#f0f2f5'};border-radius:10px;">
+        <div style="font-size:1.3rem">${isToday?'📅':'🗓'}</div>
+        <div>
+          <div style="font-size:15px;font-weight:900;color:${isToday?'white':'var(--navy)'};">${isToday?'HOY · ':''} ${fmtDate(d)}</div>
+          <div style="font-size:12px;color:${isToday?'rgba(255,255,255,0.75)':'var(--textLight)'};">${rows.length} alumno${rows.length!==1?'s':''} · ${pass} aprobado${pass!==1?'s':''}</div>
+        </div>
+      </div>
+      ${rows.map(rowHtml).join('')}
     </div>`;
   }).join('');
 }
