@@ -901,31 +901,25 @@ textarea{resize:vertical;min-height:64px;}
       <div class="sline"></div>
       <div class="si"><div class="sd">2</div><div class="sl">Evaluación</div></div>
       <div class="sline"></div>
-      <div class="si"><div class="sd">3</div><div class="sl">Responde</div></div>
-      <div class="sline"></div>
-      <div class="si"><div class="sd">4</div><div class="sl">Resultado</div></div>
+      <div class="si"><div class="sd">3</div><div class="sl">Resultado</div></div>
     </div>
     <div class="card">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border);">
         <div style="width:42px;height:42px;border-radius:50%;background:var(--orangeL);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">👤</div>
-        <div><div style="font-size:17px;font-weight:900;color:var(--navy)">Ingresa tus datos</div><div style="font-size:12px;color:var(--textLight)">Paso 1 de 4 · GP Empresas</div></div>
+        <div><div style="font-size:17px;font-weight:900;color:var(--navy)">Ingresa tus datos</div><div style="font-size:12px;color:var(--textLight)">Nombre · RUT · Empresa · GP Empresas</div></div>
       </div>
       <div class="fg">
-        <label>RUT / Cédula de identidad <span style="color:var(--red);font-size:10px;font-weight:700">* Obligatorio</span></label>
-        <input type="text" id="srut" placeholder="Ej: 12345678-9 (sin puntos, con guión)" oninput="autoNombre(this.value)">
-        <div style="font-size:11px;color:var(--textLight);margin-top:3px">⚠️ Ingresa tu RUT <strong>sin puntos y con guión</strong> — Ej: 12345678-9</div>
+        <label>Nombre completo <span style="color:var(--red);font-size:10px;font-weight:700">* Obligatorio</span></label>
+        <input type="text" id="sn" placeholder="Ej: Juan Pérez González">
       </div>
       <div class="fg">
-        <label>Nombre completo <span style="color:var(--textLight);font-size:10px;font-weight:600">Se autocompleta con tu RUT</span></label>
-        <input type="text" id="sn" placeholder="Se autocompleta al ingresar RUT" readonly style="background:#f5f7fa;color:#555">
+        <label>RUT <span style="color:var(--red);font-size:10px;font-weight:700">* Obligatorio</span></label>
+        <input type="text" id="srut" placeholder="Ej: 12.345.678-9 ó 12345678-9">
+        <div style="font-size:11px;color:var(--textLight);margin-top:3px">Puedes ingresarlo con o sin puntos</div>
       </div>
       <div class="fg">
-        <label>Fecha <span style="color:var(--red);font-size:10px;font-weight:700">* Obligatorio</span></label>
-        <input type="date" id="sd">
-      </div>
-      <div class="fg">
-        <label>Correo electrónico <span style="color:var(--textLight);font-size:10px;font-weight:600">No es obligatorio</span></label>
-        <input type="text" id="semail" placeholder="Ej: juan.perez@empresa.cl">
+        <label>Empresa <span style="color:var(--red);font-size:10px;font-weight:700">* Obligatorio</span></label>
+        <input type="text" id="sempresa" placeholder="Ej: Empresas Otero">
       </div>
       <div id="ie" class="alert ae hidden">Por favor completa todos los campos incluyendo el RUT.</div>
       <button class="btn btn-orange btn-block" onclick="gtsq()">Continuar →</button>
@@ -1395,14 +1389,13 @@ function autoNombre(rut){
 }
 
 function gtsq(){
-  const n=document.getElementById('sn').value.trim(),d=document.getElementById('sd').value,rut=document.getElementById('srut').value.trim(),email=document.getElementById('semail').value.trim();
+  const nombre=document.getElementById('sn').value.trim(),rut=document.getElementById('srut').value.trim(),empresa=document.getElementById('sempresa').value.trim();
+  const today=new Date().toISOString().slice(0,10);
+  if(!nombre){document.getElementById('ie').textContent='Por favor ingresa tu nombre.';document.getElementById('ie').classList.remove('hidden');return;}
   if(!rut){document.getElementById('ie').textContent='Por favor ingresa tu RUT.';document.getElementById('ie').classList.remove('hidden');return;}
-  const part=findParticipante(rut);
-  if(!part){document.getElementById('ie').textContent='RUT no encontrado. Asegúrate de ingresarlo sin puntos y con guión (Ej: 12345678-9) o consulta al instructor.';document.getElementById('ie').classList.remove('hidden');return;}
-  if(!d){document.getElementById('ie').textContent='Por favor selecciona la fecha.';document.getElementById('ie').classList.remove('hidden');return;}
+  if(!empresa){document.getElementById('ie').textContent='Por favor ingresa tu empresa.';document.getElementById('ie').classList.remove('hidden');return;}
   document.getElementById('ie').classList.add('hidden');
-  const nombre=n||part.nombre;
-  curS={name:nombre,date:d,rut:rut,email:email};
+  curS={name:nombre,date:today,rut:normRut(rut),email:'',empresa:empresa};
   if(selQid){startQ();return;}
   document.getElementById('qsgrid').innerHTML=DB.quizzes.map(q=>`<div class="qsc" id="qc-${q.id}" onclick="selQ('${q.id}')"><div class="qsc-body"><div class="qi">${q.icon||'📋'}</div><h3>${q.name}</h3><p>${q.questions.length} preguntas</p></div><button class="btn btn-orange btn-sm" style="margin-top:10px;width:100%;justify-content:center" onclick="event.stopPropagation();selQ('${q.id}');startQ()">Comenzar →</button></div>`).join('');
   sp('psq');
@@ -1412,7 +1405,7 @@ function startQ(){
   if(!selQid){document.getElementById('qse').classList.remove('hidden');return;}
   curQ=DB.quizzes.find(q=>q.id===selQid);if(!curQ)return;
   document.getElementById('qnl').textContent=curQ.name;
-  document.getElementById('qsl').textContent='👤 '+curS.name+' · 📅 '+curS.date;
+  document.getElementById('qsl').textContent='👤 '+curS.name+' · 🏢 '+curS.empresa+' · 📅 '+curS.date;
   
   // Add special RCP banner if it's the RCP quiz
   const existingBanner = document.getElementById('rcp-banner');
@@ -1461,7 +1454,7 @@ async function submitQ(){
   const ua=curQ.questions.map((_,i)=>ans[i]);
   const corr=ua.filter((a,i)=>a===curQ.questions[i].answer).length;
   const score=Math.round(corr/tot*100);
-  const rec={id:Date.now()+'',quiz_id:curQ.id,quiz_name:curQ.name,student:curS.name,rut:curS.rut||'',email:curS.email||'',date:curS.date,score,correct:corr,total:tot,answers:ua};
+  const rec={id:Date.now()+'',quiz_id:curQ.id,quiz_name:curQ.name,student:curS.name,rut:curS.rut||'',email:curS.email||'',empresa:curS.empresa||'',date:curS.date,score,correct:corr,total:tot,answers:ua};
   try{await sb.from('results').insert([rec]);}catch(e){console.error(e);}
   showRes({...rec,quizId:rec.quiz_id,quizName:rec.quiz_name});
 }
