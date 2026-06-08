@@ -922,7 +922,7 @@ textarea{resize:vertical;min-height:64px;}
         <input type="text" id="sempresa" placeholder="Ej: Empresas Otero">
       </div>
       <div id="ie" class="alert ae hidden">Por favor completa todos los campos incluyendo el RUT.</div>
-      <button class="btn btn-orange btn-block" onclick="gtsq()">Continuar →</button>
+      <button class="btn btn-orange btn-block" id="btn-continuar" onclick="gtsq()" disabled style="opacity:0.6;cursor:not-allowed">Cargando...</button>
     </div>
   </div>
 </div>
@@ -1397,13 +1397,8 @@ function gtsq(){
   document.getElementById('ie').classList.add('hidden');
   curS={name:nombre,date:today,rut:normRut(rut),email:'',empresa:empresa};
   if(selQid){startQ();return;}
+  renderQuizGrid();
   sp('psq');
-  if(DB.quizzes&&DB.quizzes.length>0){
-    renderQuizGrid();
-  } else {
-    document.getElementById('qsgrid').innerHTML='<div class="empty"><div>⏳</div><p>Cargando evaluaciones...</p></div>';
-    const wait=setInterval(()=>{if(DB.quizzes&&DB.quizzes.length>0){clearInterval(wait);renderQuizGrid();}},300);
-  }
 }
 function renderQuizGrid(){
   document.getElementById('qsgrid').innerHTML=DB.quizzes.map(q=>`<div class="qsc" id="qc-${q.id}" onclick="selQ('${q.id}')"><div class="qsc-body"><div class="qi">${q.icon||'📋'}</div><h3>${q.name}</h3><p>${q.questions.length} preguntas</p></div><button class="btn btn-orange btn-sm" style="margin-top:10px;width:100%;justify-content:center" onclick="event.stopPropagation();selQ('${q.id}');startQ()">Comenzar →</button></div>`).join('');
@@ -1849,7 +1844,10 @@ async function submitEnc(){
 }
 
 document.getElementById('sd').value=new Date().toISOString().split('T')[0];
-initDB();
+initDB().then(()=>{
+  const btn=document.getElementById('btn-continuar');
+  if(btn){btn.disabled=false;btn.style.opacity='1';btn.style.cursor='pointer';btn.textContent='Continuar →';}
+});
 
 async function insertRCPQuiz(){
   const rcpId = 'rcp-basica-2026';
