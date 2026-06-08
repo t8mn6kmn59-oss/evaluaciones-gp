@@ -1843,7 +1843,7 @@ async function submitEnc(){
   document.getElementById('enc-err').style.display='none';
 }
 
-document.getElementById('sd').value=new Date().toISOString().split('T')[0];
+// fecha se asigna automáticamente en gtsq()
 initDB().then(()=>{
   const btn=document.getElementById('btn-continuar');
   if(btn){btn.disabled=false;btn.style.opacity='1';btn.style.cursor='pointer';btn.textContent='Continuar →';}
