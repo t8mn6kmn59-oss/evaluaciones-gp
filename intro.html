@@ -194,6 +194,24 @@ let countdownTimer = null;
 async function init() {
   const params = new URLSearchParams(window.location.search);
   nomId = params.get('nom');
+  const quizParam = params.get('quiz');
+
+  // Si viene con ?quiz= directo, no necesita nómina
+  if (quizParam) {
+    quizId = quizParam;
+    try {
+      const { data: qData } = await sb.from('quizzes').select('name').eq('id', quizId).single();
+      if (qData) document.getElementById('curso-nombre').textContent = qData.name;
+    } catch(e) {}
+    const videoId = VIDEOS[quizId];
+    if (videoId) {
+      cargarVideo(videoId);
+    } else {
+      document.getElementById('video-wrap').style.display = 'none';
+      activarBoton();
+    }
+    return;
+  }
 
   if (!nomId) {
     mostrarError('No se encontró la nómina. Verifica el QR.');
@@ -278,7 +296,11 @@ function mostrarError(msg) {
 }
 
 function irAlPortal() {
-  window.location.href = `${PORTAL_URL}?nom=${nomId}`;
+  if (quizId && !nomId) {
+    window.location.href = `${PORTAL_URL}?quiz=${quizId}`;
+  } else {
+    window.location.href = `${PORTAL_URL}?nom=${nomId}`;
+  }
 }
 
 init();
