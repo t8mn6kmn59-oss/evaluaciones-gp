@@ -901,34 +901,28 @@ textarea{resize:vertical;min-height:64px;}
       <div class="sline"></div>
       <div class="si"><div class="sd">2</div><div class="sl">Evaluación</div></div>
       <div class="sline"></div>
-      <div class="si"><div class="sd">3</div><div class="sl">Responde</div></div>
-      <div class="sline"></div>
-      <div class="si"><div class="sd">4</div><div class="sl">Resultado</div></div>
+      <div class="si"><div class="sd">3</div><div class="sl">Resultado</div></div>
     </div>
     <div class="card">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border);">
         <div style="width:42px;height:42px;border-radius:50%;background:var(--orangeL);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">👤</div>
-        <div><div style="font-size:17px;font-weight:900;color:var(--navy)">Ingresa tus datos</div><div style="font-size:12px;color:var(--textLight)">Paso 1 de 4 · GP Empresas</div></div>
+        <div><div style="font-size:17px;font-weight:900;color:var(--navy)">Ingresa tus datos</div><div style="font-size:12px;color:var(--textLight)">Nombre · RUT · Empresa · GP Empresas</div></div>
       </div>
       <div class="fg">
-        <label>RUT / Cédula de identidad <span style="color:var(--red);font-size:10px;font-weight:700">* Obligatorio</span></label>
-        <input type="text" id="srut" placeholder="Ej: 12345678-9 (sin puntos, con guión)" oninput="autoNombre(this.value)">
-        <div style="font-size:11px;color:var(--textLight);margin-top:3px">⚠️ Ingresa tu RUT <strong>sin puntos y con guión</strong> — Ej: 12345678-9</div>
+        <label>Nombre completo <span style="color:var(--red);font-size:10px;font-weight:700">* Obligatorio</span></label>
+        <input type="text" id="sn" placeholder="Ej: Juan Pérez González">
       </div>
       <div class="fg">
-        <label>Nombre completo <span style="color:var(--textLight);font-size:10px;font-weight:600">Se autocompleta con tu RUT</span></label>
-        <input type="text" id="sn" placeholder="Se autocompleta al ingresar RUT" readonly style="background:#f5f7fa;color:#555">
+        <label>RUT <span style="color:var(--red);font-size:10px;font-weight:700">* Obligatorio</span></label>
+        <input type="text" id="srut" placeholder="Ej: 12.345.678-9 ó 12345678-9">
+        <div style="font-size:11px;color:var(--textLight);margin-top:3px">Puedes ingresarlo con o sin puntos</div>
       </div>
       <div class="fg">
-        <label>Fecha <span style="color:var(--red);font-size:10px;font-weight:700">* Obligatorio</span></label>
-        <input type="date" id="sd">
-      </div>
-      <div class="fg">
-        <label>Correo electrónico <span style="color:var(--textLight);font-size:10px;font-weight:600">No es obligatorio</span></label>
-        <input type="text" id="semail" placeholder="Ej: juan.perez@empresa.cl">
+        <label>Empresa <span style="color:var(--red);font-size:10px;font-weight:700">* Obligatorio</span></label>
+        <input type="text" id="sempresa" placeholder="Ej: Empresas Otero">
       </div>
       <div id="ie" class="alert ae hidden">Por favor completa todos los campos incluyendo el RUT.</div>
-      <button class="btn btn-orange btn-block" onclick="gtsq()">Continuar →</button>
+      <button class="btn btn-orange btn-block" id="btn-continuar" onclick="gtsq()" disabled style="opacity:0.6;cursor:not-allowed">Cargando...</button>
     </div>
   </div>
 </div>
@@ -1261,16 +1255,11 @@ async function initDB(){
   DB.pw=lv('pw','admin123');
   DB.siteUrl=lv('siteUrl','https://t8mn6kmn59-oss.github.io/evaluaciones-gp');
   await loadQuizzes();
-  await insertRCPQuiz();
-  await insertLiderazgoQuiz();
-  await insertErgonomiaQuiz();
   const params=new URLSearchParams(window.location.search);
   const qp=params.get('quiz');
-  if(qp){
-    // Redirigir a intro.html para mostrar video de bienvenida
-    window.location.href='intro.html?quiz='+qp;
-    return;
-  }
+  const fromIntro=params.get('from')==='intro';
+  if(qp&&DB.quizzes.find(q=>q.id===qp)){selQid=qp;showQuizEntry(qp);return;}
+  if(qp&&!fromIntro){window.location.href='intro.html?quiz='+qp;return;}
   const np=params.get('nom');
   if(np){
     try{
@@ -1340,12 +1329,9 @@ function goMat(){
   sp('pmatsel');
 }
 function showQuizEntry(qid){
-  const q=DB.quizzes.find(x=>x.id===qid);
-  if(q){
-    document.getElementById('qr-name').textContent=q.name;
-    document.getElementById('qr-icon').textContent=q.icon||'📋';
-  }
-  sp('pqr');
+  const btn=document.getElementById('btn-continuar');
+  if(btn){btn.disabled=false;btn.style.opacity='1';btn.style.cursor='pointer';btn.textContent='Continuar →';}
+  sp('psi');
 }
 function toggleMod(id){
   const body=document.getElementById(id);
@@ -1399,24 +1385,26 @@ function autoNombre(rut){
 }
 
 function gtsq(){
-  const n=document.getElementById('sn').value.trim(),d=document.getElementById('sd').value,rut=document.getElementById('srut').value.trim(),email=document.getElementById('semail').value.trim();
+  const nombre=document.getElementById('sn').value.trim(),rut=document.getElementById('srut').value.trim(),empresa=document.getElementById('sempresa').value.trim();
+  const today=new Date().toISOString().slice(0,10);
+  if(!nombre){document.getElementById('ie').textContent='Por favor ingresa tu nombre.';document.getElementById('ie').classList.remove('hidden');return;}
   if(!rut){document.getElementById('ie').textContent='Por favor ingresa tu RUT.';document.getElementById('ie').classList.remove('hidden');return;}
-  const part=findParticipante(rut);
-  if(!part){document.getElementById('ie').textContent='RUT no encontrado. Asegúrate de ingresarlo sin puntos y con guión (Ej: 12345678-9) o consulta al instructor.';document.getElementById('ie').classList.remove('hidden');return;}
-  if(!d){document.getElementById('ie').textContent='Por favor selecciona la fecha.';document.getElementById('ie').classList.remove('hidden');return;}
+  if(!empresa){document.getElementById('ie').textContent='Por favor ingresa tu empresa.';document.getElementById('ie').classList.remove('hidden');return;}
   document.getElementById('ie').classList.add('hidden');
-  const nombre=n||part.nombre;
-  curS={name:nombre,date:d,rut:rut,email:email};
+  curS={name:nombre,date:today,rut:normRut(rut),email:'',empresa:empresa};
   if(selQid){startQ();return;}
-  document.getElementById('qsgrid').innerHTML=DB.quizzes.map(q=>`<div class="qsc" id="qc-${q.id}" onclick="selQ('${q.id}')"><div class="qsc-body"><div class="qi">${q.icon||'📋'}</div><h3>${q.name}</h3><p>${q.questions.length} preguntas</p></div><button class="btn btn-orange btn-sm" style="margin-top:10px;width:100%;justify-content:center" onclick="event.stopPropagation();selQ('${q.id}');startQ()">Comenzar →</button></div>`).join('');
+  renderQuizGrid();
   sp('psq');
+}
+function renderQuizGrid(){
+  document.getElementById('qsgrid').innerHTML=DB.quizzes.map(q=>`<div class="qsc" id="qc-${q.id}" onclick="selQ('${q.id}')"><div class="qsc-body"><div class="qi">${q.icon||'📋'}</div><h3>${q.name}</h3><p>${q.questions.length} preguntas</p></div><button class="btn btn-orange btn-sm" style="margin-top:10px;width:100%;justify-content:center" onclick="event.stopPropagation();selQ('${q.id}');startQ()">Comenzar →</button></div>`).join('');
 }
 function selQ(id){selQid=id;document.querySelectorAll('.qsc').forEach(c=>c.classList.remove('active'));const el=document.getElementById('qc-'+id);if(el)el.classList.add('active');document.getElementById('qse').classList.add('hidden');}
 function startQ(){
   if(!selQid){document.getElementById('qse').classList.remove('hidden');return;}
   curQ=DB.quizzes.find(q=>q.id===selQid);if(!curQ)return;
   document.getElementById('qnl').textContent=curQ.name;
-  document.getElementById('qsl').textContent='👤 '+curS.name+' · 📅 '+curS.date;
+  document.getElementById('qsl').textContent='👤 '+curS.name+' · 🏢 '+curS.empresa+' · 📅 '+curS.date;
   
   // Add special RCP banner if it's the RCP quiz
   const existingBanner = document.getElementById('rcp-banner');
@@ -1465,7 +1453,7 @@ async function submitQ(){
   const ua=curQ.questions.map((_,i)=>ans[i]);
   const corr=ua.filter((a,i)=>a===curQ.questions[i].answer).length;
   const score=Math.round(corr/tot*100);
-  const rec={id:Date.now()+'',quiz_id:curQ.id,quiz_name:curQ.name,student:curS.name,rut:curS.rut||'',email:curS.email||'',date:curS.date,score,correct:corr,total:tot,answers:ua};
+  const rec={id:Date.now()+'',quiz_id:curQ.id,quiz_name:curQ.name,student:curS.name,rut:curS.rut||'',email:curS.email||'',empresa:curS.empresa||'',date:curS.date,score,correct:corr,total:tot,answers:ua};
   try{await sb.from('results').insert([rec]);}catch(e){console.error(e);}
   showRes({...rec,quizId:rec.quiz_id,quizName:rec.quiz_name});
 }
@@ -1677,20 +1665,34 @@ function renderReport(){
     ciPie=new Chart(cvPie,{type:'doughnut',data:{labels:['Aprobados','Reprobados'],datasets:[{data:[pass,fail],backgroundColor:['#2D7D2D','#C0392B'],borderWidth:0,hoverOffset:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:12},padding:16,boxWidth:12,boxHeight:12}},tooltip:{callbacks:{label:(c)=>c.label+': '+c.raw+' ('+Math.round(c.raw/tot*100)+'%)'}}}},cutout:'65%'});
   }
 
-  // Lista alumnos
+  // Lista alumnos agrupada por fecha
   const list=document.getElementById('students-list');
   const em=document.getElementById('rem');
   document.getElementById('total-label').textContent=tot+' resultado'+(tot!==1?'s':'');
   if(!f.length){list.innerHTML='';em.classList.remove('hidden');return;}
   em.classList.add('hidden');
-  list.innerHTML=f.map((r,idx)=>{
+
+  // Agrupar por fecha, más reciente primero
+  const byDate={};
+  f.forEach(r=>{if(!byDate[r.date])byDate[r.date]=[];byDate[r.date].push(r);});
+  const dates=Object.keys(byDate).sort((a,b)=>b.localeCompare(a));
+
+  const fmtDate=d=>{
+    const [y,m,dd]=d.split('-');
+    const meses=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+    const dias=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+    const fecha=new Date(y,m-1,dd);
+    return dias[fecha.getDay()]+' '+parseInt(dd)+' de '+meses[m-1]+' '+y;
+  };
+
+  const rowHtml=r=>{
     const p=r.score>=60;
     const initials=r.student.split(' ').slice(0,2).map(n=>n[0]||'').join('').toUpperCase();
     return`<div class="student-row" style="cursor:pointer;">
       <div class="student-avatar ${p?'pass':'fail'}" onclick="showStudentDetail('${r.id}')">${initials}</div>
       <div class="student-info" onclick="showStudentDetail('${r.id}')">
         <div class="name">${r.student}</div>
-        <div class="meta">${r.rut?r.rut+' · ':''}${r.email?'📧 '+r.email+' · ':''}${r.quizName} · ${r.date} · ${r.correct}/${r.total} correctas</div>
+        <div class="meta">${r.rut?r.rut+' · ':''}${r.email?'📧 '+r.email+' · ':''}${r.quizName} · ${r.correct}/${r.total} correctas</div>
       </div>
       <div style="text-align:right;display:flex;align-items:center;gap:8px;">
         <div onclick="showStudentDetail('${r.id}')">
@@ -1701,6 +1703,22 @@ function renderReport(){
         <button class="btn btn-sm" style="background:white;color:var(--navy);border:1.5px solid var(--border);font-size:11px;padding:4px 10px;" onclick="event.stopPropagation();printResult('${r.id}')">🖨</button>
         <div style="font-size:18px;color:var(--textLight)" onclick="showStudentDetail('${r.id}')">›</div>
       </div>
+    </div>`;
+  };
+
+  list.innerHTML=dates.map(d=>{
+    const isToday=d===new Date().toISOString().slice(0,10);
+    const rows=byDate[d];
+    const pass=rows.filter(r=>r.score>=60).length;
+    return`<div style="margin-bottom:1.5rem;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:.75rem;padding:10px 16px;background:${isToday?'var(--navy)':'#f0f2f5'};border-radius:10px;">
+        <div style="font-size:1.3rem">${isToday?'📅':'🗓'}</div>
+        <div>
+          <div style="font-size:15px;font-weight:900;color:${isToday?'white':'var(--navy)'};">${isToday?'HOY · ':''} ${fmtDate(d)}</div>
+          <div style="font-size:12px;color:${isToday?'rgba(255,255,255,0.75)':'var(--textLight)'};">${rows.length} alumno${rows.length!==1?'s':''} · ${pass} aprobado${pass!==1?'s':''}</div>
+        </div>
+      </div>
+      ${rows.map(rowHtml).join('')}
     </div>`;
   }).join('');
 }
@@ -1851,8 +1869,11 @@ async function submitEnc(){
   document.getElementById('enc-err').style.display='none';
 }
 
-document.getElementById('sd').value=new Date().toISOString().split('T')[0];
-initDB();
+// fecha se asigna automáticamente en gtsq()
+initDB().then(()=>{
+  const btn=document.getElementById('btn-continuar');
+  if(btn){btn.disabled=false;btn.style.opacity='1';btn.style.cursor='pointer';btn.textContent='Continuar →';}
+});
 
 async function insertRCPQuiz(){
   const rcpId = 'rcp-basica-2026';

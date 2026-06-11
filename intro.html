@@ -297,9 +297,9 @@ function mostrarError(msg) {
 
 function irAlPortal() {
   if (quizId && !nomId) {
-    window.location.href = `${PORTAL_URL}?quiz=${quizId}`;
+    window.location.href = `${PORTAL_URL}/index.html?quiz=${quizId}&from=intro`;
   } else {
-    window.location.href = `${PORTAL_URL}?nom=${nomId}`;
+    window.location.href = `${PORTAL_URL}/index.html?nom=${nomId}`;
   }
 }
 
