@@ -1258,8 +1258,8 @@ async function initDB(){
   const params=new URLSearchParams(window.location.search);
   const qp=params.get('quiz');
   const fromIntro=params.get('from')==='intro';
-  if(qp&&DB.quizzes.find(q=>q.id===qp)){selQid=qp;showQuizEntry(qp);return;}
   if(qp&&!fromIntro){window.location.href='intro.html?quiz='+qp;return;}
+  if(qp&&fromIntro&&DB.quizzes.find(q=>q.id===qp)){selQid=qp;showQuizEntry(qp);return;}
   const np=params.get('nom');
   if(np){
     try{
