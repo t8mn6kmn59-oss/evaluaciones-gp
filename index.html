@@ -1870,7 +1870,8 @@ async function submitEnc(){
 }
 
 // fecha se asigna automáticamente en gtsq()
-initDB().then(()=>{
+initDB().then(async ()=>{
+  await insertCCTIQuiz();
   const btn=document.getElementById('btn-continuar');
   if(btn){btn.disabled=false;btn.style.opacity='1';btn.style.cursor='pointer';btn.textContent='Continuar →';}
 });
@@ -1970,6 +1971,33 @@ async function insertErgonomiaQuiz(){
     console.log('Ergonomía quiz insertado!');
     await loadQuizzes();
   }catch(e){console.error('Error insertando Ergonomía quiz:',e);}
+}
+
+
+async function insertCCTIQuiz(){
+  const cctiId = 'liderazgo-ccti';
+  const cctiQuiz = {
+    id: cctiId,
+    name: 'Liderazgo CCTI',
+    icon: '🎯',
+    questions: [
+      {text:'¿Qué es la motivación intrínseca?',options:['La que se obtiene mediante castigos.','La que depende de supervisión constante.','La satisfacción personal al realizar una tarea.','La que solo se relaciona con dinero.'],answer:2},
+      {text:'¿Cuál es un elemento del proceso de comunicación?',options:['Liderazgo','Emisor','Motivación','Negociación'],answer:1},
+      {text:'¿Qué técnica mejora la motivación laboral?',options:['Evitar la participación del equipo.','Reconocer el trabajo bien realizado.','Aumentar conflictos.','Eliminar reuniones.'],answer:1},
+      {text:'¿Qué busca una reunión efectiva?',options:['Generar discusiones innecesarias.','Evitar la toma de decisiones.','Coordinar acciones y cumplir objetivos.','Reducir la comunicación.'],answer:2},
+      {text:'¿Cuál es una técnica de empoderamiento empresarial?',options:['Evitar delegar funciones.','Comunicación estrecha con el equipo.','Limitar la participación.','Restringir información.'],answer:1},
+      {text:'¿Qué estilo de manejo de conflictos busca beneficiar a todas las partes?',options:['Competitivo','Evasivo','Colaborativo','Complaciente'],answer:2},
+      {text:'La comunicación efectiva ayuda a mejorar las relaciones laborales.',options:['Verdadero','Falso'],answer:0},
+      {text:'El estilo evasivo enfrenta directamente los conflictos.',options:['Verdadero','Falso'],answer:1}
+    ]
+  };
+  try{
+    const existing=DB.quizzes.find(q=>q.id===cctiId);
+    if(!existing){
+      await sb.from('quizzes').upsert(cctiQuiz);
+      await loadQuizzes();
+    }
+  }catch(e){console.error('Error insertando CCTI quiz:',e);}
 }
 
 async function delResult(rid){
