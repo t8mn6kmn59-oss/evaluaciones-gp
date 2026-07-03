@@ -1301,7 +1301,7 @@ async function loadResults(){
   try{
     const {data,error}=await sb.from('results').select('*').order('created_at',{ascending:false});
     if(error)throw error;
-    DB.results=(data||[]).map(r=>({id:r.id,quizId:r.quiz_id,quizName:r.quiz_name,student:r.student,rut:r.rut||'',email:r.email||'',date:r.date,score:r.score,correct:r.correct,total:r.total,answers:r.answers,enc1:r.enc1||null,enc2:r.enc2||null,enc3:r.enc3||null}));
+    DB.results=(data||[]).map(r=>({id:r.id,quizId:r.quiz_id,quizName:r.quiz_name,student:r.student,rut:r.rut||'',email:r.email||'',empresa:r.empresa||'',date:r.date,score:r.score,correct:r.correct,total:r.total,answers:r.answers,enc1:r.enc1||null,enc2:r.enc2||null,enc3:r.enc3||null}));
   }catch(e){console.error(e);}
 }
 
@@ -1340,7 +1340,19 @@ function toggleMod(id){
   body.classList.toggle('open',!open);
   ch.classList.toggle('open',!open);
 }
-function gh(){selQid=null;curQ=null;curS=null;for(const k in ans)delete ans[k];sp('ph');}
+let encPending=false;
+function gh(){
+  if(encPending){
+    alert('⚠️ Antes de salir debes responder la encuesta de satisfacción (son solo 3 preguntas rápidas).');
+    const el=document.getElementById('enc-preguntas');
+    if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+  selQid=null;curQ=null;curS=null;for(const k in ans)delete ans[k];sp('ph');
+}
+window.addEventListener('beforeunload',function(e){
+  if(encPending){e.preventDefault();e.returnValue='';return '';}
+});
 
 const PARTICIPANTES=[
   // Prueba 15-05-2026
@@ -1692,7 +1704,7 @@ function renderReport(){
       <div class="student-avatar ${p?'pass':'fail'}" onclick="showStudentDetail('${r.id}')">${initials}</div>
       <div class="student-info" onclick="showStudentDetail('${r.id}')">
         <div class="name">${r.student}</div>
-        <div class="meta">${r.rut?r.rut+' · ':''}${r.email?'📧 '+r.email+' · ':''}${r.quizName} · ${r.correct}/${r.total} correctas</div>
+        <div class="meta">${r.rut?r.rut+' · ':''}${r.empresa?'🏢 '+r.empresa+' · ':''}${r.email?'📧 '+r.email+' · ':''}${r.quizName} · ${r.correct}/${r.total} correctas</div>
       </div>
       <div style="text-align:right;display:flex;align-items:center;gap:8px;">
         <div onclick="showStudentDetail('${r.id}')">
@@ -1824,6 +1836,7 @@ const encResp={};
 
 function showEnc(rec){
   encLastRec=rec;
+  encPending=true;
   encResp[0]=null;encResp[1]=null;encResp[2]=null;
   document.getElementById('enc-preguntas').innerHTML=ENC_PREGUNTAS.map((q,i)=>`
     <div style="margin-bottom:1rem;padding:1rem;border:1.5px solid rgba(255,255,255,0.15);border-radius:var(--rs);background:rgba(255,255,255,0.07);">
@@ -1855,6 +1868,7 @@ async function submitEnc(){
   const seleccionadas=[encResp[0]||null,encResp[1]||null,encResp[2]||null];
   if(seleccionadas.some(v=>!v)){document.getElementById('enc-err').classList.remove('hidden');return;}
   document.getElementById('enc-err').classList.add('hidden');
+  encPending=false;
   try{
     const res=await sb.from('results').update({enc1:seleccionadas[0],enc2:seleccionadas[1],enc3:seleccionadas[2]}).eq('id',encLastRec.id);
     console.log('Encuesta guardada:',seleccionadas,res);
@@ -2047,7 +2061,7 @@ function printResult(rid){
     @media print{body{padding:8px;}button{display:none!important;}.q{page-break-inside:avoid;}}
   </style></head><body>
   <div class="header">
-    <div><h1>GP Empresas · ${quiz.name}</h1><p>${r.student}${r.rut?' · RUT: '+r.rut:''} · ${r.date}</p></div>
+    <div><h1>GP Empresas · ${quiz.name}</h1><p>${r.student}${r.rut?' · RUT: '+r.rut:''}${r.empresa?' · '+r.empresa:''} · ${r.date}</p></div>
     <span class="status-badge ${pass?'pass':'fail'}">${pass?'✓ APROBADO':'✗ REPROBADO'}</span>
   </div>
   <div class="score-row">
@@ -2105,7 +2119,7 @@ function showStudentDetail(rid){
   const pass=r.score>=60;
 
   document.getElementById('dm-name').textContent=r.student;
-  document.getElementById('dm-meta').textContent=(r.rut?'RUT: '+r.rut+' · ':'')+(r.email?'📧 '+r.email+' · ':'')+r.quizName+' · '+r.date;
+  document.getElementById('dm-meta').textContent=(r.rut?'RUT: '+r.rut+' · ':'')+(r.empresa?'🏢 '+r.empresa+' · ':'')+(r.email?'📧 '+r.email+' · ':'')+r.quizName+' · '+r.date;
 
   document.getElementById('dm-metrics').innerHTML=`
     <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:8px 14px;text-align:center;">
@@ -2260,12 +2274,12 @@ async function generarPDF(){
   doc.text('Resumen por alumno',15,y);y+=4;
   doc.autoTable({
     startY:y,
-    head:[['#','Alumno','RUT','Correo','Fecha','Nota','Estado']],
-    body:f.map((r,i)=>[i+1,r.student,r.rut||'-',r.email||'-',r.date,r.score+'%',r.score>=60?'Aprobado':'Reprobado']),
+    head:[['#','Alumno','RUT','Empresa','Correo','Fecha','Nota','Estado']],
+    body:f.map((r,i)=>[i+1,r.student,r.rut||'-',r.empresa||'-',r.email||'-',r.date,r.score+'%',r.score>=60?'Aprobado':'Reprobado']),
     headStyles:{fillColor:[27,42,74],textColor:[255,255,255],fontStyle:'bold',fontSize:9},
     bodyStyles:{fontSize:9},
     alternateRowStyles:{fillColor:[248,249,252]},
-    columnStyles:{0:{cellWidth:8,halign:'center'},3:{halign:'center'},4:{halign:'center',fontStyle:'bold'},5:{halign:'center'}},
+    columnStyles:{0:{cellWidth:8,halign:'center'},4:{halign:'center'},5:{halign:'center',fontStyle:'bold'},6:{halign:'center'}},
     margin:{left:15,right:15},
   });
 
