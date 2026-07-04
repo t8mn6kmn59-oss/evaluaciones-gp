@@ -988,6 +988,7 @@ textarea{resize:vertical;min-height:64px;}
     </div>
     <h3 style="font-size:15px;font-weight:900;color:var(--navy);margin-bottom:1rem;">Revisión de respuestas</h3>
     <div id="rrv"></div>
+    <div id="rrv-enc"></div>
   </div>
 </div>
 
@@ -1468,7 +1469,23 @@ function showRes(rec){
   document.getElementById('rrv').innerHTML=curQ.questions.map((q,i)=>{
     const ua=rec.answers[i];const ok=ua===q.answer;
     return`<div class="qcard" style="border-color:${ok?'#2D7D2D':'#C0392B'};background:${ok?'#f8fff8':'#fff8f8'}"><div class="qnum" style="color:${ok?'var(--green)':'var(--red)'}">Pregunta ${i+1} · ${ok?'Correcta ✓':'Incorrecta ✗'}</div><div class="qtext">${q.text}</div>${q.options.map((o,j)=>{let c='opt';if(j===q.answer)c+=' correct';else if(j===ua&&!ok)c+=' wrong';return`<div class="${c}" style="pointer-events:none"><div class="ol">${LT[j]}</div><span>${o}</span></div>`;}).join('')}</div>`;
-  }).join('');sp('prx');
+  }).join('');
+  const ENC_LABELS=['Entendió el objetivo de la capacitación','Se siente más preparado tras la capacitación','El relator transmitió los contenidos en forma clara'];
+  const encVals=[rec.enc1,rec.enc2,rec.enc3];
+  const encColors={I:'#C0392B',S:'#E67E22',B:'#2980B9',MB:'#2D7D2D'};
+  const encBg={I:'#fdecea',S:'#fef5e7',B:'#ebf5fb',MB:'#e8f5e8'};
+  document.getElementById('rrv-enc').innerHTML=`
+    <div style="margin-top:1.25rem;">
+      <h3 style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:.75rem;">📝 Tu encuesta de satisfacción</h3>
+      ${ENC_LABELS.map((lbl,i)=>{
+        const v=encVals[i];
+        return`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border:1px solid var(--border);border-radius:var(--rs);margin-bottom:6px;background:white;">
+          <span style="font-size:12px;color:var(--navy);flex:1">${lbl}</span>
+          ${v?`<span style="background:${encBg[v]};color:${encColors[v]};font-weight:900;font-size:12px;padding:3px 12px;border-radius:99px;">${v}</span>`:'<span style="font-size:11px;color:var(--textLight)">Sin respuesta</span>'}
+        </div>`;
+      }).join('')}
+    </div>`;
+  sp('prx');
 }
 
 function doLogin(){
