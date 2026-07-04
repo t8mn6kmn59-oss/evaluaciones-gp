@@ -960,6 +960,12 @@ textarea{resize:vertical;min-height:64px;}
   <div class="wrap" style="max-width:680px;padding-top:1.25rem;">
     <div style="font-size:12px;color:var(--textLight);margin-bottom:1.25rem" id="qsl"></div>
     <div id="qbody"></div>
+    <div id="enc-quiz-card" style="margin-top:1.5rem;background:linear-gradient(135deg,var(--navy) 0%,#2d4270 100%);border-radius:var(--r);padding:1.5rem;">
+      <div style="font-size:14px;font-weight:900;color:white;margin-bottom:3px">📝 Antes de enviar: Encuesta de Satisfacción</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:1.25rem">Responde estas 3 preguntas para poder enviar tus respuestas. Solo toma 1 minuto.</div>
+      <div id="enc-preguntas"></div>
+      <div style="margin-top:.75rem;text-align:center;font-size:11px;color:rgba(255,255,255,0.4)">I = Insuficiente (1-3) &nbsp;|&nbsp; S = Suficiente (4) &nbsp;|&nbsp; B = Bueno (5-6) &nbsp;|&nbsp; MB = Muy Bueno (7)</div>
+    </div>
     <div id="qse2" class="alert ae hidden">Responde todas las preguntas antes de enviar.</div>
     <div style="display:flex;gap:.75rem;flex-wrap:wrap;">
       <button class="btn btn-orange" onclick="submitQ()">Enviar respuestas ✓</button>
@@ -971,25 +977,15 @@ textarea{resize:vertical;min-height:64px;}
 <!-- ALUMNO: RESULTADO -->
 <div class="page" id="prx">
   <div class="wrap" style="max-width:620px">
-    <div style="background:linear-gradient(135deg,var(--navy) 0%,#2d4270 100%);border-radius:var(--r);padding:1.5rem;">
-      <div style="font-size:14px;font-weight:900;color:white;margin-bottom:3px">📝 Encuesta de Satisfacción</div>
-      <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:1.25rem">Responde estas 3 preguntas para ver tu nota. Solo toma 1 minuto.</div>
-      <div id="enc-preguntas"></div>
-      <div id="enc-err" class="alert ae hidden" style="margin-top:1rem">Por favor responde todas las preguntas.</div>
-      <button id="enc-submit-btn" class="btn btn-orange btn-block" style="margin-top:1.25rem;opacity:0.45;pointer-events:none" onclick="submitEnc()">Enviar y ver mi resultado ✓</button>
-      <div style="margin-top:.75rem;text-align:center;font-size:11px;color:rgba(255,255,255,0.4)">I = Insuficiente (1-3) &nbsp;|&nbsp; S = Suficiente (4) &nbsp;|&nbsp; B = Bueno (5-6) &nbsp;|&nbsp; MB = Muy Bueno (7)</div>
+    <div class="result-hero">
+      <div class="rcircle" id="rc"></div>
+      <div class="rname" id="rsn"></div>
+      <div class="rscore" id="rsc"></div>
+      <div class="rstatus" id="rst"></div>
+      <div class="rdetail" id="rdt"></div>
     </div>
-    <div id="result-content" class="hidden" style="margin-top:1.5rem">
-      <div class="result-hero">
-        <div class="rcircle" id="rc"></div>
-        <div class="rname" id="rsn"></div>
-        <div class="rscore" id="rsc"></div>
-        <div class="rstatus" id="rst"></div>
-        <div class="rdetail" id="rdt"></div>
-      </div>
-      <h3 style="font-size:15px;font-weight:900;color:var(--navy);margin-bottom:1rem;">Revisión de respuestas</h3>
-      <div id="rrv"></div>
-    </div>
+    <h3 style="font-size:15px;font-weight:900;color:var(--navy);margin-bottom:1rem;">Revisión de respuestas</h3>
+    <div id="rrv"></div>
   </div>
 </div>
 
@@ -1338,19 +1334,7 @@ function toggleMod(id){
   body.classList.toggle('open',!open);
   ch.classList.toggle('open',!open);
 }
-let encPending=false;
-function gh(){
-  if(encPending){
-    alert('⚠️ Antes de salir debes responder la encuesta de satisfacción (son solo 3 preguntas rápidas).');
-    const el=document.getElementById('enc-preguntas');
-    if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
-    return;
-  }
-  selQid=null;curQ=null;curS=null;for(const k in ans)delete ans[k];sp('ph');
-}
-window.addEventListener('beforeunload',function(e){
-  if(encPending){e.preventDefault();e.returnValue='';return '';}
-});
+function gh(){selQid=null;curQ=null;curS=null;for(const k in ans)delete ans[k];sp('ph');}
 
 const PARTICIPANTES=[
   // Prueba 15-05-2026
@@ -1447,6 +1431,7 @@ function startQ(){
     }).join('');
     return `<div class="qcard">${tag}<div class="qnum">Pregunta ${i+1} de ${curQ.questions.length}</div><div class="qtext">${q.text}</div>${opts}</div>`;
   }).join('');
+  renderEncuestaQuiz();
   sp('pqz');
 }
 function selO(qi,oi,tot){
@@ -1458,12 +1443,15 @@ function selO(qi,oi,tot){
 }
 async function submitQ(){
   const tot=curQ.questions.length;
-  if(Object.keys(ans).length<tot){document.getElementById('qse2').classList.remove('hidden');return;}
-  document.getElementById('qse2').classList.add('hidden');
+  const qse2=document.getElementById('qse2');
+  if(Object.keys(ans).length<tot){qse2.textContent='Responde todas las preguntas antes de enviar.';qse2.classList.remove('hidden');document.getElementById('qbody').scrollIntoView({behavior:'smooth',block:'start'});return;}
+  const encOk=encResp[0]&&encResp[1]&&encResp[2];
+  if(!encOk){qse2.textContent='Responde también la encuesta de satisfacción antes de enviar.';qse2.classList.remove('hidden');document.getElementById('enc-quiz-card').scrollIntoView({behavior:'smooth',block:'center'});return;}
+  qse2.classList.add('hidden');
   const ua=curQ.questions.map((_,i)=>ans[i]);
   const corr=ua.filter((a,i)=>a===curQ.questions[i].answer).length;
   const score=Math.round(corr/tot*100);
-  const rec={id:Date.now()+'',quiz_id:curQ.id,quiz_name:curQ.name,student:curS.name,rut:curS.rut||'',email:curS.email||'',empresa:curS.empresa||'',date:curS.date,score,correct:corr,total:tot,answers:ua};
+  const rec={id:Date.now()+'',quiz_id:curQ.id,quiz_name:curQ.name,student:curS.name,rut:curS.rut||'',email:curS.email||'',empresa:curS.empresa||'',date:curS.date,score,correct:corr,total:tot,answers:ua,enc1:encResp[0],enc2:encResp[1],enc3:encResp[2]};
   try{await sb.from('results').insert([rec]);}catch(e){console.error(e);}
   showRes({...rec,quizId:rec.quiz_id,quizName:rec.quiz_name});
 }
@@ -1478,7 +1466,7 @@ function showRes(rec){
   document.getElementById('rrv').innerHTML=curQ.questions.map((q,i)=>{
     const ua=rec.answers[i];const ok=ua===q.answer;
     return`<div class="qcard" style="border-color:${ok?'#2D7D2D':'#C0392B'};background:${ok?'#f8fff8':'#fff8f8'}"><div class="qnum" style="color:${ok?'var(--green)':'var(--red)'}">Pregunta ${i+1} · ${ok?'Correcta ✓':'Incorrecta ✗'}</div><div class="qtext">${q.text}</div>${q.options.map((o,j)=>{let c='opt';if(j===q.answer)c+=' correct';else if(j===ua&&!ok)c+=' wrong';return`<div class="${c}" style="pointer-events:none"><div class="ol">${LT[j]}</div><span>${o}</span></div>`;}).join('')}</div>`;
-  }).join('');sp('prx');showEnc(window._lastRec);
+  }).join('');sp('prx');
 }
 
 function doLogin(){
@@ -1829,26 +1817,19 @@ const ENC_PREGUNTAS=[
   '3.- El relator transmitió los contenidos en forma clara.'
 ];
 const ENC_OPTS=['I','S','B','MB'];
-let encLastRec=null;
 const encResp={};
 
-function showEnc(rec){
-  encLastRec=rec;
-  encPending=true;
+function renderEncuestaQuiz(){
   encResp[0]=null;encResp[1]=null;encResp[2]=null;
-  document.getElementById('enc-preguntas').innerHTML=ENC_PREGUNTAS.map((q,i)=>`
+  const cont=document.getElementById('enc-preguntas');
+  if(!cont)return;
+  cont.innerHTML=ENC_PREGUNTAS.map((q,i)=>`
     <div style="margin-bottom:1rem;padding:1rem;border:1.5px solid rgba(255,255,255,0.15);border-radius:var(--rs);background:rgba(255,255,255,0.07);">
       <div style="font-size:13px;font-weight:700;color:white;margin-bottom:.75rem">${q}</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         ${ENC_OPTS.map(o=>`<button id="enc-${i}-${o}" onclick="selEnc(${i},'${o}')" style="flex:1;min-width:48px;padding:8px 4px;border:2px solid rgba(255,255,255,0.25);border-radius:8px;background:transparent;font-size:13px;font-weight:800;color:rgba(255,255,255,0.7);cursor:pointer;transition:all .15s">${o}</button>`).join('')}
       </div>
     </div>`).join('');
-}
-
-function checkEncComplete(){
-  const all=encResp[0]&&encResp[1]&&encResp[2];
-  const btn=document.getElementById('enc-submit-btn');
-  if(btn){btn.style.opacity=all?'1':'0.45';btn.style.pointerEvents=all?'auto':'none';}
 }
 
 function selEnc(idx, val){
@@ -1859,29 +1840,6 @@ function selEnc(idx, val){
   });
   const sel=document.getElementById(`enc-${idx}-${val}`);
   if(sel){sel.style.background='var(--orange)';sel.style.borderColor='var(--orange)';sel.style.color='white';}
-  checkEncComplete();
-}
-
-async function submitEnc(){
-  const seleccionadas=[encResp[0]||null,encResp[1]||null,encResp[2]||null];
-  if(seleccionadas.some(v=>!v)){document.getElementById('enc-err').classList.remove('hidden');return;}
-  document.getElementById('enc-err').classList.add('hidden');
-  encPending=false;
-  try{
-    const res=await sb.from('results').update({enc1:seleccionadas[0],enc2:seleccionadas[1],enc3:seleccionadas[2]}).eq('id',encLastRec.id);
-    console.log('Encuesta guardada:',seleccionadas,res);
-  }catch(e){console.error('Error guardando encuesta:',e);}
-  document.getElementById('enc-preguntas').innerHTML=`
-    <div style="text-align:center;padding:1.5rem 1rem;">
-      <div style="font-size:3rem;margin-bottom:1rem">🎉</div>
-      <div style="font-size:18px;font-weight:900;color:white;margin-bottom:.5rem">¡Gracias por tu opinión!</div>
-      <div style="font-size:13px;color:rgba(255,255,255,0.6)">Aquí tienes tu resultado 👇</div>
-    </div>`;
-  document.getElementById('enc-submit-btn').style.display='none';
-  document.getElementById('enc-err').style.display='none';
-  const rc=document.getElementById('result-content');
-  rc.classList.remove('hidden');
-  rc.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 // fecha se asigna automáticamente en gtsq()
