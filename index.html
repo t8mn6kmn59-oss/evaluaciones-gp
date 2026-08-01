@@ -2443,17 +2443,32 @@ async function guardarEdicionNomina(){
   </div>
 </div>
 
-<div id="modal-instructivo" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:9999;align-items:center;justify-content:center;padding:20px;">
-  <div style="background:white;border-radius:16px;padding:1.75rem;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
-    <div style="font-size:16px;font-weight:900;color:var(--navy);margin-bottom:12px;">📋 Instrucciones para el participante</div>
-    <div style="font-size:13.5px;color:#333;line-height:1.7;margin-bottom:1.5rem;">
-      Lea cada pregunta y seleccione una sola alternativa.<br><br>
-      En las preguntas de Verdadero/Falso, marque la opción que corresponda.<br><br>
-      Al finalizar el cuestionario, responda la breve encuesta de satisfacción para poder enviar sus respuestas.
+<div id="modal-instructivo" style="display:none;position:fixed;inset:0;background:rgba(27,42,74,0.75);z-index:9999;align-items:center;justify-content:center;padding:20px;overflow-y:auto;">
+  <div style="background:white;border-radius:18px;max-width:560px;width:100%;overflow:hidden;box-shadow:0 25px 70px rgba(0,0,0,0.4);margin:20px 0;">
+    <div style="background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);padding:1.75rem 1.75rem 1.5rem;">
+      <div style="display:inline-block;background:var(--orange);color:white;font-size:10.5px;font-weight:900;letter-spacing:.08em;padding:4px 12px;border-radius:99px;margin-bottom:12px;">EVALUACIÓN FINAL APLICADA</div>
+      <div style="font-size:21px;font-weight:900;color:white;line-height:1.3;">Liderazgo y autoliderazgo para el seguimiento del desempeño</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.7);margin-top:8px;line-height:1.5;">Cuestionario de verificación de contenidos — 12 preguntas (alternativas y verdadero/falso) más una breve encuesta de satisfacción.</div>
     </div>
-    <button onclick="document.getElementById('modal-instructivo').style.display='none'" class="btn btn-orange btn-block">Entendido, comenzar →</button>
+    <div style="padding:1.5rem 1.75rem;">
+      <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:1.5rem;">
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:9px 10px 9px 0;color:var(--navy);font-weight:800;width:110px;vertical-align:top;">Modalidad</td><td style="padding:9px 0;color:#444;">Autoinstrucción — cuestionario individual</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:9px 10px 9px 0;color:var(--navy);font-weight:800;vertical-align:top;">N° preguntas</td><td style="padding:9px 0;color:#444;">12 de contenido + 3 de satisfacción</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:9px 10px 9px 0;color:var(--navy);font-weight:800;vertical-align:top;">Tiempo estimado</td><td style="padding:9px 0;color:#444;">10 a 15 minutos</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:9px 10px 9px 0;color:var(--navy);font-weight:800;vertical-align:top;">Cobertura</td><td style="padding:9px 0;color:#444;">Módulo 1: Liderazgo y autoliderazgo · Módulo 2: Equipos y coordinación · Módulo 3: Comunicación y feedback · Módulo 4: Conversaciones de seguimiento</td></tr>
+        <tr><td style="padding:9px 10px 9px 0;color:var(--navy);font-weight:800;vertical-align:top;">Aprobación</td><td style="padding:9px 0;color:#444;">75% de respuestas correctas (9 de 12)</td></tr>
+      </table>
+      <div style="background:var(--orangeL);border-left:4px solid var(--orange);border-radius:var(--rs);padding:1.1rem 1.25rem;">
+        <div style="font-size:13px;font-weight:900;color:var(--navy);margin-bottom:10px;">📋 Instrucciones para el participante</div>
+        <div style="font-size:13px;color:#444;line-height:1.9;">
+          • Lea cada pregunta y seleccione una sola alternativa.<br>
+          • En las preguntas de Verdadero/Falso, marque la opción que corresponda.<br>
+          • Al finalizar el cuestionario, responda la breve encuesta de satisfacción para poder enviar sus respuestas.
+        </div>
+      </div>
+      <button onclick="document.getElementById('modal-instructivo').style.display='none'" class="btn btn-orange btn-block" style="margin-top:1.5rem;justify-content:center;padding:13px;font-size:14px;">Entendido, comenzar evaluación →</button>
+    </div>
   </div>
 </div>
-
 </body>
 </html>
