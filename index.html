@@ -903,14 +903,6 @@ textarea{resize:vertical;min-height:64px;}
       <div class="sline"></div>
       <div class="si"><div class="sd">3</div><div class="sl">Resultado</div></div>
     </div>
-    <div id="instructivo-ctp" style="display:none;background:var(--navy);border-radius:var(--r);padding:1.25rem 1.5rem;margin-bottom:1.25rem;">
-      <div style="font-size:14px;font-weight:900;color:white;margin-bottom:8px;">📋 Instrucciones para el participante</div>
-      <div style="font-size:12.5px;color:rgba(255,255,255,0.85);line-height:1.6;">
-        Lea cada pregunta y seleccione una sola alternativa.<br>
-        En las preguntas de Verdadero/Falso, marque la opción que corresponda.<br>
-        Al finalizar el cuestionario, responda la breve encuesta de satisfacción para poder enviar sus respuestas.
-      </div>
-    </div>
     <div class="card">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border);">
         <div style="width:42px;height:42px;border-radius:50%;background:var(--orangeL);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">👤</div>
@@ -1310,7 +1302,7 @@ async function loadResults(){
   }catch(e){console.error(e);}
 }
 
-function sp(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);if(id==='pmat')loadMat();if(id==='psi'){const ic=document.getElementById('instructivo-ctp');if(ic)ic.style.display=(selQid==='ctp-liderazgo')?'block':'none';}}
+function sp(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);if(id==='pmat')loadMat();}
 function loadMat(){
   const isLid=selQid&&selQid.includes('liderazgo');
   const isErgo=selQid&&selQid.includes('ergonomia');
@@ -1408,6 +1400,7 @@ function selQ(id){selQid=id;document.querySelectorAll('.qsc').forEach(c=>c.class
 function startQ(){
   if(!selQid){document.getElementById('qse').classList.remove('hidden');return;}
   curQ=DB.quizzes.find(q=>q.id===selQid);if(!curQ)return;
+  if(curQ.id==='ctp-liderazgo'){const m=document.getElementById('modal-instructivo');if(m)m.style.display='flex';}
   document.getElementById('qnl').textContent=curQ.name;
   document.getElementById('qsl').textContent='👤 '+curS.name+' · 🏢 '+curS.empresa+' · 📅 '+curS.date;
   
@@ -2447,6 +2440,18 @@ async function guardarEdicionNomina(){
         <button class="btn btn-orange" onclick="guardarEdicionNomina()">💾 Guardar cambios</button>
       </div>
     </div>
+  </div>
+</div>
+
+<div id="modal-instructivo" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:9999;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:white;border-radius:16px;padding:1.75rem;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <div style="font-size:16px;font-weight:900;color:var(--navy);margin-bottom:12px;">📋 Instrucciones para el participante</div>
+    <div style="font-size:13.5px;color:#333;line-height:1.7;margin-bottom:1.5rem;">
+      Lea cada pregunta y seleccione una sola alternativa.<br><br>
+      En las preguntas de Verdadero/Falso, marque la opción que corresponda.<br><br>
+      Al finalizar el cuestionario, responda la breve encuesta de satisfacción para poder enviar sus respuestas.
+    </div>
+    <button onclick="document.getElementById('modal-instructivo').style.display='none'" class="btn btn-orange btn-block">Entendido, comenzar →</button>
   </div>
 </div>
 
