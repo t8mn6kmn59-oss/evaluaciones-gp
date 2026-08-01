@@ -903,6 +903,14 @@ textarea{resize:vertical;min-height:64px;}
       <div class="sline"></div>
       <div class="si"><div class="sd">3</div><div class="sl">Resultado</div></div>
     </div>
+    <div id="instructivo-ctp" style="display:none;background:var(--navy);border-radius:var(--r);padding:1.25rem 1.5rem;margin-bottom:1.25rem;">
+      <div style="font-size:14px;font-weight:900;color:white;margin-bottom:8px;">📋 Instrucciones para el participante</div>
+      <div style="font-size:12.5px;color:rgba(255,255,255,0.85);line-height:1.6;">
+        Lea cada pregunta y seleccione una sola alternativa.<br>
+        En las preguntas de Verdadero/Falso, marque la opción que corresponda.<br>
+        Al finalizar el cuestionario, responda la breve encuesta de satisfacción para poder enviar sus respuestas.
+      </div>
+    </div>
     <div class="card">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border);">
         <div style="width:42px;height:42px;border-radius:50%;background:var(--orangeL);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">👤</div>
@@ -1302,7 +1310,7 @@ async function loadResults(){
   }catch(e){console.error(e);}
 }
 
-function sp(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);if(id==='pmat')loadMat();}
+function sp(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);if(id==='pmat')loadMat();if(id==='psi'){const ic=document.getElementById('instructivo-ctp');if(ic)ic.style.display=(selQid==='ctp-liderazgo')?'block':'none';}}
 function loadMat(){
   const isLid=selQid&&selQid.includes('liderazgo');
   const isErgo=selQid&&selQid.includes('ergonomia');
