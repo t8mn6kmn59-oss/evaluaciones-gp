@@ -1540,6 +1540,19 @@ function showRes(rec){
       if(q.type==='text'){
         return`<div class="qcard"><div class="qnum">Pregunta ${i+1}</div><div class="qtext">${q.text}</div><div style="background:#f7f7fa;border:1.5px solid #e3e3ec;border-radius:10px;padding:12px;font-size:13px;color:#333;white-space:pre-wrap;">${ua&&ua.trim()?ua:'<em style="color:#999">Sin respuesta</em>'}</div></div>`;
       }
+      if(q.type==='scale'){
+        const opts=`<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;margin-top:4px;">${q.options.map((o,j)=>
+          `<div class="opt${j===ua?' sel':''}" style="pointer-events:none;flex:1;min-width:38px;aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0;font-weight:900;font-size:15px;">${o}</div>`
+        ).join('')}</div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:10px;color:var(--textLight);padding:0 4px;"><span>Deficiente</span><span>Excelente</span></div>`;
+        return`<div class="qcard"><div class="qnum">Pregunta ${i+1}</div><div class="qtext">${q.text}</div>${opts}</div>`;
+      }
+      if(q.type==='yesno'){
+        const opts=`<div style="display:flex;gap:10px;margin-top:4px;">${q.options.map((o,j)=>
+          `<div class="opt${j===ua?' sel':''}" style="pointer-events:none;flex:1;text-align:center;justify-content:center;font-weight:800;font-size:15px;">${j===0?'✅ ':'❌ '}${o}</div>`
+        ).join('')}</div>`;
+        return`<div class="qcard"><div class="qnum">Pregunta ${i+1}</div><div class="qtext">${q.text}</div>${opts}</div>`;
+      }
       return`<div class="qcard"><div class="qnum">Pregunta ${i+1}</div><div class="qtext">${q.text}</div>${q.options.map((o,j)=>{let c='opt';if(j===ua)c+=' correct';return`<div class="${c}" style="pointer-events:none"><div class="ol">${LT[j]||(j+1)}</div><span>${o}</span></div>`;}).join('')}</div>`;
     }).join('');
     document.getElementById('rrv-enc').innerHTML='';
