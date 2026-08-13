@@ -1510,9 +1510,20 @@ async function submitQ(){
   qse2.classList.add('hidden');
   const ua=curQ.questions.map((_,i)=>ans[i]);
   const corr=isSurvey?0:ua.filter((a,i)=>a===curQ.questions[i].answer).length;
-  const score=isSurvey?null:Math.round(corr/tot*100);
+  const score=isSurvey?0:Math.round(corr/tot*100);
   const rec={id:Date.now()+'',quiz_id:curQ.id,quiz_name:curQ.name,student:curS.name,rut:curS.rut||'',email:curS.email||'',empresa:curS.empresa||'',date:curS.date,score,correct:corr,total:tot,answers:ua,enc1:isSurvey?null:encResp[0],enc2:isSurvey?null:encResp[1],enc3:isSurvey?null:encResp[2]};
-  try{await sb.from('results').insert([rec]);}catch(e){console.error(e);}
+  try{
+    const {error}=await sb.from('results').insert([rec]);
+    if(error){
+      console.error('Error guardando resultado:',error);
+      alert('Hubo un problema guardando tu respuesta. Por favor avisa al administrador. Detalle: '+error.message);
+      return;
+    }
+  }catch(e){
+    console.error(e);
+    alert('Hubo un problema guardando tu respuesta. Por favor avisa al administrador.');
+    return;
+  }
   showRes({...rec,quizId:rec.quiz_id,quizName:rec.quiz_name});
 }
 function showRes(rec){
@@ -1748,7 +1759,7 @@ function renderReport(){
   const cvDist=document.getElementById('ch-dist');
   const ranges=['0-19%','20-39%','40-59%','60-79%','80-100%'];
   const counts=[0,0,0,0,0];
-  f.forEach(r=>{counts[Math.min(Math.floor(r.score/20),4)]++;});
+  f.forEach(r=>{if(isSurveyQuiz(r.quizId))return;counts[Math.min(Math.floor(r.score/20),4)]++;});
   const colors=['#E74C3C','#E67E22','#F1C40F','#27AE60','#2ECC71'];
   ciDist=new Chart(cvDist,{type:'bar',data:{labels:ranges,datasets:[{data:counts,backgroundColor:colors,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:11}}},y:{beginAtZero:true,ticks:{stepSize:1,font:{size:11}},grid:{color:'rgba(0,0,0,0.05)'}}}}});
 
