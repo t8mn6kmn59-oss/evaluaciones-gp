@@ -1446,13 +1446,34 @@ function startQ(){
   document.getElementById('qbody').innerHTML=curQ.questions.map((q,i)=>{
     const isVF = q.type==='vf';
     const isOrder = q.type==='order';
+    const isScale = q.type==='scale';
+    const isYesNo = q.type==='yesno';
+    const isText = q.type==='text';
+    if(isText && ans[i]===undefined) ans[i]='';
     const tag = isVF ? '<span style="display:inline-block;background:#1B2A4A;color:white;font-size:10px;font-weight:900;padding:2px 8px;border-radius:99px;margin-bottom:8px;letter-spacing:.05em">V / F</span>' 
                      : isOrder ? '<span style="display:inline-block;background:#F5811E;color:white;font-size:10px;font-weight:900;padding:2px 8px;border-radius:99px;margin-bottom:8px;letter-spacing:.05em">ORDENAR</span>'
+                     : isScale ? '<span style="display:inline-block;background:#2D7D2D;color:white;font-size:10px;font-weight:900;padding:2px 8px;border-radius:99px;margin-bottom:8px;letter-spacing:.05em">ESCALA 1-7</span>'
+                     : isYesNo ? '<span style="display:inline-block;background:#2980B9;color:white;font-size:10px;font-weight:900;padding:2px 8px;border-radius:99px;margin-bottom:8px;letter-spacing:.05em">SÍ / NO</span>'
+                     : isText ? '<span style="display:inline-block;background:#7A4FBF;color:white;font-size:10px;font-weight:900;padding:2px 8px;border-radius:99px;margin-bottom:8px;letter-spacing:.05em">RESPUESTA ABIERTA</span>'
                      : '<span style="display:inline-block;background:#4A5568;color:white;font-size:10px;font-weight:900;padding:2px 8px;border-radius:99px;margin-bottom:8px;letter-spacing:.05em">ALTERNATIVAS</span>';
-    const opts = q.options.map((o,j)=>{
-      const icon = isVF ? (j===0?'✅ ':'❌ ') : isOrder ? `${j+1}. ` : '';
-      return `<div class="opt" id="op-${i}-${j}" onclick="selO(${i},${j},${curQ.questions.length})"><div class="ol">${isVF||isOrder?j+1:LT[j]}</div><span>${icon}${o}</span></div>`;
-    }).join('');
+    let opts;
+    if(isText){
+      opts = `<textarea id="txt-${i}" oninput="onTextInput(${i},${curQ.questions.length})" placeholder="Escriba su respuesta aquí (opcional)..." style="width:100%;min-height:90px;border:1.5px solid #d8dde8;border-radius:10px;padding:12px;font-family:inherit;font-size:14px;resize:vertical;box-sizing:border-box;"></textarea>`;
+    }else if(isScale){
+      opts = `<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;margin-top:4px;">${q.options.map((o,j)=>
+        `<div class="opt" id="op-${i}-${j}" onclick="selO(${i},${j},${curQ.questions.length})" style="flex:1;min-width:38px;aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0;font-weight:900;font-size:15px;">${o}</div>`
+      ).join('')}</div>
+      <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:10px;color:var(--textLight);padding:0 4px;"><span>Deficiente</span><span>Excelente</span></div>`;
+    }else if(isYesNo){
+      opts = `<div style="display:flex;gap:10px;margin-top:4px;">${q.options.map((o,j)=>
+        `<div class="opt" id="op-${i}-${j}" onclick="selO(${i},${j},${curQ.questions.length})" style="flex:1;text-align:center;justify-content:center;font-weight:800;font-size:15px;">${j===0?'✅ ':'❌ '}${o}</div>`
+      ).join('')}</div>`;
+    }else{
+      opts = q.options.map((o,j)=>{
+        const icon = isVF ? (j===0?'✅ ':'❌ ') : isOrder ? `${j+1}. ` : '';
+        return `<div class="opt" id="op-${i}-${j}" onclick="selO(${i},${j},${curQ.questions.length})"><div class="ol">${isVF||isOrder?j+1:LT[j]||(j+1)}</div><span>${icon}${o}</span></div>`;
+      }).join('');
+    }
     return `<div class="qcard">${tag}<div class="qnum">Pregunta ${i+1} de ${curQ.questions.length}</div><div class="qtext">${q.text}</div>${opts}</div>`;
   }).join('');
   const encCard=document.getElementById('enc-quiz-card');
@@ -1467,6 +1488,13 @@ function startQ(){
 function selO(qi,oi,tot){
   if(ans[qi]!==undefined)document.getElementById(`op-${qi}-${ans[qi]}`).classList.remove('sel');
   ans[qi]=oi;document.getElementById(`op-${qi}-${oi}`).classList.add('sel');
+  const c=Object.keys(ans).length;
+  document.getElementById('qpf').style.width=Math.round(c/tot*100)+'%';
+  document.getElementById('qpl').textContent=c+' de '+tot+' respondidas';
+}
+function onTextInput(qi,tot){
+  const v=document.getElementById('txt-'+qi).value;
+  if(v.trim().length>0){ans[qi]=v;}else{delete ans[qi];}
   const c=Object.keys(ans).length;
   document.getElementById('qpf').style.width=Math.round(c/tot*100)+'%';
   document.getElementById('qpl').textContent=c+' de '+tot+' respondidas';
@@ -1497,7 +1525,10 @@ function showRes(rec){
     document.getElementById('rdt').textContent='Su opinión nos ayuda a mejorar el servicio';
     document.getElementById('rrv').innerHTML=curQ.questions.map((q,i)=>{
       const ua=rec.answers[i];
-      return`<div class="qcard"><div class="qnum">Pregunta ${i+1}</div><div class="qtext">${q.text}</div>${q.options.map((o,j)=>{let c='opt';if(j===ua)c+=' correct';return`<div class="${c}" style="pointer-events:none"><div class="ol">${LT[j]}</div><span>${o}</span></div>`;}).join('')}</div>`;
+      if(q.type==='text'){
+        return`<div class="qcard"><div class="qnum">Pregunta ${i+1}</div><div class="qtext">${q.text}</div><div style="background:#f7f7fa;border:1.5px solid #e3e3ec;border-radius:10px;padding:12px;font-size:13px;color:#333;white-space:pre-wrap;">${ua&&ua.trim()?ua:'<em style="color:#999">Sin respuesta</em>'}</div></div>`;
+      }
+      return`<div class="qcard"><div class="qnum">Pregunta ${i+1}</div><div class="qtext">${q.text}</div>${q.options.map((o,j)=>{let c='opt';if(j===ua)c+=' correct';return`<div class="${c}" style="pointer-events:none"><div class="ol">${LT[j]||(j+1)}</div><span>${o}</span></div>`;}).join('')}</div>`;
     }).join('');
     document.getElementById('rrv-enc').innerHTML='';
     sp('prx');
@@ -2020,16 +2051,16 @@ async function insertEncuestaClienteQuiz(){
     icon: '🤝',
     isSurvey: true,
     questions: [
-      {text:'¿Cree usted que se ha cumplido con el objetivo planteado?',options:['1','2','3','4','5','6','7'],answer:0},
-      {text:'¿Ha notado cambios favorables en el clima laboral de su empresa?',options:['Sí','No'],answer:0},
-      {text:'¿Considera que la actividad tuvo buena acogida por los participantes de su empresa?',options:['Sí','No'],answer:0},
-      {text:'Los contenidos abordados en la actividad y el grado de profundidad de su análisis, ¿le parecieron adecuados?',options:['Sí','No'],answer:0},
-      {text:'¿Los relatores mostraron dominio de los temas expuestos, siendo capaces de aclarar todas las dudas de los participantes?',options:['Sí','No'],answer:0},
+      {text:'¿Cree usted que se ha cumplido con el objetivo planteado?',type:'scale',options:['1','2','3','4','5','6','7'],answer:0},
+      {text:'¿Ha notado cambios favorables en el clima laboral de su empresa?',type:'yesno',options:['Sí','No'],answer:0},
+      {text:'¿Considera que la actividad tuvo buena acogida por los participantes de su empresa?',type:'yesno',options:['Sí','No'],answer:0},
+      {text:'Los contenidos abordados en la actividad y el grado de profundidad de su análisis, ¿le parecieron adecuados?',type:'yesno',options:['Sí','No'],answer:0},
+      {text:'¿Los relatores mostraron dominio de los temas expuestos, siendo capaces de aclarar todas las dudas de los participantes?',type:'yesno',options:['Sí','No'],answer:0},
       {text:'¿Cuál es su nivel de satisfacción con el servicio?',options:['Muy Satisfecho','Satisfecho','Insatisfecho','Muy Insatisfecho'],answer:0},
-      {text:'Las sugerencias e instrucciones entregadas por usted como cliente, ¿son acogidas y aplicadas en forma oportuna?',options:['Sí','No'],answer:0},
-      {text:'¿El servicio se adapta perfectamente a sus necesidades como cliente?',options:['Sí','No'],answer:0},
-      {text:'¿El servicio realiza la labor esperada como proveedor?',options:['Sí','No'],answer:0},
-      {text:'¿Quisiera destacar algún beneficio o sugerencia sobre la actividad?',options:['Sí','No'],answer:0}
+      {text:'Las sugerencias e instrucciones entregadas por usted como cliente, ¿son acogidas y aplicadas en forma oportuna?',type:'yesno',options:['Sí','No'],answer:0},
+      {text:'¿El servicio se adapta perfectamente a sus necesidades como cliente?',type:'yesno',options:['Sí','No'],answer:0},
+      {text:'¿El servicio realiza la labor esperada como proveedor?',type:'yesno',options:['Sí','No'],answer:0},
+      {text:'¿Quisiera destacar algún beneficio o sugerencia sobre la actividad?',type:'text',options:[],answer:null}
     ]
   };
   try{
@@ -2129,6 +2160,12 @@ function printResult(rid){
   ${quiz.questions.map((q,i)=>{
     const ua=r.answers[i];const ok=ua===q.answer;
     if(isSurvey){
+      if(q.type==='text'){
+        return`<div class="q">
+        <div class="qh ok">P${i+1}: ${q.text}</div>
+        <div style="background:#f7f7fa;border:1px solid #e3e3ec;border-radius:8px;padding:10px;font-size:11px;color:#333;white-space:pre-wrap;">${ua&&(''+ua).trim()?ua:'Sin respuesta'}</div>
+      </div>`;
+      }
       return`<div class="q">
       <div class="qh ok">P${i+1}: ${q.text}</div>
       <div class="opts">${q.options.map((o,j)=>{
@@ -2214,6 +2251,14 @@ function showStudentDetail(rid){
     const ua=r.answers[i];
     const ok=ua===q.answer;
     if(isSurvey){
+      if(q.type==='text'){
+        return`<div style="margin-bottom:12px;border:1.5px solid #2D7D2D;border-radius:10px;overflow:hidden;">
+        <div style="background:#f0fff0;padding:10px 14px;">
+          <span style="font-size:13px;font-weight:700;color:var(--navy)">Pregunta ${i+1}: ${q.text}</span>
+        </div>
+        <div style="padding:10px 14px;background:white;font-size:12px;color:#333;white-space:pre-wrap;">${ua&&(''+ua).trim()?ua:'<em style="color:#999">Sin respuesta</em>'}</div>
+      </div>`;
+      }
       return`<div style="margin-bottom:12px;border:1.5px solid #2D7D2D;border-radius:10px;overflow:hidden;">
       <div style="background:#f0fff0;padding:10px 14px;">
         <span style="font-size:13px;font-weight:700;color:var(--navy)">Pregunta ${i+1}: ${q.text}</span>
@@ -2417,7 +2462,7 @@ async function generarPDF(){
         const ok = isSv2 ? true : ua===q.answer;
 
         // Check page space
-        const neededSpace = 18 + (q.options.length * 8);
+        const neededSpace = q.type==='text' ? 34 : 18 + (q.options.length * 8);
         if(y2 + neededSpace > H-20){
           doc.addPage();
           // mini header
@@ -2441,6 +2486,19 @@ async function generarPDF(){
         y2+=12;
 
         // Options
+        if(q.type==='text'){
+          const txt = (ua&&(''+ua).trim())?(''+ua):'Sin respuesta';
+          const lines = doc.splitTextToSize(txt, W-42);
+          const boxH = Math.max(10, lines.length*4+4);
+          doc.setFillColor(247,247,250);
+          doc.setDrawColor(220,220,230);
+          doc.setLineWidth(0.2);
+          doc.roundedRect(18,y2,W-36,boxH,1,1,'FD');
+          doc.setFontSize(7.5);doc.setFont('helvetica','normal');
+          doc.setTextColor(60,60,70);
+          doc.text(lines,21,y2+5);
+          y2 += boxH + 3;
+        }else{
         q.options.forEach((opt,oi)=>{
           let bgColor=[255,255,255], textColor=[80,80,100], marker='';
           if(!isSv2&&oi===q.answer){bgColor=[232,245,232];textColor=[45,125,45];marker=' ✓';}
@@ -2457,6 +2515,7 @@ async function generarPDF(){
           doc.text(optText,22,y2+4.8);
           y2+=8;
         });
+        }
         y2+=4;
       });
     });
