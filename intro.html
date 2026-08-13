@@ -166,7 +166,7 @@
 </div>
 
 <button class="btn-continuar" id="btn-continuar" onclick="irAlPortal()">
-  ✏️ IR A LA EVALUACIÓN
+  ✏️ <span id="btn-continuar-txt">IR A LA EVALUACIÓN</span>
 </button>
 
 <div class="timer" id="timer-msg"></div>
@@ -286,6 +286,8 @@ function iniciarContador() {
 
 function activarBoton() {
   document.getElementById('btn-continuar').classList.add('active');
+  const txt = document.getElementById('btn-continuar-txt');
+  if (txt) txt.textContent = (quizId === 'encuesta-cliente-2026') ? 'IR A LA ENCUESTA' : 'IR A LA EVALUACIÓN';
 }
 
 function mostrarError(msg) {

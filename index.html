@@ -1321,7 +1321,7 @@ function goMat(){
   // Mostrar pantalla de selección de curso para material
   const grid=document.getElementById('mat-sel-grid');
   if(grid&&DB.quizzes){
-    grid.innerHTML=DB.quizzes.map(q=>`<div class="qsc" onclick="selQid='${q.id}';sp('pmat')" style="text-align:center;padding:1.5rem"><div style="font-size:2rem;margin-bottom:8px">${q.icon||'📋'}</div><div style="font-size:14px;font-weight:800;color:var(--navy)">${q.name}</div><div style="font-size:12px;color:var(--textLight);margin-top:4px">${q.questions.length} preguntas</div></div>`).join('');
+    grid.innerHTML=DB.quizzes.filter(q=>!isSurveyQuiz(q.id)).map(q=>`<div class="qsc" onclick="selQid='${q.id}';sp('pmat')" style="text-align:center;padding:1.5rem"><div style="font-size:2rem;margin-bottom:8px">${q.icon||'📋'}</div><div style="font-size:14px;font-weight:800;color:var(--navy)">${q.name}</div><div style="font-size:12px;color:var(--textLight);margin-top:4px">${q.questions.length} preguntas</div></div>`).join('');
   }
   sp('pmatsel');
 }
@@ -1938,12 +1938,13 @@ function selEnc(idx, val){
 }
 
 // fecha se asigna automáticamente en gtsq()
-initDB().then(async ()=>{
+(async ()=>{
   await insertCCTIQuiz();
   await insertEncuestaClienteQuiz();
+  await initDB();
   const btn=document.getElementById('btn-continuar');
   if(btn){btn.disabled=false;btn.style.opacity='1';btn.style.cursor='pointer';btn.textContent='Continuar →';}
-});
+})();
 
 async function insertRCPQuiz(){
   const rcpId = 'rcp-basica-2026';
