@@ -1412,13 +1412,13 @@ function startQ(){
   if(isSurveyQuiz(curQ.id)){
     const sbanner = document.createElement('div');
     sbanner.id = 'survey-banner';
-    sbanner.style.cssText = 'background:linear-gradient(135deg,#1B2A4A 0%,#2d4270 100%);padding:1.25rem 1.5rem;text-align:center;border-bottom:3px solid #F5811E;';
-    sbanner.innerHTML = `<div style="max-width:680px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:8px;">
-      <img src="logo-gp.png" alt="GP Empresas" style="width:64px;height:64px;">
-      <div>
-        <div style="font-size:13px;font-weight:900;color:white;letter-spacing:.05em">ENCUESTA DE SATISFACCIÓN — CLIENTE</div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.65);margin-top:2px">GP Empresas · Su opinión nos ayuda a mejorar</div>
-      </div>
+    sbanner.innerHTML = `
+    <div style="background:linear-gradient(135deg,#1B2A4A 0%,#2d4270 100%);padding:1.1rem 1.5rem;text-align:center;">
+      <div style="font-size:13px;font-weight:900;color:white;letter-spacing:.05em">ENCUESTA DE SATISFACCIÓN — CLIENTE</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.65);margin-top:2px">Su opinión nos ayuda a mejorar</div>
+    </div>
+    <div style="background:white;padding:1rem 1.5rem;text-align:center;border-bottom:3px solid #F5811E;">
+      <img src="logo-gp.png" alt="GP Empresas" style="width:72px;height:72px;">
     </div>`;
     const navBar2 = document.querySelector('#pqz > div:first-child');
     navBar2.insertAdjacentElement('afterend', sbanner);
