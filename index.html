@@ -1372,6 +1372,8 @@ const PARTICIPANTES=[
   {rut:'14431904-4',nombre:'Leonardo Ulloa'},
   {rut:'16115025-8',nombre:'Yenny Espinoza'}
 ];
+const SURVEY_QUIZ_ID='encuesta-cliente-2026';
+function isSurveyQuiz(id){return id===SURVEY_QUIZ_ID;}
 function normRut(r){return r.replace(/\./g,'').replace(/\s/g,'').toUpperCase();}
 function findParticipante(rut){const nr=normRut(rut);return PARTICIPANTES.find(p=>normRut(p.rut)===nr);}
 function autoNombre(rut){
@@ -1404,6 +1406,24 @@ function startQ(){
   document.getElementById('qnl').textContent=curQ.name;
   document.getElementById('qsl').textContent='👤 '+curS.name+' · 🏢 '+curS.empresa+' · 📅 '+curS.date;
   
+  // Add GP logo banner if it's the client survey
+  const existingSurveyBanner = document.getElementById('survey-banner');
+  if(existingSurveyBanner) existingSurveyBanner.remove();
+  if(isSurveyQuiz(curQ.id)){
+    const sbanner = document.createElement('div');
+    sbanner.id = 'survey-banner';
+    sbanner.style.cssText = 'background:linear-gradient(135deg,#1B2A4A 0%,#2d4270 100%);padding:1.25rem 1.5rem;text-align:center;border-bottom:3px solid #F5811E;';
+    sbanner.innerHTML = `<div style="max-width:680px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:8px;">
+      <img src="logo-gp.png" alt="GP Empresas" style="width:64px;height:64px;">
+      <div>
+        <div style="font-size:13px;font-weight:900;color:white;letter-spacing:.05em">ENCUESTA DE SATISFACCIÓN — CLIENTE</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.65);margin-top:2px">GP Empresas · Su opinión nos ayuda a mejorar</div>
+      </div>
+    </div>`;
+    const navBar2 = document.querySelector('#pqz > div:first-child');
+    navBar2.insertAdjacentElement('afterend', sbanner);
+  }
+
   // Add special RCP banner if it's the RCP quiz
   const existingBanner = document.getElementById('rcp-banner');
   if(existingBanner) existingBanner.remove();
@@ -1435,7 +1455,13 @@ function startQ(){
     }).join('');
     return `<div class="qcard">${tag}<div class="qnum">Pregunta ${i+1} de ${curQ.questions.length}</div><div class="qtext">${q.text}</div>${opts}</div>`;
   }).join('');
-  renderEncuestaQuiz();
+  const encCard=document.getElementById('enc-quiz-card');
+  if(isSurveyQuiz(curQ.id)){
+    if(encCard)encCard.style.display='none';
+  }else{
+    if(encCard)encCard.style.display='';
+    renderEncuestaQuiz();
+  }
   sp('pqz');
 }
 function selO(qi,oi,tot){
@@ -1449,24 +1475,40 @@ async function submitQ(){
   const tot=curQ.questions.length;
   const qse2=document.getElementById('qse2');
   if(Object.keys(ans).length<tot){qse2.textContent='Responde todas las preguntas antes de enviar.';qse2.classList.remove('hidden');document.getElementById('qbody').scrollIntoView({behavior:'smooth',block:'start'});return;}
-  const encOk=encResp[0]&&encResp[1]&&encResp[2];
+  const isSurvey=isSurveyQuiz(curQ.id);
+  const encOk=isSurvey?true:(encResp[0]&&encResp[1]&&encResp[2]);
   if(!encOk){qse2.textContent='Responde también la encuesta de satisfacción antes de enviar.';qse2.classList.remove('hidden');document.getElementById('enc-quiz-card').scrollIntoView({behavior:'smooth',block:'center'});return;}
   qse2.classList.add('hidden');
   const ua=curQ.questions.map((_,i)=>ans[i]);
-  const corr=ua.filter((a,i)=>a===curQ.questions[i].answer).length;
-  const score=Math.round(corr/tot*100);
-  const rec={id:Date.now()+'',quiz_id:curQ.id,quiz_name:curQ.name,student:curS.name,rut:curS.rut||'',email:curS.email||'',empresa:curS.empresa||'',date:curS.date,score,correct:corr,total:tot,answers:ua,enc1:encResp[0],enc2:encResp[1],enc3:encResp[2]};
+  const corr=isSurvey?0:ua.filter((a,i)=>a===curQ.questions[i].answer).length;
+  const score=isSurvey?null:Math.round(corr/tot*100);
+  const rec={id:Date.now()+'',quiz_id:curQ.id,quiz_name:curQ.name,student:curS.name,rut:curS.rut||'',email:curS.email||'',empresa:curS.empresa||'',date:curS.date,score,correct:corr,total:tot,answers:ua,enc1:isSurvey?null:encResp[0],enc2:isSurvey?null:encResp[1],enc3:isSurvey?null:encResp[2]};
   try{await sb.from('results').insert([rec]);}catch(e){console.error(e);}
   showRes({...rec,quizId:rec.quiz_id,quizName:rec.quiz_name});
 }
 function showRes(rec){
+  const isSurvey=isSurveyQuiz(rec.quiz_id||rec.quizId);
+  window._lastRec={...rec};
+  if(isSurvey){
+    const rc=document.getElementById('rc');rc.className='rcircle pass';rc.textContent='🙏';
+    document.getElementById('rsn').textContent=rec.student+' · '+rec.empresa+' · '+rec.date;
+    const rs=document.getElementById('rsc');rs.textContent='¡Gracias!';rs.className='rscore pass';
+    document.getElementById('rst').textContent='Respuesta registrada correctamente';
+    document.getElementById('rdt').textContent='Su opinión nos ayuda a mejorar el servicio';
+    document.getElementById('rrv').innerHTML=curQ.questions.map((q,i)=>{
+      const ua=rec.answers[i];
+      return`<div class="qcard"><div class="qnum">Pregunta ${i+1}</div><div class="qtext">${q.text}</div>${q.options.map((o,j)=>{let c='opt';if(j===ua)c+=' correct';return`<div class="${c}" style="pointer-events:none"><div class="ol">${LT[j]}</div><span>${o}</span></div>`;}).join('')}</div>`;
+    }).join('');
+    document.getElementById('rrv-enc').innerHTML='';
+    sp('prx');
+    return;
+  }
   const pass=rec.score>=60;
   const rc=document.getElementById('rc');rc.className='rcircle '+(pass?'pass':'fail');rc.textContent=pass?'🎉':'😔';
   document.getElementById('rsn').textContent=rec.student+' · '+rec.date;
   const rs=document.getElementById('rsc');rs.textContent=rec.score+'%';rs.className='rscore '+(pass?'pass':'fail');
   document.getElementById('rst').textContent=pass?'¡Aprobado!':'Reprobado';
   document.getElementById('rdt').textContent=rec.correct+' de '+rec.total+' preguntas correctas';
-  window._lastRec={...rec};
   document.getElementById('rrv').innerHTML=curQ.questions.map((q,i)=>{
     const ua=rec.answers[i];const ok=ua===q.answer;
     return`<div class="qcard" style="border-color:${ok?'#2D7D2D':'#C0392B'};background:${ok?'#f8fff8':'#fff8f8'}"><div class="qnum" style="color:${ok?'var(--green)':'var(--red)'}">Pregunta ${i+1} · ${ok?'Correcta ✓':'Incorrecta ✗'}</div><div class="qtext">${q.text}</div>${q.options.map((o,j)=>{let c='opt';if(j===q.answer)c+=' correct';else if(j===ua&&!ok)c+=' wrong';return`<div class="${c}" style="pointer-events:none"><div class="ol">${LT[j]}</div><span>${o}</span></div>`;}).join('')}</div>`;
@@ -1647,10 +1689,12 @@ function renderReport(){
   const fq=document.getElementById('fq').value;
   const f=fq?DB.results.filter(r=>r.quizId===fq):DB.results;
   const tot=f.length;
-  const avg=tot?Math.round(f.reduce((s,r)=>s+r.score,0)/tot):0;
-  const pass=f.filter(r=>r.score>=60).length;
-  const fail=tot-pass;
-  const passRate=tot?Math.round(pass/tot*100):0;
+  const fg=f.filter(r=>!isSurveyQuiz(r.quizId));
+  const totG=fg.length;
+  const avg=totG?Math.round(fg.reduce((s,r)=>s+r.score,0)/totG):0;
+  const pass=fg.filter(r=>r.score>=60).length;
+  const fail=totG-pass;
+  const passRate=totG?Math.round(pass/totG*100):0;
 
   // Subtitle
   const quizName=fq?DB.quizzes.find(q=>q.id===fq)?.name:'Todas las evaluaciones';
@@ -1865,6 +1909,7 @@ function selEnc(idx, val){
 // fecha se asigna automáticamente en gtsq()
 initDB().then(async ()=>{
   await insertCCTIQuiz();
+  await insertEncuestaClienteQuiz();
   const btn=document.getElementById('btn-continuar');
   if(btn){btn.disabled=false;btn.style.opacity='1';btn.style.cursor='pointer';btn.textContent='Continuar →';}
 });
@@ -1967,6 +2012,38 @@ async function insertErgonomiaQuiz(){
 }
 
 
+async function insertEncuestaClienteQuiz(){
+  const encId = 'encuesta-cliente-2026';
+  const encQuiz = {
+    id: encId,
+    name: 'Encuesta de Satisfacción — Cliente',
+    icon: '🤝',
+    isSurvey: true,
+    questions: [
+      {text:'¿Cree usted que se ha cumplido con el objetivo planteado?',options:['1','2','3','4','5','6','7'],answer:0},
+      {text:'¿Ha notado cambios favorables en el clima laboral de su empresa?',options:['Sí','No'],answer:0},
+      {text:'¿Considera que la actividad tuvo buena acogida por los participantes de su empresa?',options:['Sí','No'],answer:0},
+      {text:'Los contenidos abordados en la actividad y el grado de profundidad de su análisis, ¿le parecieron adecuados?',options:['Sí','No'],answer:0},
+      {text:'¿Los relatores mostraron dominio de los temas expuestos, siendo capaces de aclarar todas las dudas de los participantes?',options:['Sí','No'],answer:0},
+      {text:'¿Cuál es su nivel de satisfacción con el servicio?',options:['Muy Satisfecho','Satisfecho','Insatisfecho','Muy Insatisfecho'],answer:0},
+      {text:'Las sugerencias e instrucciones entregadas por usted como cliente, ¿son acogidas y aplicadas en forma oportuna?',options:['Sí','No'],answer:0},
+      {text:'¿El servicio se adapta perfectamente a sus necesidades como cliente?',options:['Sí','No'],answer:0},
+      {text:'¿El servicio realiza la labor esperada como proveedor?',options:['Sí','No'],answer:0},
+      {text:'¿Quisiera destacar algún beneficio o sugerencia sobre la actividad?',options:['Sí','No'],answer:0}
+    ]
+  };
+  try{
+    await sb.from('quizzes').upsert([{
+      id: encQuiz.id,
+      name: encQuiz.name,
+      icon: encQuiz.icon,
+      questions: encQuiz.questions
+    }]);
+    console.log('Encuesta cliente actualizada!');
+    await loadQuizzes();
+  }catch(e){console.error('Error actualizando encuesta cliente:',e);}
+}
+
 async function insertCCTIQuiz(){
   const cctiId = 'liderazgo-ccti';
   const cctiQuiz = {
@@ -2008,7 +2085,8 @@ function printResult(rid){
   if(!r)return;
   const quiz=DB.quizzes.find(q=>q.id===r.quizId);
   if(!quiz)return;
-  const pass=r.score>=60;
+  const isSurvey=isSurveyQuiz(r.quizId);
+  const pass=isSurvey?true:r.score>=60;
   const LT2=['A','B','C','D','E'];
   const win=window.open('','_blank','width=800,height=600');
   win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
@@ -2041,15 +2119,25 @@ function printResult(rid){
   </style></head><body>
   <div class="header">
     <div><h1>GP Empresas · ${quiz.name}</h1><p>${r.student}${r.rut?' · RUT: '+r.rut:''}${r.empresa?' · '+r.empresa:''} · ${r.date}</p></div>
-    <span class="status-badge ${pass?'pass':'fail'}">${pass?'✓ APROBADO':'✗ REPROBADO'}</span>
+    <span class="status-badge ${pass?'pass':'fail'}">${isSurvey?'📋 ENCUESTA':(pass?'✓ APROBADO':'✗ REPROBADO')}</span>
   </div>
-  <div class="score-row">
+  ${isSurvey?'':`<div class="score-row">
     <div class="score-box"><div class="val ${pass?'pass':'fail'}">${r.score}%</div><div class="lbl">Puntaje</div></div>
     <div class="score-box"><div class="val">${r.correct}/${r.total}</div><div class="lbl">Correctas</div></div>
     <div class="score-box"><div class="val">${r.total-r.correct}</div><div class="lbl">Incorrectas</div></div>
-  </div>
+  </div>`}
   ${quiz.questions.map((q,i)=>{
     const ua=r.answers[i];const ok=ua===q.answer;
+    if(isSurvey){
+      return`<div class="q">
+      <div class="qh ok">P${i+1}: ${q.text}</div>
+      <div class="opts">${q.options.map((o,j)=>{
+        let cls='opt';
+        if(j===ua)cls+=' correct';
+        return`<div class="${cls}"><span class="opt-letter">${LT2[j]||(j+1)}.</span><span>${o}${j===ua?' ✓':''}</span></div>`;
+      }).join('')}</div>
+    </div>`;
+    }
     return`<div class="q">
       <div class="qh ${ok?'ok':'bad'}">${ok?'✅':'❌'} P${i+1}: ${q.text}</div>
       <div class="opts">${q.options.map((o,j)=>{
@@ -2095,12 +2183,20 @@ function showStudentDetail(rid){
   if(!r)return;
   const quiz=DB.quizzes.find(q=>q.id===r.quizId);
   if(!quiz)return;
-  const pass=r.score>=60;
+  const isSurvey=isSurveyQuiz(r.quizId);
+  const pass=isSurvey?true:r.score>=60;
 
   document.getElementById('dm-name').textContent=r.student;
   document.getElementById('dm-meta').textContent=(r.rut?'RUT: '+r.rut+' · ':'')+(r.empresa?'🏢 '+r.empresa+' · ':'')+(r.email?'📧 '+r.email+' · ':'')+r.quizName+' · '+r.date;
 
-  document.getElementById('dm-metrics').innerHTML=`
+  document.getElementById('dm-metrics').innerHTML=isSurvey?`
+    <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:8px 14px;text-align:center;">
+      <div style="font-size:22px">🤝</div>
+      <div style="font-size:10px;color:rgba(255,255,255,0.5)">ENCUESTA CLIENTE</div>
+    </div>
+    <div style="background:rgba(45,125,45,0.3);border-radius:8px;padding:8px 14px;text-align:center;">
+      <div style="font-size:14px;font-weight:900;color:#5DD45D">✓ RESPONDIDA</div>
+    </div>`:`
     <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:8px 14px;text-align:center;">
       <div style="font-size:22px;font-weight:900;color:${pass?'#5DD45D':'#FF6B6B'}">${r.score}%</div>
       <div style="font-size:10px;color:rgba(255,255,255,0.5)">NOTA</div>
@@ -2113,10 +2209,26 @@ function showStudentDetail(rid){
       <div style="font-size:14px;font-weight:900;color:${pass?'#5DD45D':'#FF6B6B'}">${pass?'✓ APROBADO':'✗ REPROBADO'}</div>
     </div>`;
 
-  const LT2=['A','B','C','D'];
+  const LT2=['A','B','C','D','E','F','G'];
   document.getElementById('dm-questions').innerHTML=quiz.questions.map((q,i)=>{
     const ua=r.answers[i];
     const ok=ua===q.answer;
+    if(isSurvey){
+      return`<div style="margin-bottom:12px;border:1.5px solid #2D7D2D;border-radius:10px;overflow:hidden;">
+      <div style="background:#f0fff0;padding:10px 14px;">
+        <span style="font-size:13px;font-weight:700;color:var(--navy)">Pregunta ${i+1}: ${q.text}</span>
+      </div>
+      <div style="padding:10px 14px;background:white;display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+        ${q.options.map((o,j)=>{
+          let bg='#f8f8f8',border='#eee',color='#555',fw='400';
+          if(j===ua){bg='#e8f5e8';border='#2D7D2D';color='#2D7D2D';fw='700';}
+          return`<div style="background:${bg};border:1.5px solid ${border};border-radius:6px;padding:6px 10px;font-size:12px;color:${color};font-weight:${fw};">
+            <strong>${LT2[j]||(j+1)}.</strong> ${o}${j===ua?' ✓ (su respuesta)':''}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+    }
     return`<div style="margin-bottom:12px;border:1.5px solid ${ok?'#2D7D2D':'#C0392B'};border-radius:10px;overflow:hidden;">
       <div style="background:${ok?'#f0fff0':'#fff0f0'};padding:10px 14px;display:flex;align-items:center;gap:8px;">
         <span style="font-size:16px">${ok?'✅':'❌'}</span>
@@ -2142,7 +2254,7 @@ function showStudentDetail(rid){
   const encVals=[r.enc1,r.enc2,r.enc3];
   const encColors={I:'#C0392B',S:'#E67E22',B:'#2980B9',MB:'#2D7D2D'};
   const encBg={I:'#fdecea',S:'#fef5e7',B:'#ebf5fb',MB:'#e8f5e8'};
-  const encSection = encVals.some(v=>v) ? `
+  const encSection = isSurvey ? '' : encVals.some(v=>v) ? `
     <div style="margin-top:1.25rem;">
       <h3 style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:.75rem;">📝 Encuesta de satisfacción</h3>
       ${ENC_LABELS.map((lbl,i)=>{
@@ -2209,9 +2321,11 @@ async function generarPDF(){
   drawHeader('Reporte de Evaluaciones', 'GP Empresas · '+quizName);
   let y = 54;
 
-  const tot=f.length, avg=tot?Math.round(f.reduce((s,r)=>s+r.score,0)/tot):0;
-  const pass=f.filter(r=>r.score>=60).length, fail=tot-pass;
-  const passRate=tot?Math.round(pass/tot*100):0;
+  const tot=f.length;
+  const fg=f.filter(r=>!isSurveyQuiz(r.quizId));
+  const totG=fg.length, avg=totG?Math.round(fg.reduce((s,r)=>s+r.score,0)/totG):0;
+  const pass=fg.filter(r=>r.score>=60).length, fail=totG-pass;
+  const passRate=totG?Math.round(pass/totG*100):0;
 
   // Métricas
   const metrics=[
@@ -2254,7 +2368,10 @@ async function generarPDF(){
   doc.autoTable({
     startY:y,
     head:[['#','Alumno','RUT','Empresa','Correo','Fecha','Nota','Estado']],
-    body:f.map((r,i)=>[i+1,r.student,r.rut||'-',r.empresa||'-',r.email||'-',r.date,r.score+'%',r.score>=60?'Aprobado':'Reprobado']),
+    body:f.map((r,i)=>{
+      const isSv=isSurveyQuiz(r.quizId);
+      return[i+1,r.student,r.rut||'-',r.empresa||'-',r.email||'-',r.date,isSv?'—':r.score+'%',isSv?'Encuesta':(r.score>=60?'Aprobado':'Reprobado')];
+    }),
     headStyles:{fillColor:[27,42,74],textColor:[255,255,255],fontStyle:'bold',fontSize:9},
     bodyStyles:{fontSize:9},
     alternateRowStyles:{fillColor:[248,249,252]},
@@ -2283,20 +2400,21 @@ async function generarPDF(){
       doc.text('Evaluación: '+quiz.name, 20, y2+21);
 
       // Nota badge
-      const pass2 = r.score>=60;
-      doc.setFillColor(...(pass2?[45,125,45]:[192,57,43]));
+      const isSv2 = isSurveyQuiz(r.quizId);
+      const pass2 = isSv2?true:r.score>=60;
+      doc.setFillColor(...(isSv2?[27,42,74]:(pass2?[45,125,45]:[192,57,43])));
       doc.roundedRect(W-55,y2+4,40,16,3,3,'F');
       doc.setFontSize(14);doc.setFont('helvetica','bold');doc.setTextColor(255,255,255);
-      doc.text(r.score+'%',W-35,y2+13,{align:'center'});
+      doc.text(isSv2?'🤝':r.score+'%',W-35,y2+13,{align:'center'});
       doc.setFontSize(8);
-      doc.text(pass2?'APROBADO':'REPROBADO',W-35,y2+19,{align:'center'});
+      doc.text(isSv2?'ENCUESTA':(pass2?'APROBADO':'REPROBADO'),W-35,y2+19,{align:'center'});
 
       y2+=30;
 
       // Preguntas
       quiz.questions.forEach((q,qi)=>{
         const ua = r.answers[qi];
-        const ok = ua===q.answer;
+        const ok = isSv2 ? true : ua===q.answer;
 
         // Check page space
         const neededSpace = 18 + (q.options.length * 8);
@@ -2325,9 +2443,9 @@ async function generarPDF(){
         // Options
         q.options.forEach((opt,oi)=>{
           let bgColor=[255,255,255], textColor=[80,80,100], marker='';
-          if(oi===q.answer){bgColor=[232,245,232];textColor=[45,125,45];marker=' ✓';}
+          if(!isSv2&&oi===q.answer){bgColor=[232,245,232];textColor=[45,125,45];marker=' ✓';}
           if(oi===ua&&!ok){bgColor=[253,236,234];textColor=[192,57,43];marker=' ✗';}
-          if(oi===ua&&ok){marker=' ✓';}
+          if(oi===ua&&ok){bgColor=isSv2?[232,245,232]:bgColor;textColor=isSv2?[45,125,45]:textColor;marker=' ✓';}
 
           doc.setFillColor(...bgColor);
           doc.setDrawColor(220,220,230);
