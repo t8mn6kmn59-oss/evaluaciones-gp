@@ -2346,6 +2346,11 @@ function showStudentDetail(rid){
 
 
 async function generarPDF(){
+  try{ await _generarPDF(); }
+  catch(e){ console.error(e); alert('No se pudo generar el PDF: '+(e&&e.message?e.message:e)); }
+}
+
+async function _generarPDF(){
   const {jsPDF} = window.jspdf;
   const doc = new jsPDF('p','mm','a4');
   const fq = document.getElementById('fq').value;
@@ -2487,11 +2492,11 @@ async function generarPDF(){
 
       // Preguntas
       quiz.questions.forEach((q,qi)=>{
-        const ua = r.answers[qi];
+        const ua = (r.answers||[])[qi];
         const ok = isSv2 ? true : ua===q.answer;
 
         // Check page space
-        const neededSpace = q.type==='text' ? 34 : 18 + (q.options.length * 8);
+        const neededSpace = q.type==='text' ? 34 : 18 + ((q.options||[]).length * 8);
         if(y2 + neededSpace > H-20){
           doc.addPage();
           // mini header
@@ -2504,7 +2509,6 @@ async function generarPDF(){
         }
 
         // Question header
-        doc.setFillColor(ok?[240,255,240]:[255,240,240]);
         doc.setFillColor(...(ok?[240,255,240]:[255,240,240]));
         doc.setDrawColor(...(ok?[45,125,45]:[192,57,43]));
         doc.setLineWidth(0.3);
@@ -2528,7 +2532,7 @@ async function generarPDF(){
           doc.text(lines,21,y2+5);
           y2 += boxH + 3;
         }else{
-        q.options.forEach((opt,oi)=>{
+        (q.options||[]).forEach((opt,oi)=>{
           let bgColor=[255,255,255], textColor=[80,80,100], marker='';
           if(!isSv2&&oi===q.answer){bgColor=[232,245,232];textColor=[45,125,45];marker=' ✓';}
           if(oi===ua&&!ok){bgColor=[253,236,234];textColor=[192,57,43];marker=' ✗';}
