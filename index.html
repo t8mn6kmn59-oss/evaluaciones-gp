@@ -62,6 +62,9 @@ textarea{resize:vertical;min-height:64px;}
 .badge{display:inline-block;font-size:11px;font-weight:800;padding:3px 10px;border-radius:99px;}
 .badge-green{background:var(--greenL);color:var(--green);}
 .badge-red{background:var(--redL);color:var(--red);}
+.badge-gray{background:#eef1f6;color:#6b7690;}
+.venc-row{display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:wrap;margin:.6rem 0 1rem;font-size:12px;}
+.venc-row input[type=date]{padding:5px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;}
 .progress{height:6px;background:rgba(255,255,255,0.15);border-radius:3px;overflow:hidden;margin:6px 0 1.5rem;}
 .pf{height:100%;background:linear-gradient(90deg,var(--navy),var(--orange));border-radius:3px;transition:width .4s;}
 .step-bar{display:flex;align-items:center;margin-bottom:2rem;}
@@ -894,6 +897,17 @@ textarea{resize:vertical;min-height:64px;}
 </div>
 
 <!-- ALUMNO: DATOS -->
+<div class="page" id="pexp">
+  <div class="wrap" style="max-width:520px">
+    <div class="card" style="text-align:center;padding:2.5rem 1.75rem">
+      <div style="font-size:2.6rem;margin-bottom:.75rem">&#9203;</div>
+      <div style="font-size:19px;font-weight:900;color:var(--navy);margin-bottom:.5rem">Este código QR ya no está disponible</div>
+      <div id="pexp-fecha" style="font-size:13px;color:var(--textLight);margin-bottom:1rem"></div>
+      <div style="font-size:14px;color:var(--text);line-height:1.6">Para rendir esta evaluación, contacta a <b>GP Empresas</b>.</div>
+    </div>
+  </div>
+</div>
+
 <div class="page" id="psi">
   <div class="wrap" style="max-width:520px">
     <div class="back" onclick="gh()">← Volver al inicio</div>
@@ -1096,7 +1110,7 @@ textarea{resize:vertical;min-height:64px;}
       <div class="shdr"><h2>Códigos QR</h2></div>
       <div class="url-box">
         <h3>🔗 URL de tu plataforma</h3>
-        <p>Los QR apuntan directo a cada evaluación.</p>
+        <p>Los QR apuntan directo a cada evaluación. Cada QR deja de funcionar después de su fecha de vencimiento (deja la fecha vacía para que no venza).</p>
         <div class="url-input-row">
           <input type="text" id="surl" value="https://t8mn6kmn59-oss.github.io/evaluaciones-gp">
           <button class="btn btn-orange btn-sm" onclick="saveUrl()">Guardar URL</button>
@@ -1158,11 +1172,16 @@ textarea{resize:vertical;min-height:64px;}
           <div class="fg" style="margin:0"><label>Fecha inicio</label><input type="date" id="nom-fecha"></div>
         </div>
         <div class="fg">
+          <label>El QR vence el <span style="color:var(--red);font-size:10px;font-weight:700">* Obligatorio</span></label>
+          <input type="date" id="nom-vence">
+          <div style="font-size:11px;color:var(--textLight);margin-top:3px">Después de esta fecha el QR deja de funcionar. Puedes extenderla cuando quieras.</div>
+        </div>
+        <div class="fg">
           <label>Evaluación que rendirán</label>
           <select id="nom-quiz"></select>
         </div>
         <div class="fg">
-          <label>Participantes (un RUT;Nombre por línea)</label>
+          <label>Participantes (opcional · un RUT;Nombre por línea)</label>
           <textarea id="nom-participantes" style="min-height:140px" placeholder="14431904-4;Leonardo Ulloa Hidalgo&#10;21091545-1;Martín Ulloa Canales"></textarea>
         </div>
         <div id="nom-err" class="alert ae hidden"></div>
@@ -1256,13 +1275,16 @@ async function initDB(){
   const params=new URLSearchParams(window.location.search);
   const qp=params.get('quiz');
   const fromIntro=params.get('from')==='intro';
+  if(qp){const qx=DB.quizzes.find(q=>q.id===qp);if(qx&&vencido(qx.vence)){mostrarVencido(qx.vence);return;}}
   if(qp&&!fromIntro){window.location.href='intro.html?quiz='+qp;return;}
   if(qp&&fromIntro&&DB.quizzes.find(q=>q.id===qp)){selQid=qp;showQuizEntry(qp);return;}
   const np=params.get('nom');
   if(np){
     try{
-      const {data,error}=await sb.from('nominas').select('quiz_id,participantes').eq('id',np).single();
+      const {data,error}=await sb.from('nominas').select('quiz_id,participantes,vence').eq('id',np).single();
+      if(!error&&data&&vencido(data.vence)){mostrarVencido(data.vence);return;}
       if(!error&&data&&data.quiz_id){
+        NOM_ID=np;
         if(data.participantes&&data.participantes.length>0){
           PARTICIPANTES.length=0;
           data.participantes.forEach(p=>PARTICIPANTES.push(p));
@@ -1280,7 +1302,7 @@ async function loadQuizzes(){
     const {data,error}=await sb.from('quizzes').select('*').order('created_at');
     if(error)throw error;
     if(data&&data.length>0){
-      DB.quizzes=data.map(q=>({id:q.id,name:q.name,icon:q.icon,questions:q.questions}));
+      DB.quizzes=data.map(q=>({id:q.id,name:q.name,icon:q.icon,questions:q.questions,vence:q.vence||null}));
     }else{
       const dq={id:'ergo1',name:'Ergonomia - Prevencion de riesgos',icon:'🏗️',questions:[
         {text:'¿Que es la ergonomia?',options:['Ciencia que estudia solo maquinas','Disciplina que adapta el trabajo al trabajador','Tecnica de produccion industrial','Metodo de evaluacion financiera'],answer:1},
@@ -1375,6 +1397,35 @@ const PARTICIPANTES=[
 ];
 const SURVEY_QUIZ_ID='encuesta-cliente-2026';
 function isSurveyQuiz(id){return id===SURVEY_QUIZ_ID;}
+// ===== Vencimiento de códigos QR =====
+let NOM_ID=null;
+function hoyCL(){return new Date().toLocaleDateString('en-CA',{timeZone:'America/Santiago'});}
+function vencido(v){return !!v&&hoyCL()>v;}
+function fmtFecha(v){if(!v)return '';const[y,m,d]=String(v).slice(0,10).split('-');return d+'-'+m+'-'+y;}
+function sumarDias(n){const d=new Date(hoyCL()+'T12:00:00');d.setDate(d.getDate()+n);return d.toISOString().slice(0,10);}
+function badgeVence(v){
+  if(!v)return '<span class="badge badge-gray">Sin vencimiento</span>';
+  if(vencido(v))return '<span class="badge badge-red">Vencido el '+fmtFecha(v)+'</span>';
+  return '<span class="badge badge-green">Vigente hasta el '+fmtFecha(v)+'</span>';
+}
+function mostrarVencido(v){
+  const el=document.getElementById('pexp-fecha');
+  if(el)el.textContent=v?('Este código venció el '+fmtFecha(v)+'.'):'';
+  sp('pexp');
+}
+async function guardarVenceQuiz(id){
+  const v=document.getElementById('vq-'+id).value||null;
+  const {error}=await sb.from('quizzes').update({vence:v}).eq('id',id);
+  if(error){alert('Error al guardar: '+error.message);return;}
+  const q=DB.quizzes.find(x=>x.id===id);if(q)q.vence=v;
+  renderQR();
+}
+async function guardarVenceNom(id){
+  const v=document.getElementById('vn-'+id).value||null;
+  const {error}=await sb.from('nominas').update({vence:v}).eq('id',id);
+  if(error){alert('Error al guardar: '+error.message);return;}
+  cargarNominas();
+}
 function normRut(r){return r.replace(/\./g,'').replace(/\s/g,'').toUpperCase();}
 function findParticipante(rut){const nr=normRut(rut);return PARTICIPANTES.find(p=>normRut(p.rut)===nr);}
 function autoNombre(rut){
@@ -1397,12 +1448,13 @@ function gtsq(){
   sp('psq');
 }
 function renderQuizGrid(){
-  document.getElementById('qsgrid').innerHTML=DB.quizzes.map(q=>`<div class="qsc" id="qc-${q.id}" onclick="selQ('${q.id}')"><div class="qsc-body"><div class="qi">${q.icon||'📋'}</div><h3>${q.name}</h3><p>${q.questions.length} preguntas</p></div><button class="btn btn-orange btn-sm" style="margin-top:10px;width:100%;justify-content:center" onclick="event.stopPropagation();selQ('${q.id}');startQ()">Comenzar →</button></div>`).join('');
+  document.getElementById('qsgrid').innerHTML=DB.quizzes.filter(q=>!vencido(q.vence)).map(q=>`<div class="qsc" id="qc-${q.id}" onclick="selQ('${q.id}')"><div class="qsc-body"><div class="qi">${q.icon||'📋'}</div><h3>${q.name}</h3><p>${q.questions.length} preguntas</p></div><button class="btn btn-orange btn-sm" style="margin-top:10px;width:100%;justify-content:center" onclick="event.stopPropagation();selQ('${q.id}');startQ()">Comenzar →</button></div>`).join('');
 }
 function selQ(id){selQid=id;document.querySelectorAll('.qsc').forEach(c=>c.classList.remove('active'));const el=document.getElementById('qc-'+id);if(el)el.classList.add('active');document.getElementById('qse').classList.add('hidden');}
 function startQ(){
   if(!selQid){document.getElementById('qse').classList.remove('hidden');return;}
   curQ=DB.quizzes.find(q=>q.id===selQid);if(!curQ)return;
+  if(!NOM_ID&&vencido(curQ.vence)){mostrarVencido(curQ.vence);return;}
   if(curQ.id==='ctp-liderazgo'){const m=document.getElementById('modal-instructivo');if(m)m.style.display='flex';}
   document.getElementById('qnl').textContent=curQ.name;
   document.getElementById('qsl').textContent='👤 '+curS.name+' · 🏢 '+curS.empresa+' · 📅 '+curS.date;
@@ -1511,9 +1563,10 @@ async function submitQ(){
   const ua=curQ.questions.map((_,i)=>ans[i]);
   const corr=isSurvey?0:ua.filter((a,i)=>a===curQ.questions[i].answer).length;
   const score=isSurvey?0:Math.round(corr/tot*100);
-  const rec={id:Date.now()+'',quiz_id:curQ.id,quiz_name:curQ.name,student:curS.name,rut:curS.rut||'',email:curS.email||'',empresa:curS.empresa||'',date:curS.date,score,correct:corr,total:tot,answers:ua,enc1:isSurvey?null:encResp[0],enc2:isSurvey?null:encResp[1],enc3:isSurvey?null:encResp[2]};
+  const rec={id:Date.now()+'',quiz_id:curQ.id,quiz_name:curQ.name,student:curS.name,rut:curS.rut||'',email:curS.email||'',empresa:curS.empresa||'',date:curS.date,score,correct:corr,total:tot,answers:ua,enc1:isSurvey?null:encResp[0],enc2:isSurvey?null:encResp[1],enc3:isSurvey?null:encResp[2],nomina_id:NOM_ID||null};
   try{
     const {error}=await sb.from('results').insert([rec]);
+    if(error&&String(error.message||'').includes('QR_VENCIDO')){mostrarVencido(null);return;}
     if(error){
       console.error('Error guardando resultado:',error);
       alert('Hubo un problema guardando tu respuesta. Por favor avisa al administrador. Detalle: '+error.message);
@@ -1644,6 +1697,7 @@ function cerrarNom(){
 function showCrearNomina(){
   const sel=document.getElementById('nom-quiz');
   sel.innerHTML=DB.quizzes.map(q=>`<option value="${q.id}">${q.name}</option>`).join('');
+  document.getElementById('nom-vence').value=sumarDias(3);
   document.getElementById('nom-form').classList.remove('hidden');
 }
 
@@ -1681,6 +1735,7 @@ function renderNominas(){
           <button class="btn btn-ghost btn-sm" onclick="eliminarNomina('${n.id}')">&#128465; Eliminar</button>
         </div>
       </div>
+      <div style="margin-top:.6rem;display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:12px">${badgeVence(n.vence)}<span style="margin-left:6px">Vence:</span><input type="date" id="vn-${n.id}" value="${n.vence||''}" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit"><button class="btn btn-outline btn-sm" onclick="guardarVenceNom('${n.id}')">Guardar</button></div>
       <div style="margin-top:.75rem;padding:.75rem;background:#f8f9fb;border-radius:8px;font-size:11px;color:var(--textLight);word-break:break-all">${url}</div>
       <div style="margin-top:.75rem;display:flex;gap:.5rem;flex-wrap:wrap">
         <button class="btn btn-navy btn-sm" onclick="verQRNomina('${n.id}','${n.empresa}')">&#128202; Ver QR</button>
@@ -1695,13 +1750,14 @@ async function guardarNomina(){
   const fecha=document.getElementById('nom-fecha').value;
   const quizId=document.getElementById('nom-quiz').value;
   const raw=document.getElementById('nom-participantes').value.trim();
+  const vence=document.getElementById('nom-vence').value;
   const err=document.getElementById('nom-err');
-  if(!empresa||!quizId||!raw){err.textContent='Completa todos los campos.';err.classList.remove('hidden');return;}
-  const participantes=raw.split('\n').map(l=>{const[rut,...n]=l.split(';');return{rut:rut.trim(),nombre:n.join(';').trim()};}).filter(p=>p.rut&&p.nombre);
-  if(!participantes.length){err.textContent='Agrega al menos un participante con formato RUT;Nombre.';err.classList.remove('hidden');return;}
+  if(!empresa||!quizId||!vence){err.textContent='Completa empresa, evaluación y fecha de vencimiento.';err.classList.remove('hidden');return;}
+  const participantes=raw?raw.split('\n').map(l=>{const[rut,...n]=l.split(';');return{rut:rut.trim(),nombre:n.join(';').trim()};}).filter(p=>p.rut&&p.nombre):[];
+  if(raw&&!participantes.length){err.textContent='Formato de participantes incorrecto. Usa RUT;Nombre por línea, o deja el campo vacío.';err.classList.remove('hidden');return;}
   err.classList.add('hidden');
   try{
-    const {data,error}=await sb.from('nominas').insert({empresa,fecha_inicio:fecha||null,quiz_id:quizId,participantes}).select().single();
+    const {data,error}=await sb.from('nominas').insert({empresa,fecha_inicio:fecha||null,quiz_id:quizId,participantes,vence}).select().single();
     if(error)throw error;
     document.getElementById('nom-form').classList.add('hidden');
     document.getElementById('nom-empresa').value='';
@@ -1875,6 +1931,8 @@ function renderQR(){
     <h3>${q.name}</h3><p>${q.questions.length} preguntas</p>
     <div class="qr-wrap"><canvas id="qrc-${q.id}" width="160" height="160"></canvas></div>
     <div class="qr-url">${qUrl(q.id)}</div>
+    <div style="margin-bottom:.25rem">${badgeVence(q.vence)}</div>
+    <div class="venc-row"><span>Vence:</span><input type="date" id="vq-${q.id}" value="${q.vence||''}"><button class="btn btn-outline btn-sm" onclick="guardarVenceQuiz('${q.id}')">Guardar</button></div>
     <div class="qr-actions">
       <button class="btn btn-navy btn-sm" onclick="openModal('${q.id}')">🖨 Imprimir</button>
       <button class="btn btn-outline btn-sm" onclick="dlQR('${q.id}','${q.name.replace(/'/g,'')}')">⬇ PNG</button>
@@ -2580,9 +2638,8 @@ function editarNomina(id){
 async function guardarEdicionNomina(){
   const raw=document.getElementById('edit-nom-participantes').value.trim();
   const err=document.getElementById('edit-nom-err');
-  if(!raw){err.textContent='Agrega al menos un participante.';err.classList.remove('hidden');return;}
-  const participantes=raw.split('\n').map(l=>{const[rut,...n]=l.split(';');return{rut:rut.trim(),nombre:n.join(';').trim()};}).filter(p=>p.rut&&p.nombre);
-  if(!participantes.length){err.textContent='Formato incorrecto. Usa RUT;Nombre por línea.';err.classList.remove('hidden');return;}
+  const participantes=raw?raw.split('\n').map(l=>{const[rut,...n]=l.split(';');return{rut:rut.trim(),nombre:n.join(';').trim()};}).filter(p=>p.rut&&p.nombre):[];
+  if(raw&&!participantes.length){err.textContent='Formato incorrecto. Usa RUT;Nombre por línea.';err.classList.remove('hidden');return;}
   err.classList.add('hidden');
   try{
     await sb.from('nominas').update({participantes}).eq('id',editNominaId);

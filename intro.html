@@ -187,6 +187,14 @@ const VIDEOS = {
   'inteligencia-artificial': 'EFGXcPvM3MY'
 };
 
+function hoyCL(){return new Date().toLocaleDateString('en-CA',{timeZone:'America/Santiago'});}
+function fmtFecha(v){const[y,m,d]=String(v).slice(0,10).split('-');return d+'-'+m+'-'+y;}
+function qrVencido(v){
+  if(!v || hoyCL() <= v) return false;
+  mostrarError('Este código QR venció el ' + fmtFecha(v) + '. Para rendir la evaluación, contacta a GP Empresas.');
+  return true;
+}
+
 let nomId = null;
 let quizId = null;
 let countdownTimer = null;
@@ -200,8 +208,9 @@ async function init() {
   if (quizParam) {
     quizId = quizParam;
     try {
-      const { data: qData } = await sb.from('quizzes').select('name').eq('id', quizId).single();
+      const { data: qData } = await sb.from('quizzes').select('name,vence').eq('id', quizId).single();
       if (qData) document.getElementById('curso-nombre').textContent = qData.name;
+      if (qData && qrVencido(qData.vence)) return;
     } catch(e) {}
     const videoId = VIDEOS[quizId];
     if (videoId) {
@@ -220,8 +229,9 @@ async function init() {
   }
 
   try {
-    const { data, error } = await sb.from('nominas').select('quiz_id').eq('id', nomId).single();
+    const { data, error } = await sb.from('nominas').select('quiz_id,vence').eq('id', nomId).single();
     if (error || !data) throw new Error('Nómina no encontrada');
+    if (qrVencido(data.vence)) return;
 
     quizId = data.quiz_id;
 
