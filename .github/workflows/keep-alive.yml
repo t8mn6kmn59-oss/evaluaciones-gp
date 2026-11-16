@@ -2,16 +2,49 @@ name: Keep Supabase Alive
 
 on:
   schedule:
-    - cron: '0 9 * * 1,3,5'
+    - cron: '0 13 * * *'
   workflow_dispatch: {}
+
+permissions:
+  contents: write
 
 jobs:
   ping-supabase:
     runs-on: ubuntu-latest
     steps:
-      - name: Consulta simple a Supabase para mantenerlo activo
+      - name: Consulta real a la base de Supabase para mantenerla activa
+        env:
+          # La clave "anon" es publica (ya esta en index.html). Si existe el secreto, se usa ese.
+          ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6dHFmdmFrc3VycXltYmZ3Y2tiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwOTUzMzcsImV4cCI6MjA5MzY3MTMzN30.WBLF5Zuih2mvEXKQp7ozZjJFNoKEb_fDYZ8mxq0hjwQ' }}
         run: |
-          curl -s -o /dev/null -w "HTTP %{http_code}\n" \
-            "https://xztqfvaksurqymbfwckb.supabase.co/rest/v1/quizzes?select=id&limit=1" \
-            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}"
+          URL="https://xztqfvaksurqymbfwckb.supabase.co/rest/v1"
+          for TABLA in quizzes results nominas; do
+            CODE=$(curl -s --retry 3 --retry-delay 10 -o /dev/null -w "%{http_code}" \
+              "$URL/$TABLA?select=id&limit=1" \
+              -H "apikey: $ANON_KEY" -H "Authorization: Bearer $ANON_KEY" || true)
+            echo "$TABLA -> HTTP $CODE"
+            if [ "$CODE" != "200" ]; then
+              echo "::error::Supabase no respondio bien ($TABLA HTTP $CODE). Revisa si el proyecto esta pausado."
+              exit 1
+            fi
+          done
+
+      # GitHub apaga los workflows programados si el repo pasa 60 dias sin cambios.
+      # El dia 1 de cada mes se guarda la fecha en un archivo para que el repo
+      # siga "activo" y este keep-alive no se desactive nunca.
+      - uses: actions/checkout@v4
+
+      - name: Marca mensual para que GitHub no desactive este workflow
+        run: |
+          DIA=$(date -u +%d)
+          if [ "$DIA" = "01" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            mkdir -p .github
+            date -u +"%Y-%m-%d %H:%M UTC" > .github/keep-alive-ultimo.txt
+            git config user.name "keep-alive-bot"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add .github/keep-alive-ultimo.txt
+            git commit -m "keep-alive: marca mensual" || echo "Sin cambios"
+            git push
+          else
+            echo "Hoy no toca la marca mensual (dia $DIA)."
+          fi
